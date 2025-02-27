@@ -16,13 +16,15 @@
 ## Requisitos
 [//]:  -Creación del mapa y las conexiones entre las distintas regiones (José Francisco Hurtado Valero) 
 
+-Generación aleatoria de recursos y distribución por el mapa (José Francisco Hurtado Valero)
+
 -Creación de un sistema de combate (Sergio Azorín Julián) 
 
 -Gestión de las familias y el procesamiento de los recursos (Carlos Peñalver Mora) 
 
 -Creación de los diferentes tipos de edificios y sus niveles (Carlos Peñalver Mora) 
 
--Creación de un mapa gráfico interactivo (Mario Berná Berná) 
+-Creación de un mapa gráfico (Mario Berná Berná) 
 
 -Guardados de partida en formato binario y JSON (Tomás Marzullo) 
 
