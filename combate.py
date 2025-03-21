@@ -1,32 +1,95 @@
-from tropas import *
+#TROPAS
+
+
+
+class Tropa(ABC):
+    def __init__(self, numero: int, recursos: int, nombre:str , puntos_vida: float, ataque: float):
+
+        self.nombre = nombre
+        self.puntos_vida = puntos_vida
+        self.ataque = ataque
+        self.numero=numero
+        self.recursos=recursos
+
+
+
+# -----------------------------------------------
+# CLASES INTERMEDIAS
+# -----------------------------------------------
+
+class TropaAtaque(Tropa):
+    def __init__(self, numero: int, recursos: int, nombre:str , puntos_vida: float, ataque: float):
+        super().__init__(numero, recursos,nombre, puntos_vida, ataque)
+
+
+
+
+
+class TropaDefensa(Tropa):
+    def __init__(self, numero: int, recursos: int, nombre: str, puntos_vida: float, ataque: float):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+
+
+
+class TropaApoyo(Tropa):
+    def __init__(self, numero: int, recursos: int, nombre: str, puntos_vida: float, ataque: float):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+# TROPAS DE ATAQUE
+class Soldado(TropaAtaque):
+    Soldados={}
+    def __init__(self, numero: int, recursos=50, nombre='Soldado', puntos_vida=100, ataque=100):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+class Caballero(TropaAtaque):
+    Caballeros={}
+    def __init__(self, numero: int, recursos= 70, nombre='Caballero', puntos_vida=200, ataque=85):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+class Arquero(TropaAtaque):
+    Arqueros={}
+    def __init__(self, numero: int, recursos=80, nombre='Arquero', puntos_vida=50, ataque=150):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+# TROPAS DE DEFENSA
+class Ballestero(TropaDefensa):
+    Ballesteros={}
+    def __init__(self, numero: int, recursos=100, nombre='Ballestero', puntos_vida=300, ataque=70):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+# TROPAS DE CURACION
+class Mago(TropaApoyo):
+    Magos={}
+    def __init__(self, numero: int, recursos=110, nombre='Mago', puntos_vida=100, ataque=110):
+        super().__init__(numero, recursos, nombre, puntos_vida, ataque)
+
+
+
+
+
+Mago1=Mago(5)
+Mago2=Mago(4)
+Caballero1=Caballero(4)
+Caballero2=Caballero(3)
+Ballestero1=Ballestero(3)
+Ballestero2=Ballestero(3)
+
+
+
+
 class Combate:
     escenario_batalla={'atacantes':['','',''],'defensores':['','','']}
     @staticmethod
-    def preparando_combate(tropas_ataque:dict,tropas_defensa:dict):
+    def preparando_batalla(tropas_ataque,tropas_defensa):
+        
 
-        Combate.escenario_batalla["atacantes"]=['','','']
-        for j in range(1,3):
-            for _ in range(0,2):
-                if tropas_ataque[list(tropas_ataque.keys())[j]]==j+1:
-                    Combate.escenario_batalla['atacantes'].append(list(tropas_ataque.keys())[j])
-
-
-
-        Combate.escenario_batalla["defensores"] = ['','','']
-
-        for i in range(1,3):
-            for _ in range(0,2):
-                if tropas_ataque[list(tropas_ataque.keys())[i]] == i:
-                    Combate.escenario_batalla['defensores'].append(list(tropas_ataque.keys())[i])
-        print(Combate.escenario_batalla)
-    @staticmethod
-    def inicio_combate(tropas_ataque:dict,tropas_defensa:dict):
-
-
-
-
-Combate.preparando_combate(tropas_ataque,tropas_defensa)
-Combate.inicio_combate(tropas_ataque,tropas_defensa)
 
 
 
