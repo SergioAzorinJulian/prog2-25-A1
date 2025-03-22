@@ -247,9 +247,13 @@ class Mapa:
         terrenos_disponibles = ['terreno1', 'terreno2', 'terreno3', 'terreno4', 'terreno5', 'terreno6', 'terreno7', 'terreno8','terrenoN']
 
         if terrenos: # Si el usuario me ha pasado un listado de terrenos especificos
-            for terreno in terrenos: # Iteramos sobre el listado para verificar si todos los terrenos existen en el juego o no
-                if terreno not in terrenos_disponibles: # Si se detecta algun terreno que no existe, se lanza una excepcion
-                    raise ValueError(f'El terreno {terreno} no existe en el juego')
+            try:
+                for terreno in terrenos:  # Iteramos sobre el listado para verificar si todos los terrenos existen en el juego o no
+                    if terreno not in terrenos_disponibles:  # Si se detecta algun terreno que no existe, se lanza una excepcion
+                        raise ValueError(f'El terreno {terreno} no existe en el juego')
+            except ValueError as e: # Capturamos la excepcion
+                print(e)
+                return {} # Devolvemos un diccionario vacio para mantener la consistencia de los datos
 
         nodos_disponibles: List[tuple[int, int]] = deepcopy(list(nodos_conectados.keys())) # Copia del listado de nodos (claves del diccionario)
         # Lo convertimos a lista para poder iterar, eliminar elementos, ...
@@ -305,7 +309,7 @@ mapa1 = Mapa(7, 7)
 nod = mapa1.crear_nodos()
 conex = mapa1.crear_aristas(nod)
 print(mapa1.anyadir_terreno(conex))
-print(mapa1.get_conexiones())
+mapa1.get_conexiones()
 
 print(f'\n{mapa1.get_terrenos()}')
 
