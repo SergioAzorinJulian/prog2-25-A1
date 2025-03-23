@@ -50,6 +50,6 @@ class GestorFamilias:
         return nueva_familia
 
     def mostrar_familias(self):
-        print("Listado de familias:")
+        print("Registro de familias:")
         for familia in self.familias:
             print(familia)
