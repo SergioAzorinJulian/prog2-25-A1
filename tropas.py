@@ -11,16 +11,11 @@ class Tropa(ABC):
 
     @abstractmethod
     def atacar(self, objetivo: "Tropa"):
-        print(f"{self.nombre} ataca a {objetivo.nombre}")
-        dano = self.ataque - objetivo.defensa
-        objetivo.recibir_dano(dano)
+        pass
 
     @abstractmethod
     def recibir_dano(self, dano: float):
-        self.puntos_vida -= dano
-        print(f"{self.nombre} fue atacado y recibe {dano} de daño. Vida restante: {self.puntos_vida}")
-        if self.puntos_vida <= 0:
-            print(f"{self.nombre} ha sido derrotado.")
+        pass
 
 
 # -----------------------------------------------
@@ -36,9 +31,16 @@ class TropaAtaque(Tropa):
 
     def atacar(self, objetivo: "Tropa"):
         super().atacar(objetivo)
+        print(f"{self.nombre} ataca a {objetivo.nombre}")
+        dano = self.ataque - objetivo.defensa
+        objetivo.recibir_dano(dano)
 
     def recibir_dano(self, dano: float):
         super().recibir_dano(dano)
+        self.puntos_vida -= dano
+        print(f"{self.nombre} fue atacado y recibe {dano} de daño. Vida restante: {self.puntos_vida}")
+        if self.puntos_vida <= 0:
+            print(f"{self.nombre} ha sido derrotado.")
 
     def ataque_especial(self, objetivo: "Tropa"):
         dano = self.ataque * 1.5
@@ -55,6 +57,9 @@ class TropaDefensa(Tropa):
 
     def atacar(self, objetivo: "Tropa"):
         super().atacar(objetivo)
+        print(f"{self.nombre} ataca a {objetivo.nombre}")
+        dano = self.ataque - objetivo.defensa
+        objetivo.recibir_dano(dano)
 
     def recibir_dano(self, dano: float):
         """ Reduccion de daño por alta defensa """
@@ -71,9 +76,16 @@ class TropaApoyo(Tropa):
 
     def atacar(self, objetivo: "Tropa"):
         super().atacar(objetivo)
+        print(f"{self.nombre} ataca a {objetivo.nombre}")
+        dano = self.ataque - objetivo.defensa
+        objetivo.recibir_dano(dano)
 
     def recibir_dano(self, dano: float):
         super().recibir_dano(dano)
+        self.puntos_vida -= dano
+        print(f"{self.nombre} fue atacado y recibe {dano} de daño. Vida restante: {self.puntos_vida}")
+        if self.puntos_vida <= 0:
+            print(f"{self.nombre} ha sido derrotado.")
 
     def curar(self, aliado : "Tropa"):
         if aliado.puntos_vida > 0:
@@ -82,16 +94,18 @@ class TropaApoyo(Tropa):
         else:
             print(f"{aliado.nombre} fue derrotado y no puede ser curado.")
 
+    def revivir_aliado(self, aliado= "Tropa"):
+        if aliado.puntos_vida <= 0:
+            aliado.puntos_vida = self.curaciones    #--> revive con la vida que tiene de curaciones el curador
+            print(f"{self.nombre} ha revivido a {aliado.nombre} con {self.curaciones} de vida.")
+        else:
+            print(f"{aliado.nombre} todavia sigue vivo, no puede ser revivido.")
+
 # -----------------------------------------------
 # CLASES ESPECIFICAS DE TROPAS
 # -----------------------------------------------
 
 # TROPAS DE ATAQUE
-class Soldado(TropaAtaque):
-    def __init__(self):
-        super().__init__("Soldado", puntos_vida=100.00, ataque=10.00, defensa=5.00, bono_ataque=3.00)
-
-
 class Caballero(TropaAtaque):
     def __init__(self):
         super().__init__("Caballero", puntos_vida=80.00, ataque=12.50, defensa=6.00, bono_ataque=2.50)
@@ -107,8 +121,16 @@ class Ballestero(TropaDefensa):
     def __init__(self):
         super().__init__("Ballestero", puntos_vida=70.00, ataque=8.00, defensa=15.00, armadura_extra=5.00)
 
+class Escudero(TropaDefensa):
+    def __init__(self):
+        super().__init__("Escudero", puntos_vida=120.00, ataque=6.00, defensa=18.00, armadura_extra=8.00)
+
 
 # TROPAS DE CURACION
 class Mago(TropaApoyo):
     def __init__(self):
         super().__init__("Mago", puntos_vida=50.00, ataque=8.00, defensa=4.00, curaciones=20.00)
+
+class Sacerdote(TropaApoyo):
+    def __init__(self):
+        super().__init__("Sacerdote", puntos_vida=70.00, ataque=5.00, defensa=6.50, curaciones=25.00)
