@@ -6,10 +6,11 @@ class Region:
         self._propietario: str = 'Neutral'
         self._tipo_terreno = tipo_terreno
         self._es_reino = es_reino
-        self._recursos = recursos_base# if recursos_base else self._genera_recursos_aleatorios()
+        self._recursos = recursos_base
         self._edificios: dict = {}
         self._tropas: dict = {}
         self._conexiones: list = []
+        self._lugar_especial: str | None = None
 
     ### GETTERS ###
     def get_posicion(self):
@@ -36,6 +37,9 @@ class Region:
     def get_conexiones(self):
         return deepcopy(self._conexiones)
 
+    def get_lugar_especial(self):
+        return self._lugar_especial
+
 
     ### SETTERS ###
     def set_posicion(self, nueva_posicion: tuple[int, int]):
@@ -50,13 +54,20 @@ class Region:
     def set_es_reino(self, nuevo_es_reino: bool):
         self._es_reino = nuevo_es_reino
 
+    def set_recursos(self, nuevo_recursos: dict):
+        self._recursos = nuevo_recursos
+
+    def set_edificio(self, nuevo_edificios: dict):
+        self._edificios = nuevo_edificios
+
+    def set_tropas(self, nueva_tropas: dict):
+        self._tropas = nueva_tropas
+
     def set_conexiones(self, nueva_conexiones: list):
         self._conexiones = nueva_conexiones
 
-
-    ### METODO PARA GENERAR RECURSOS ALEATORIOS ###
-    #def _genera_recursos_aleatorios(self) -> dict:
-    #    return {}
+    def set_lugar_especial(self, nuevo_lugar: str):
+        self._lugar_especial = nuevo_lugar
 
 
     ### METODOS PARA EDIFICIOS ###
@@ -71,6 +82,7 @@ class Region:
         if nombre in self._edificios:
             del self._edificios[nombre]
 
+    ### METODOS PARA TROPAS ###     
     def agregar_tropa(self, tipo: str, cantidad: int):
         if tipo in self._tropas:
             self._tropas[tipo] += cantidad
