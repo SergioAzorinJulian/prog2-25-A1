@@ -1,4 +1,5 @@
 
+
 class Edificio:
     def __init__(self, nombre: str, nivel: int, costo_mejora: dict, familias_asignadas: int):
         self.nombre = nombre
