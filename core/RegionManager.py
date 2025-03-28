@@ -36,21 +36,29 @@ class RegionManager:
         for region in self.regiones:
             recursos = {}
 
+            if region.get_es_reino(): # Si la region en cuestion es un reino ...
+                # 80% de probabilidades para obtener 3 recursos en un reino, 20% de obtener 4 recursos
+                cantidad = 3 if random.random() < 0.8 else 4
 
-            if region.get_es_reino(): # Si la region es un reino, se le asignan sus tres recursos basicos
+                # Recursos base que estaran en todos los reinos
                 recursos["oro"] = random.randint(100, 300)
                 recursos["agua"] = random.randint(200, 500)
-                comida = random.choice(["caza", "recolección"]) # Se selecciona aleatoriamente un tipo de comida
+                comida = random.choice(["caza", "recolección"])
                 recursos[comida] = random.randint(200, 500)
+
+                cantidad -= 3  # Ya hemos asignado 3 recursos base, si hay extra, se sumarán con seleccionar_recursos()
             # No contabilizamos si un recurso (comida o agua) ha aparecido en un reino
             # porque siempre apareceran, lo haremos solo en las zonas neutras
 
-            elif self.es_colindante_con_reino(region):  # Si la región colinda con un reino, tendrá 2 recursos
-                recursos.update(self.seleccionar_recursos(2))
+            elif self.es_colindante_con_reino(region): # Si la region colinda con un reino ...
+                # 60% de probabilidad de obtener 2 recursos, 40% de obtener 3 recursos
+                cantidad = 2 if random.random() < 0.6 else 3
 
-            else:  # Si la región no colinda con un reino, tendrá solo 1 recurso
-                recursos.update(self.seleccionar_recursos(1))
+            else: # Si no colinda con ningun reino ...
+                # 70% de probabilidad de obtener 1 recursos, 30% de obtener 2 recursos
+                cantidad = 1 if random.random() < 0.7 else 2
 
+            recursos.update(self.seleccionar_recursos(cantidad))
             region.set_recursos(recursos) # Asignamos los recursos a la region correspondiente
 
 
@@ -141,10 +149,14 @@ class RegionManager:
 
 
     def mostrar_regiones_con_lugares(self):
-        """Muestra todas las regiones que tienen un lugar especial."""
+        """Devuelve una lista con la información de cada región."""
+        info_regiones = []
         for region in self.regiones:
-            if region.get_lugar_especial():
-                propietario = region.get_propietario() or "Neutral"
-                print(f"Región {region.get_posicion()} ({propietario}) tiene un {region.get_lugar_especial()}")
-
-
+            info = (
+                f"Región: {region.get_nombre()} - Propietario: {region.get_propietario()}\n"
+                f"Recursos: {', '.join(region.get_recursos()) if region.get_recursos() else 'Ninguno'}\n"
+                f"Conexiones: {', '.join([r.get_nombre() for r in region.get_conexiones()])}\n"
+                "-------------------------------------------------"
+            )
+            info_regiones.append(info)
+        return info_regiones
