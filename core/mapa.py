@@ -1,3 +1,5 @@
+from core.region_manager import RegionManager
+
 from random import randint, choice
 from typing import List, Dict
 from copy import deepcopy
@@ -79,6 +81,10 @@ class Mapa:
         self._columnas = columnas # Numero de columnas del mapa
         self._conexiones:dict = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
         self._terrenos: dict = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
+        self.regiones = {}
+
+        # Crear instancia de RegionManager con referencia a este mapa
+        self.region_manager = RegionManager(self)
 
     """def asigna_zonas(self):
         
@@ -305,12 +311,30 @@ class Mapa:
 
         return resultado
 
+
+    def __str__(self):
+        map_str = ''
+        for fila in range(self._filas):
+            for columna in range(self._columnas):
+                punto = (fila, columna)  # Posición actual en el mapa
+                if punto in self._terrenos:
+                    map_str += f"{self._terrenos[punto]} "
+                else:
+                    map_str += "None "
+            map_str += '\n'  # Nueva línea al final de cada fila
+        return map_str
+
+
+"""
+### PRUEBAS ###
+
 mapa1 = Mapa(7, 7)
+print(mapa1)
 nod = mapa1.crear_nodos()
 conex = mapa1.crear_aristas(nod)
 print(mapa1.anyadir_terreno(conex))
 mapa1.get_conexiones()
-
+print(mapa1)
 print(f'\n{mapa1.get_terrenos()}')
 
 # Mostramos la distribucion de los terrenos en el mapa
@@ -321,4 +345,4 @@ for fil in range(mapa1.get_filas()):
         if nod in mapa1.get_terrenos(): # Buscamos que terreno tiene en el diccionario de terrenos (esta desordenado)
             print(mapa1.get_terrenos()[nod], end = ' ')
 
-    print()
+    print()"""
