@@ -108,44 +108,6 @@ class Region:
         self._lugar_especial = nuevo_lugar
 
 
-    ### METODOS PARA EDIFICIOS ###
-    def construir_edificio(self, nombre: str, nivel: int = 1):
-        """Añade un edificio o mejora su nivel."""
-        try:
-            if nombre in self._edificios:
-                self._edificios[nombre] += 1
-            else:
-                self._edificios[nombre] = nivel
-        except Exception as e:
-            print('Error al construir edificio:', e)
-
-    def eliminar_edificio(self, nombre: str):
-        try:
-            if nombre in self._edificios:
-                del self._edificios[nombre]
-        except Exception as e:
-            print('Error al eliminar edificio:', e)
-
-    ### METODOS PARA TROPAS ###     
-    def agregar_tropa(self, tipo: str, cantidad: int):
-        try:
-            if tipo in self._tropas:
-                self._tropas[tipo] += cantidad
-            else:
-                self._tropas[tipo] = cantidad
-        except Exception as e:
-            print('Error al agregar tropa:', e)
-
-    def eliminar_tropa(self, tipo: str, cantidad: int):
-        try:
-            if tipo in self._tropas:
-                self._tropas[tipo] -= cantidad
-                if self._tropas[tipo] <= 0:
-                    del self._tropas[tipo]
-        except Exception as e:
-            print('Error al eliminar tropa:', e)
-
-
     ### METODO PARA MOSTRAR INFORMACION SOBRE LA REGION ###
     def __str__(self) -> str:
         return (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | "

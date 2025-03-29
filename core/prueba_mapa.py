@@ -81,18 +81,6 @@ try:
     RegionManager.asignar_propietario_a_region(region_especifica, "Jugador1")
     print(f"\nPropietario asignado a la región {region_especifica.get_posicion()}: {region_especifica.get_propietario()}")
 
-    # Construir un edificio en la región específica
-    region_especifica.construir_edificio("Cuartel", nivel=1)
-    print(f"\nEdificios en la región {region_especifica.get_posicion()}: {region_especifica.get_edificios()}")
-
-    # Agregar tropas a la región específica
-    region_especifica.agregar_tropa("Infantería", cantidad=100)
-    print(f"\nTropas en la región {region_especifica.get_posicion()}: {region_especifica.get_tropas()}")
-
-    # Eliminar tropas de la región específica
-    region_especifica.eliminar_tropa("Infantería", cantidad=50)
-    print(f"\nTropas en la región {region_especifica.get_posicion()} después de eliminar: {region_especifica.get_tropas()}")
-
     # Verificar recursos faltantes y forzar su aparición
     mapa.region_manager.verificar_recursos_faltantes()
 
@@ -104,4 +92,3 @@ try:
 except Exception as e:
     print(f"Error durante la ejecución del mapa: {e}")
 """
-
