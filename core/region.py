@@ -1,7 +1,45 @@
 from copy import deepcopy
 
 class Region:
+    """
+    Clase que representa una región del mapa.
+
+    Attributes
+    ----------
+    _posicion : tuple[int, int]
+        Coordenadas de la región en el mapa.
+    _propietario : str
+        Nombre del propietario de la región.
+    _tipo_terreno : str
+        Tipo de terreno de la región.
+    _es_reino : bool
+        Indica si la región es un reino.
+    _recursos : dict
+        Recursos disponibles en la región.
+    _edificios : dict
+        Edificios construidos en la región.
+    _tropas : dict
+        Tropas presentes en la región.
+    _conexiones : list
+        Lista de conexiones con otras regiones.
+    _lugar_especial : str or None
+        Lugar especial presente en la región.
+    """
+
     def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: dict = None):
+        """
+        Parameters
+        ----------
+        posicion : tuple[int, int]
+            Coordenadas de la región en el mapa.
+        tipo_terreno : str
+            Tipo de terreno de la región.
+        es_reino : bool, optional
+            Indica si la región es un reino (por defecto es False).
+        recursos_base : dict, optional
+            Recursos iniciales de la región (por defecto es None).
+        """
+
         self._posicion = posicion
         self._propietario: str = 'Neutral'
         self._tipo_terreno = tipo_terreno
@@ -73,28 +111,39 @@ class Region:
     ### METODOS PARA EDIFICIOS ###
     def construir_edificio(self, nombre: str, nivel: int = 1):
         """Añade un edificio o mejora su nivel."""
-        if nombre in self._edificios:
-            self._edificios[nombre] += 1
-        else:
-            self._edificios[nombre] = nivel
+        try:
+            if nombre in self._edificios:
+                self._edificios[nombre] += 1
+            else:
+                self._edificios[nombre] = nivel
+        except Exception as e:
+            print('Error al construir edificio:', e)
 
     def eliminar_edificio(self, nombre: str):
-        if nombre in self._edificios:
-            del self._edificios[nombre]
+        try:
+            if nombre in self._edificios:
+                del self._edificios[nombre]
+        except Exception as e:
+            print('Error al eliminar edificio:', e)
 
     ### METODOS PARA TROPAS ###     
     def agregar_tropa(self, tipo: str, cantidad: int):
-        if tipo in self._tropas:
-            self._tropas[tipo] += cantidad
-        else:
-            self._tropas[tipo] = cantidad
+        try:
+            if tipo in self._tropas:
+                self._tropas[tipo] += cantidad
+            else:
+                self._tropas[tipo] = cantidad
+        except Exception as e:
+            print('Error al agregar tropa:', e)
 
     def eliminar_tropa(self, tipo: str, cantidad: int):
-        if tipo in self._tropas:
-            self._tropas[tipo] -= cantidad
-
-            if self._tropas[tipo] <= 0:
-                del self._tropas[tipo]
+        try:
+            if tipo in self._tropas:
+                self._tropas[tipo] -= cantidad
+                if self._tropas[tipo] <= 0:
+                    del self._tropas[tipo]
+        except Exception as e:
+            print('Error al eliminar tropa:', e)
 
 
     ### METODO PARA MOSTRAR INFORMACION SOBRE LA REGION ###
@@ -104,11 +153,11 @@ class Region:
                 f"Recursos: {self._recursos} | "
                 f"Edificios: {self._edificios} | Tropas: {self._tropas}")
 
-region1 = Region((1, 2), 'bosque', recursos_base = {'oro': 100})
+    def __repr__(self) -> str:
+        """Returns a string representation of the region for debugging."""
+        return f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self._recursos})"
 
-region1.construir_edificio('Horno', 2)
-region1.agregar_tropa('mago', 2)
-print(region1)
+
 
 
 

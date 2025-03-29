@@ -1,4 +1,5 @@
 from core.region_manager import RegionManager
+from core.region import Region
 
 from random import randint, choice
 from typing import List, Dict
@@ -58,6 +59,8 @@ class Mapa:
     def __init__(self, filas: int, columnas: int):
 
         """
+        Inicializa una instancia de la clase Mapa.
+
         Parameters
         ----------
         filas : int
@@ -75,10 +78,16 @@ class Mapa:
             Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor.
         self._terrenos : dict
             Diccionario con los nodos como clave y el tipo de terreno como valor.
+        self.regiones : dict
+            Diccionario con las regiones del mapa.
+        self.region_manager : RegionManager
+            Instancia de la clase RegionManager encargada de gestionar las regiones y sus recursos.
         """
 
-        self._filas = filas # Numero de filas del mapa
-        self._columnas = columnas # Numero de columnas del mapa
+        self._filas = 0 # Inicializamos el numero de filas a 0
+        self._columnas = 0 # Inicializamos el numero de columnas a 0
+        self.set_filas(filas) # Verificamos que el valor que nos pasa el usuario es valido y lo establecemos
+        self.set_columnas(columnas) # Verificamos que el valor que nos pasa el usuario es valido y lo establecemos
         self._conexiones:dict = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
         self._terrenos: dict = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
         self.regiones = {}
@@ -86,49 +95,112 @@ class Mapa:
         # Crear instancia de RegionManager con referencia a este mapa
         self.region_manager = RegionManager(self)
 
-    """def asigna_zonas(self):
-        
-        mapa_conexiones = []
-        
-        # Si es 1 -> izquierda/derecha. Si es 0 -> arriba/abajo
-        #orientacion_reino = randint(2)
-
-        
-
-        if orientacion_reino: # orientacion_reino != 0 -> 1
-            pass
-        
-        else: # orientacion_reino == 0
-            # Generamos aleatoriamente la posicion de la columna los reinos 
-            #reino_1 = (0, randint(self.columnas)) # Primera fila
-            #reino_2 = (self.filas - 1, randint(self.columnas)) # Ultima fila
-            
-            for fila in range(self.filas):
-                for columna in range(self.columnas):
-                    
-                    mapa_conexiones.append((fila, columna))
-                    #if (fila, columna) == (reino_1 or reino_2):
-                    #    pass"""
 
     ### FUNCIONES PARA OBTENER LOS ATRIBUTOS PROTEGIDOS ###
     def get_filas(self) -> int:
+        """
+        Devuelve el número de filas del mapa.
+
+        Returns
+        -------
+        int
+            Número de filas del mapa.
+        """
+
         return self._filas
 
     def get_columnas(self) -> int:
+        """
+        Devuelve el número de columnas del mapa.
+
+        Returns
+        -------
+        int
+            Número de columnas del mapa.
+        """
+
         return self._columnas
 
     def get_conexiones(self) -> dict:
+        """
+        Devuelve una copia del diccionario de conexiones del mapa.
+
+        Returns
+        -------
+        dict
+            Copia del diccionario de conexiones del mapa.
+        """
+
         return deepcopy(self._conexiones) # Importante lo de deepcopy para que no se modifique el diccionario original
 
     def get_terrenos(self) -> dict:
+        """
+        Devuelve una copia del diccionario de terrenos del mapa.
+
+        Returns
+        -------
+        dict
+            Copia del diccionario de terrenos del mapa.
+        """
+
         return deepcopy(self._terrenos) # Importante lo de deepcopy para que no se modifique el diccionario original
+
+    def get_regiones(self) -> dict:
+        """
+        Devuelve una copia del diccionario de regiones del mapa.
+
+        Returns
+        -------
+        dict
+            Una copia del diccionario de regiones del mapa.
+        """
+
+        return deepcopy(self.regiones)
 
     ### FUNCIONES PARA ESTABLECER NUEVOS VALORES A LOS ATRIBUTOS PROTEGIDOS ###
     def set_filas(self, filas: int):
-        self._filas = filas
+        """
+        Establece un nuevo valor para el número de filas del mapa.
+
+        Parameters
+        ----------
+        filas : int
+            Nuevo número de filas del mapa.
+
+        Raises
+        ------
+        ValueError
+            Si el número de filas es menor o igual a 0.
+        """
+
+        try:
+            if filas <= 0:
+                raise ValueError("El número de filas debe ser mayor que 0.")
+            self._filas = filas
+        except ValueError as e:
+            print(e)
 
     def set_columnas(self, columnas: int):
-        self._columnas = columnas
+        """
+        Establece un nuevo valor para el número de columnas del mapa.
+
+        Parameters
+        ----------
+        columnas : int
+            Nuevo número de columnas del mapa.
+
+        Raises
+        ------
+        ValueError
+            Si el número de columnas es menor o igual a 0.
+        """
+
+        try:
+            if columnas <= 0:
+                raise ValueError("El número de columnas debe ser mayor que 0.")
+            self._columnas = columnas
+        except ValueError as e:
+            print(e)
 
 
     def crear_nodos(self)-> List[tuple[int, int]]:
@@ -158,14 +230,14 @@ class Mapa:
         return mapa_nodos
 
 
-    def crear_aristas(self, nodos: List[tuple[int, int]], diagonales: bool = True) -> Dict[tuple[int, int], list[int]]:
+    def crear_aristas(self, nodos_mapa: List[tuple[int, int]], diagonales: bool = True) -> Dict[tuple[int, int], list[int]]:
 
         """
         Crea las aristas (conexiones) entre los nodos del mapa.
 
         Parameters
         ----------
-        nodos : list[tuple[int, int]]
+        nodos_mapa : list[tuple[int, int]]
             Listado de nodos del mapa representados como tuplas de coordenadas (fila, columna).
         diagonales : bool, optional
             Indica si se deben considerar conexiones diagonales entre los nodos (por defecto es True).
@@ -183,7 +255,7 @@ class Mapa:
 
         nodos_aristas: dict = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
 
-        for nodo_diagonal in nodos: # Iteramos sobre los nodos para calcular sus vecinos
+        for nodo_diagonal in nodos_mapa: # Iteramos sobre los nodos para calcular sus vecinos
 
             aristas: list = []  # Listado de aristas para cada nodo
 
@@ -311,8 +383,65 @@ class Mapa:
 
         return resultado
 
+    def asigna_zonas(self):
+
+        """
+        Asigna zonas y genera recursos para cada región del mapa.
+
+        Los reinos se dispondrán en los bordes del mapa, ya sea en los laterales o en la parte superior e inferior.
+        El resto de regiones se asignarán aleatoriamente.
+
+        See Also
+        --------
+        RegionManager : Clase encargada de gestionar las regiones y sus recursos.
+        Region : Clase que representa una región del mapa.
+
+        Notes
+        -----
+        La asignación de zonas incluye la creación de regiones, la definición de si son reinos o no,
+        y la generación de recursos para cada región.
+        """
+
+        # Si es 1 los reinos se dispondran uno a la izquierda y el otro a la derecha
+        # Si es 0 los reinos se dispondran uno arriba y el otro abajo
+        orientacion_reino = randint(0, 1)
+
+        if orientacion_reino:  # orientacion_reino != 0 -> 1 (izquierda/derecha)
+            # Generamos aleatoriamente la posicion de la fila de los reinos
+            # porque ya sabemos que la columna sera la primera y la ultima
+            reino_1 = (randint(0, self.get_filas() - 1), 0)  # Primera columna
+            reino_2 = (randint(0, self.get_filas() - 1), self.get_columnas() - 1)  # Última columna
+
+        else:  # orientacion_reino == 0 (arriba/abajo)
+            # Generamos aleatoriamente la posicion de la columna de los reinos
+            # porque ya sabemos que la fila sera la primera y la ultima
+            reino_1 = (0, randint(0, self.get_columnas() - 1))  # Primera fila
+            reino_2 = (self.get_filas() - 1, randint(0, self.get_columnas() - 1))  # Última fila
+
+        # Asignar regiones a los nodos del mapa
+        for fila in range(self.get_filas()):
+            for columna in range(self.get_columnas()):
+                punto = (fila, columna)
+                tipo_terreno = self._terrenos.get(punto, 'desconocido')
+                es_reino = punto == reino_1 or punto == reino_2
+                region = Region(punto, tipo_terreno, es_reino)
+                region.set_conexiones(self._conexiones.get(punto, []))
+                self.regiones[punto] = region
+
+        # Generar recursos para cada región
+        self.region_manager.regiones = self.regiones
+        self.region_manager.generar_recursos()
 
     def __str__(self):
+        """
+        Devuelve una representación en cadena del mapa con la distribución de terrenos.
+
+        Returns
+        -------
+        str
+            Representación en cadena del mapa con la distribución de terrenos.
+        """
+
         map_str = ''
         for fila in range(self._filas):
             for columna in range(self._columnas):
@@ -325,24 +454,4 @@ class Mapa:
         return map_str
 
 
-"""
-### PRUEBAS ###
 
-mapa1 = Mapa(7, 7)
-print(mapa1)
-nod = mapa1.crear_nodos()
-conex = mapa1.crear_aristas(nod)
-print(mapa1.anyadir_terreno(conex))
-mapa1.get_conexiones()
-print(mapa1)
-print(f'\n{mapa1.get_terrenos()}')
-
-# Mostramos la distribucion de los terrenos en el mapa
-print(f'\n\nMapa que representa la distribución de los terrenos:\n')
-for fil in range(mapa1.get_filas()):
-    for col in range(mapa1.get_columnas()):
-        nod = (fil, col) # Posicion actual en el mapa
-        if nod in mapa1.get_terrenos(): # Buscamos que terreno tiene en el diccionario de terrenos (esta desordenado)
-            print(mapa1.get_terrenos()[nod], end = ' ')
-
-    print()"""
