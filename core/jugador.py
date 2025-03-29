@@ -45,3 +45,5 @@ class Jugador:
         pass
     def actualizar_conquista():
         pass
+    def actualizar_tropas():
+        pass
