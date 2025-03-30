@@ -5,16 +5,34 @@ from tipos_recursos import Recurso
 '''
 PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
     VER MAPA GRÁFICO -> La idea seria mostrar tus zonas con una X, las de nadie con ? y las del enemigo con O (No es prioridad para el viernes)
+        Se podría quizá dibujar un grafo, pero ya se verá ... 
+    
     ACCEDER A ZONA:
         (SE MUESTRA LA INFORMACIÓN DE LA ZONA), Se actualiza self.region_actual a la zona que esta viendo
         AÑADIR TROPAS -> Se crean tropas en la zona actual, consume recursos:[] (escribir que recurso consume cada tropa el que lo sepa)
+            Tropas normales -> Comida y Agua
+            Tropas de asedio (elefantes y arietes) -> Comida, Agua y Madera
+            
         MOVER_TROPA -> Se mueve la tropa indicada a destino, es necesario implementar un método que permita restar cant a la instancia del obj tropa, y otro para sumarlo en caso de que en destino ya esté esa tropa
-        MOVER_BATALLÓN -> Lo mismo pero mueve todas las tropas de 1
+            Para movimientos dentro de tu dominio -> Puedes avanzar 2 (o 3, ya se ve en el desarrollo) "casillas" en un turno
+            Para movimientos en zonas neutras o enemigas -> Puedes avanzar una zona por turno
+            
+        MOVER_BATALLÓN -> Lo mismo pero mueve todas las tropas de una
+        
         CONSTRUIR EDIFICIO -> Construye edificios, escribir aquí edificios y recursos que consumen crearlos -> []
+        
         AÑADIR FAMILIA -> Añade familias, escribir aquí que recurso consume añadir cada familia -> []
+            Sistema de generación de familias:
+                Se parte de una cantidad inicial (6 o las que se definan) y cada 2 o 3 (o X) turnos se hace "recuento" de recursos del reino;
+                es decir, si se tiene comida y agua "de sobra" (superavit) vendra 1 o 2 (o Y) familias nuevas al reino; de igual manera, si para 
+                el turno X no tienes suficiente agua y comida para sustentar al pueblo (déficit) se empezaran a ir las familias del reino; pero 
+                más paulatinamente, porque sino podría llegar un punto crítico en el que no haya familias, y por tanto tampoco quien trabaje ...
+                
         VOLVER
+        
 Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territorio enemigo -> COMBATIR o ABORTAR
 '''
+
 #Recursos de region debe de ser una lista con los objetos recursos, no un diccionario
 #Tropas de region debería de ser una lista con el objeto el cual contenga su cantidad, añadir un método para poder sumar tropas y restar
 #Tropas tiene que tener un método que actualiza la cantidad tropas de la instancia y por ende su ataque en función de la vida que perdió ej: vida de 1 caballero 250, actualizar divide la vida total entre 250, redondear el número y esa es la cantidad
