@@ -1,12 +1,35 @@
 
 class Recurso():
+    '''
+    Con la clase recurso se crean los diferentes recursos
+     Attributos
+     -------------
+     creados: dict
+     atributo de clase que almacena los recursos creados
+     nombre: str
+     atributo de intancia, es el nombre del recurso
+     cantidad: int
+     atributo de instancia, es la cantidad de unidades del recurso
+     regeneracion: int
+     atribunto de instancia, es la cantidad de regeneracion del  recurso
+
+     Metodos
+     ---------
+     __init__: constructor de la instancia
+     __str__: muestra la info del objeto en formato str
+     dict: convierte la instancia en formato de diccionario
+     desde_dict: permite la construccion de la instancia desde la creacion de un diccionario con los datos
+     '''
+    creados = {}
     def __init__(self, nombre: str, cantidad:int, regeneracion: int): # constructor del objeto recurso
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
+        self.creados[self.nombre] = self.dict()
 
     def __str__(self) -> str:  # metodo para mostrar el recurso
-        return f'{self.nombre}: {self.cantidad} unidades (regeneracion: {self.regeneracion})'
+        return f'{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}'
+
 
     def dict(self) -> dict: # muestra la instancia en diccionario
         return {
@@ -16,7 +39,17 @@ class Recurso():
     }
     @classmethod
     def desde_dict(cls, datos: dict): # clase abstracta para guardar el estado de los objetos
-        return cls(datos['nombre'], datos['cantidad'], datos['regeneracion'])
+        nombre = datos['nombre']
+        cantidad = datos['cantidad']
+        regeneracion = datos['regeneracion']
+        return cls(nombre, cantidad, regeneracion)
+
+
+
+
+
+
+
 
 # los siguientes comentarios pueden ser utiles para la gestion de recursos
 '''
@@ -46,20 +79,6 @@ class Recurso():
     def __radd__(self,other:int)->int:
         return other + self.cantidad
 '''
-'''Con la clase recurso se crean los diferentes recursos
- Attributos
- -------------
- nombre: el nombre del recurso
- cantidad: cantidad de unidades del recurso
- regeneracion: cantidad de regeneracion del  recurso
- 
- Metodos
- ---------
- __str__: muestra la info del objeto
- dict: convierte la instancia en diccionario
- desde_dict: guarda el estado de los objetos
- '''
-
 
 
 
