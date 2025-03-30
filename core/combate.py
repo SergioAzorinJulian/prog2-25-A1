@@ -1,6 +1,7 @@
-import Region
-import Tropa
 import random
+import region
+import tropas
+
 
 
 
