@@ -1,49 +1,51 @@
 
 class Recurso():
-    def __init__(self, nombre: str, cantidad:int, regeneracion: int):
+    def __init__(self, nombre: str, cantidad:int, regeneracion: int): # constructor del objeto recurso
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
 
-    def __str__(self) -> str:  # almacena más del mismo recurso
+    def __str__(self) -> str:  # metodo para mostrar el recurso
         return f'{self.nombre}: {self.cantidad} unidades (regeneracion: {self.regeneracion})'
 
-    def dict(self) -> dict:
+    def dict(self) -> dict: # muestra la instancia en diccionario
         return {
             'nombre': self.nombre,
             'cantidad': self.cantidad,
             'regeneracion': self.regeneracion
     }
     @classmethod
-    def desde_dict(cls, datos: dict):
+    def desde_dict(cls, datos: dict): # clase abstracta para guardar el estado de los objetos
         return cls(datos['nombre'], datos['cantidad'], datos['regeneracion'])
 
+# los siguientes comentarios pueden ser utiles para la gestion de recursos
+'''
     def regenerar(self):
             self.cantidad += self.regeneracion
             return self
 
- #   def __sub__(self, other:int) -> int: # permite gastar recursos
-  #      try:
-  #          other + 0
-  #      except TypeError:
-   #         raise TypeError(f'Se debe de introducir un valor numérico')
-#     if other > self.cantidad:
- #           raise ValueError(f'no tiene suficiente {self.nombre}')
-#        else:
- #           nueva_cantidad = self.cantidad - other
-#        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
-  #  def __rsub__(self, other:int)->int:
- #       return other - self.cantidad
-#    def __add__(self,other:int)->int:
-#        try:
-#            other + 0
-#        except TypeError:
-#            raise TypeError(f'Se debe de introducir un valor numérico')
-#        nueva_cantidad = self.cantidad + other
-#        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
-#    def __radd__(self,other:int)->int:
-#        return other + self.cantidad
-
+    def __sub__(self, other:int) -> int: # permite gastar recursos
+        try:
+            other + 0
+        except TypeError:
+            raise TypeError(f'Se debe de introducir un valor numérico')
+        if other > self.cantidad:
+            raise ValueError(f'no tiene suficiente {self.nombre}')
+        else:
+            nueva_cantidad = self.cantidad - other
+        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
+    def __rsub__(self, other:int)->int:
+        return other - self.cantidad
+    def __add__(self,other:int)->int:
+        try:
+            other + 0
+        except TypeError:
+            raise TypeError(f'Se debe de introducir un valor numérico')
+        nueva_cantidad = self.cantidad + other
+        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
+    def __radd__(self,other:int)->int:
+        return other + self.cantidad
+'''
 '''Con la clase recurso se crean los diferentes recursos
  Attributos
  -------------
