@@ -80,7 +80,7 @@ class GranAlmacén(
                 f'Nivel de comida: {self.cantidad_comida} / {self.capacidad_comida}')
 
 
-class Castillo(Edificio):  # El castillo es el edificio principal del reino
+class Castillo(Edificio):  #El castillo es el edificio principal del reino
     def __init__(self, vida: int):
         super().__init__("Castillo", nivel, {'piedra': 25 * nivel, 'madera': 20 * nivel}, familias_asignadas=1)
         self.vida = vida
