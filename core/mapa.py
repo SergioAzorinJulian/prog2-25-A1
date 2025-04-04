@@ -421,11 +421,17 @@ class Mapa:
         # Asignar regiones a los nodos del mapa
         for fila in range(self.get_filas()):
             for columna in range(self.get_columnas()):
+                # La tupla con las coordenadas de la region a crear (fila, columna)
                 punto = (fila, columna)
+                # Accedemos al tipo de terreno de dicha coordenada
                 tipo_terreno = self._terrenos.get(punto, 'desconocido')
-                es_reino = punto == reino_1 or punto == reino_2
+                # Verificamos si la coordenada elegida es el reino 1 o 2
+                es_reino = (punto == reino_1 or punto == reino_2)
+                # Creamos la region desde la clase Region
                 region = Region(punto, tipo_terreno, es_reino)
+                # Se anyaden las conexiones de dicho nodo en la region si existe, sino simplemente ponemos una lista vacia
                 region.set_conexiones(self._conexiones.get(punto, []))
+                # Anyadimos la region al diccionario del mapa
                 self.regiones[punto] = region
 
         # Generar recursos para cada región
