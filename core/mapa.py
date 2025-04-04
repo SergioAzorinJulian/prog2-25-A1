@@ -88,9 +88,9 @@ class Mapa:
         self._columnas = 0 # Inicializamos el numero de columnas a 0
         self.set_filas(filas) # Verificamos que el valor que nos pasa el usuario es valido y lo establecemos
         self.set_columnas(columnas) # Verificamos que el valor que nos pasa el usuario es valido y lo establecemos
-        self._conexiones:dict = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
-        self._terrenos: dict = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
-        self.regiones = {}
+        self._conexiones: dict[tuple, list[tuple]] = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
+        self._terrenos: dict[tuple, str] = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
+        self.regiones dict[tuple, Region] = {} # Diccionario con los nodos como clave y el objeto Region como valor
 
         # Crear instancia de RegionManager con referencia a este mapa
         self.region_manager = RegionManager(self)
