@@ -1,4 +1,5 @@
 #from abc import ABC
+from random import random
 
 class Tropa:
 
@@ -80,9 +81,6 @@ class TropaAtaque(Tropa):
     Clase de la que heredarán las tropas de tipo "Ataque"
     '''
 
-    def __init__(self,recursos=int, nombre=str, puntos_vida=int, ataque_base=int, cantidad=int):
-        super().__init__(recursos,nombre, puntos_vida, ataque_base, cantidad)
-
     def atacar(self, enemigo= 'Tropa'):
         dano = self.ataque_base * 1.5   #MUltiplicador 1.5 por ser tropa de ataque
         enemigo.puntos_vida = dano
@@ -96,9 +94,6 @@ class TropaDefensa(Tropa):
     '''
     Clase de la que heredarán las tropas de tipo "Ataque"
     '''
-
-    def __init__(self, recursos=int, nombre=str, puntos_vida=int, ataque_base=int, cantidad=int):
-        super().__init__(recursos, nombre, puntos_vida, ataque_base, cantidad)
 
     def ataque(self, enemigo = 'Tropa'):
         """ Ataque basico para las tropas de defensa y alcance """
@@ -114,8 +109,6 @@ class TropaAlcance(Tropa):
     '''
     Clase de la que heredarán las tropas de tipo "Ataque"
     '''
-    def __init__(self, recursos=int, nombre=str, puntos_vida=float, ataque=float):
-        super().__init__(recursos, nombre, puntos_vida, ataque)
 
     def ataque(self, enemigo = 'Tropa'):
         """ Ataque basico para las tropas de defensa y alcance """
@@ -146,7 +139,6 @@ class Soldado(TropaAtaque):
     def atacar(self, enemigo = 'Tropa'):
         dano = self.ataque_base * 1.5
         enemigo.puntos_vida = dano
-        import random
         """ 20% de probabilidad de golpe critico """
         if random.random() < 0.2:  """ --->   < 0.2 quiere decir que hay un 20% de probabilidad """
             dano *= 2
