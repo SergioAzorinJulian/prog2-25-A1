@@ -1,6 +1,6 @@
-from tipos_recursos import Recurso
+from core.recursos import Recurso
 
-'''En este fichero voy a comprobar que la clase que he creado en tipos_recursos.py funciona'''
+'''En este fichero voy a comprobar que la clase que he creado en recursos.py funciona'''
 
 recurso1= Recurso('madera', 600, 100)
 print(recurso1)
