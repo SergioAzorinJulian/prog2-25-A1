@@ -90,7 +90,7 @@ class Mapa:
         self.set_columnas(columnas) # Verificamos que el valor que nos pasa el usuario es valido y lo establecemos
         self._conexiones: dict[tuple, list[tuple]] = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
         self._terrenos: dict[tuple, str] = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
-        self.regiones dict[tuple, Region] = {} # Diccionario con los nodos como clave y el objeto Region como valor
+        self.regiones: dict[tuple, Region] = {} # Diccionario con los nodos como clave y el objeto Region como valor
 
         # Crear instancia de RegionManager con referencia a este mapa
         self.region_manager = RegionManager(self)
@@ -230,7 +230,7 @@ class Mapa:
         return mapa_nodos
 
 
-    def crear_aristas(self, nodos_mapa: List[tuple[int, int]], diagonales: bool = True) -> Dict[tuple[int, int], list[int]]:
+    def crear_aristas(self, nodos_mapa: List[tuple[int, int]], diagonales: bool = True) -> Dict[tuple[int, int], list[tuple[int, int]]]:
 
         """
         Crea las aristas (conexiones) entre los nodos del mapa.
@@ -287,7 +287,7 @@ class Mapa:
         return nodos_aristas  # Devolvemos el diccionario con los vecinos de cada nodo
 
 
-    def anyadir_terreno(self, nodos_conectados: Dict[tuple[int, int], list[int]], terrenos:list[str] = None) -> dict[tuple[int, int], dict[str, list[int] | str]]:
+    def anyadir_terreno(self, nodos_conectados: Dict[tuple[int, int], list[tuple[int, int]]], terrenos:list[str] = None) -> dict[tuple[int, int], dict[str, list[int] | str]]:
 
         """
         Asigna un tipo de terreno a cada nodo del mapa. Se hace una distribucion en bloques del terreno
