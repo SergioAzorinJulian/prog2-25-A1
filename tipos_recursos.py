@@ -11,7 +11,7 @@ class Recurso():
      cantidad: int
      atributo de instancia, es la cantidad de unidades del recurso
      regeneracion: int
-     atribunto de instancia, es la cantidad de regeneracion del  recurso
+     atributo de instancia, es la cantidad de regeneracion del  recurso
 
      Metodos
      ---------
@@ -19,6 +19,10 @@ class Recurso():
      __str__: muestra la info del objeto en formato str
      dict: convierte la instancia en formato de diccionario
      desde_dict: permite la construccion de la instancia desde la creacion de un diccionario con los datos
+     __sub__: metodo para gestionar el uso de recursos, concretamente para el momento en que hay que gastar recursos
+     __rsub__: metodo para realizar operaciones aritmeticas correctas con el recurso
+     __add__: gestion de recursos, en este caso para sumar un recurso obtenido al mismo ya regustristado
+     __radd__: metodo para realizar operaciones de suma correctas con la cantidad de un recurso
      '''
     creados = {}
     def __init__(self, nombre: str, cantidad:int, regeneracion: int): # constructor del objeto recurso
@@ -31,33 +35,23 @@ class Recurso():
         return f'{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}'
 
 
-    def dict(self) -> dict: # muestra la instancia en diccionario
+    def dict(self) -> dict:
+        '''introduce la instancia en un diccionario'''
         return {
             'nombre': self.nombre,
             'cantidad': self.cantidad,
             'regeneracion': self.regeneracion
     }
     @classmethod
-    def desde_dict(cls, datos: dict): # clase abstracta para guardar el estado de los objetos
+    def desde_dict(cls, datos: dict):
         nombre = datos['nombre']
         cantidad = datos['cantidad']
         regeneracion = datos['regeneracion']
         return cls(nombre, cantidad, regeneracion)
 
 
-
-
-
-
-
-
-# los siguientes comentarios pueden ser utiles para la gestion de recursos
-'''
-    def regenerar(self):
-            self.cantidad += self.regeneracion
-            return self
-
-    def __sub__(self, other:int) -> int: # permite gastar recursos
+    def __sub__(self, other:int):
+        '''restar los recursos que van a ser utilizados'''
         try:
             other + 0
         except TypeError:
@@ -65,20 +59,28 @@ class Recurso():
         if other > self.cantidad:
             raise ValueError(f'no tiene suficiente {self.nombre}')
         else:
-            nueva_cantidad = self.cantidad - other
-        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
-    def __rsub__(self, other:int)->int:
+            self.cantidad -= other
+        return self.cantidad
+
+    def __rsub__(self, other:int):
         return other - self.cantidad
-    def __add__(self,other:int)->int:
+
+    def __add__(self,other:int):
+        '''agregar mas cantidad del recurso'''
         try:
             other + 0
         except TypeError:
             raise TypeError(f'Se debe de introducir un valor numérico')
-        nueva_cantidad = self.cantidad + other
-        return Recurso(self.nombre, nueva_cantidad, self.regeneracion)
-    def __radd__(self,other:int)->int:
+        self.cantidad += other
+        return self.cantidad
+
+    def __radd__(self,other:int):
         return other + self.cantidad
-'''
+    def regenerar(self):
+        '''cantidad de regeneracion del recurso'''
+        self.cantidad = self.cantidad + self.__add__(self.regeneracion)
+        return self.cantidad
+
 
 
 
