@@ -1,10 +1,8 @@
+
 import random
 import region
-import tropas
-
-
-
-
+from tropas import *
+from copy import deepcopy
 #!!!!!!!!!!!!!!!!
 #CODIGO DE PRUEBA PARA EL COMBATE, ES NECESARIO REGIONES Y TROPAS PARA EJECUTAR
 #!!!!!!!!!!!!!!!!
@@ -46,8 +44,8 @@ class Batalla:
 
 
     '''
-    @staticmethod
-    def preparacion_combate(posAtk:tuple,posDef:tuple):
+   # @staticmethod
+  #  def preparacion_combate(posAtk:tuple,posDef:tuple):
         '''
         PARAMETROS
         --------------
@@ -58,12 +56,10 @@ class Batalla:
         coordenadas de la zona que va a defender
         '''
 
-        tropas_def =Region.Regiones[posDef]._tropas  #Recogemos las tropas que hay en la posicion 'popDef'
-        tropas_atk=Region.Regiones[posAtk]._tropas   #Recogemos las tropas que hay en la posicion 'posAtk'
+        tropas_def =posAtk.tropas[:]  #Recogemos las tropas que hay en la posicion 'popAtk'
+        tropas_atk=posDef.tropas[:]  #Recogemos las tropas que hay en la posicion 'posDef'
 
-        Ejercito_Atk = []      #Inicializamos una lista que nos servirá para almacenar las tropas que atacarán
-        Ejercito_Def = []      #Inicializamos una lista que nos servirá para almacenar las tropas que defenderán
-
+        '''
         for _ in range(0,len(tropas_def.keys())):      #Añadimos listas vacias dentro de la lista Ejercito_Atk/Def para rellenarlas
             Ejercito_Def.append([])
 
@@ -90,10 +86,10 @@ class Batalla:
 
         return Ejercito_Atk,Ejercito_Def      #Devolvemos los ejercitos creados, con sus tropas ordenadas de manera aleatoria
 
-
+'''
     @staticmethod
 
-    def combate(Ejercito_Atk:list,Ejercito_Def:list):
+    def combate(posAtk:tuple,posDef:tuple):
         '''
             PARAMETROS
             ------------
@@ -104,13 +100,16 @@ class Batalla:
             lista con las tropas del ejercito de defensa (proporcionada por el metodo "preparacion_combate)"
 
         '''
-
+        Ejercito_Atk = posAtk
         print(Ejercito_Atk)
         print(Ejercito_Def)
-        Tropa.rellenar_tropa_stats()       #Rellenamos el diccionario tropa_stats de la clase Tropa, para poder coger las estadisticas de cada tropa
-        print(Tropa.tropa_stats)
+
         ejercito_vivo = 'Ninguno'         #Inicializamos la variable como si no hubiese ningún ejercito vivo, para así calcular estadisticas de las primeras filas
 
+
+        while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
+
+            Tropa.atacar(Ejercito_Atk[0])
 
 
 
@@ -139,7 +138,7 @@ class Batalla:
 
 
 
-
+'''
 
         while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
 
@@ -227,9 +226,19 @@ class Batalla:
             elif Ejercito_Def==[]:
                 print('LA ZONA HA SIDO CAPTURADA')        #Si el ejercito de defensa ha muerto...
                 return 3
+            '''
 
 
 
+ejercito1=[]
+ejercito1.append(deepcopy(Tropa.tropa_stats['soldado']))
+ejercito1[0].cantidad=10
 
-Ejercito_Atk,Ejercito_Def=Batalla.preparacion_combate((0,0),(0,1))
-Batalla.combate(Ejercito_Atk,Ejercito_Def)
+ejercito2=[]
+ejercito1.append(deepcopy(Tropa.tropa_stats['arquero']))
+ejercito1[0].cantidad=10
+
+ejercito1.append(deepcopy(Tropa.tropa_stats['ogro']))
+ejercito1[1].cantidad=10
+
+

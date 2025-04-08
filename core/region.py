@@ -1,8 +1,8 @@
 from copy import deepcopy
 from typing import List, Dict, Optional
 from recursos import Recurso # Para poder referenciar el tipo de recurso en la region
-from tropas import Tropa # Para poder referenciar el tipo de recurso en la region
-from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
+from core.tropas import Tropa # Para poder referenciar el tipo de recurso en la region
+#from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
 
 class Region:
     """
@@ -50,7 +50,7 @@ class Region:
         self._es_reino = es_reino
         self._recursos = recursos_base
         self._edificios: Dict[str, Edificio] = {}
-        self._tropas: Dict[str, Tropa] = {}
+        self._tropas:list=[]
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
 
