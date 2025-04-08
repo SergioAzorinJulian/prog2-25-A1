@@ -186,7 +186,7 @@ class Muros(Edificio):
 
 class GranAlmacén(Edificio):
     '''
-    Representa el almacén central del reino, donde se guardan recursos como agua y comida.
+    Representa el almacén central del reino, donde se guardan recursos como el agua y la comida.
 
     Atributos adicionales
     ---------------------
