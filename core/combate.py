@@ -32,7 +32,7 @@ Soldado2=Soldado(3)
 Arquero2=Arquero(5)
 Soldado3=Soldado(5)
 Canon1=Canon(7)
-Ejercito_Atk=[Arquero1,Arquero2,Gigante1]
+Ejercito_Atk=[Soldado1,Arquero1,Gigante1]
 Ejercito_Def=[Canon1]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
