@@ -11,12 +11,11 @@ class Batalla:
 
     @staticmethod
     def combate(Ejercito_Atk:list,Ejercito_Def:list):
-        print(Ejercito_Atk,Ejercito_Def)
+        #print(Ejercito_Atk,Ejercito_Def)
         while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
             print()
             max_tropas = max(len(Ejercito_Atk), len(Ejercito_Def))
-            print(Ejercito_Atk)
-            print(Ejercito_Def)
+
 
 
             for i in range(max_tropas):

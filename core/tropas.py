@@ -33,7 +33,11 @@ class Tropa:
         ratio = math.ceil(self.vida / self.__class__.vida_base) # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         if self.cantidad <= 0:
-            aliado.remove(self)
+            print(aliado)
+            for i in range(0, len(aliado)):
+                if aliado[i].nombre == self.nombre:
+                    del aliado[i]
+                    print(aliado)
 
     def atacar(self,aliado: list, enemigo : list) -> str:
         """ Ataque basico para las tropas """
