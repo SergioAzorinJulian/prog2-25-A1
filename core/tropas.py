@@ -35,9 +35,10 @@ class Tropa:
         if self.cantidad <= 0:
             print(aliado)
             for i in range(0, len(aliado)):
+                print(aliado[i])
                 if aliado[i].nombre == self.nombre:
                     del aliado[i]
-                    print(aliado)
+                    break
 
     def atacar(self,aliado: list, enemigo : list) -> str:
         """ Ataque basico para las tropas """
