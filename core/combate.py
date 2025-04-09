@@ -26,12 +26,13 @@ class Batalla:
 
 Soldado1=Soldado(1)
 Arquero1=Arquero(1)
+Arquero2=Arquero(1)
 Gigante1=Gigante(1)
 Soldado2=Soldado(3)
 Arquero2=Arquero(5)
 Soldado3=Soldado(5)
 Canon1=Canon(7)
-Ejercito_Atk=[Arquero1,Soldado1,Gigante1]
+Ejercito_Atk=[Arquero1,Arquero2,Gigante1]
 Ejercito_Def=[Canon1]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)

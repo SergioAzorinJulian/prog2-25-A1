@@ -2,7 +2,7 @@
 import random
 import math
 
-from core.recursos import Recurso
+from recursos import Recurso
 
 
 # from __future__ import annotations
@@ -197,17 +197,14 @@ class Canon(TropaEstructura):
 
         if enemigo != []:
             dmg_total = 0
-
+            reduccion = 1
             if self.toggle():
-                print('ATACA')
-                for i in enemigo:
-                    print('h')
-                    i.recibir_dmg(self.dmg, enemigo)
-
-
+                for i in enemigo[:]: #Copia de la lista para no alterar el orden
+                    if reduccion > 0:
+                        i.recibir_dmg(self.dmg * reduccion, enemigo)
+                        reduccion -= 0.4
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
-                print('Cargando')
                 return f'{self.nombre} sobrecalentado'
         else:
             return None
