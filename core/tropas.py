@@ -33,18 +33,17 @@ class Tropa:
         ratio = math.ceil(self.vida / self.__class__.vida_base) # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         if self.cantidad <= 0:
-            print(aliado)
-            for i in range(0, len(aliado)):
-                print(aliado[i])
-                if aliado[i].nombre == self.nombre:
-                    del aliado[i]
+            for i in aliado:
+                if i.nombre == self.nombre:
+                    aliado.remove(i)
                     break
-
     def atacar(self,aliado: list, enemigo : list) -> str:
         """ Ataque basico para las tropas """
-        n = random.randint(0 ,len(enemigo)) # Elegimos una tropa al azar de la lista
-        enemigo[n].recibir_dmg(self.dmg,aliado)
-        return f'{self.nombre} ataca a {enemigo[n].nombre} : {self.dmg}'
+        if enemigo !=[]:
+            n = random.randint(0 ,len(enemigo)-1) # Elegimos una tropa al azar de la lista
+            nombre = enemigo[n].nombre
+            enemigo[n].recibir_dmg(self.dmg,aliado)
+            return f'{self.nombre} ataca a {nombre} : {self.dmg}'
 
     def recibir_dmg(self ,dmg,aliado):
         self.vida = self.vida - dmg
@@ -103,15 +102,17 @@ class TropaAtaque(Tropa):
         return False, 1
 
     def atacar(self,aliado: list[Tropa] ,enemigo: list[Tropa]) -> str:
-        critico = self.critico()
-        n = random.randint(0,len(enemigo)-1)  # Elegimos una tropa al azar de la lista
-        if critico[0]:
-            dmg = self.dmg * critico[1]
-            enemigo[n].recibir_dmg(dmg,aliado)
-            return critico[2], f'{self.nombre} ataca a {enemigo[n].nombre} : {dmg}'
-        else:
-            enemigo[n].recibir_dmg(self.dmg,aliado)
-            return f'{self.nombre} ataca a {enemigo[n].nombre} : {self.dmg}'
+        if enemigo !=[]:
+            critico = self.critico()
+            n = random.randint(0,len(enemigo)-1)  # Elegimos una tropa al azar de la lista
+            nombre = enemigo[n].nombre
+            if critico[0]:
+                dmg = self.dmg * critico[1]
+                enemigo[n].recibir_dmg(dmg,enemigo)
+                return critico[2], f'{self.nombre} ataca a {nombre} : {dmg}'
+            else:
+                enemigo[n].recibir_dmg(self.dmg,enemigo)
+                return f'{self.nombre} ataca a {nombre} : {self.dmg}'
 
 
 class TropaDefensa(Tropa):
@@ -158,9 +159,10 @@ class Gigante(TropaDefensa):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self,aliado: list[Tropa] ,enemigo: list[Tropa]):  # Solo ataca estructuras
-        for i in enemigo:
-            if isinstance(i, TropaEstructura):
-                i.recibir_dmg(self.dmg)
+        if enemigo !=[]:
+            for i in enemigo:
+                if isinstance(i, TropaEstructura):
+                    i.recibir_dmg(self.dmg)
 
 
 # TROPAS DE ALCANCE
@@ -175,12 +177,15 @@ class Arquero(TropaAlcance):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self,aliado: list[Tropa], enemigo: list[Tropa]):
-        n = 0
-        for i in enemigo:
-            if random.random() < 0.8:  # < 80% de probabilidad
-                i.recibir_dmg(self.dmg,aliado)
-                n += 1
-        return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
+        if enemigo != []:
+            n = 0
+            for i in enemigo:
+                if random.random() < 0.8:  # < 80% de probabilidad
+                    i.recibir_dmg(self.dmg,enemigo)
+                    n += 1
+            return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
+        else:
+            return None
 
 
 # TROPAS DE ESTRUCTURA
@@ -201,15 +206,18 @@ class Canon(TropaEstructura):
         return estado
 
     def atacar(self,aliado: list[Tropa],enemigo: list[Tropa]):
-        dmg_total = 0
-        reduccion = 1.0
-        if self.toggle():
-            for i in enemigo:
-                if reduccion > 0:
-                    i.recibir_dmg(self.dmg * reduccion)
-                    dmg_total += self.dmg * reduccion
-                    reduccion -= 0.4
+        if enemigo != []:
+            dmg_total = 0
+            reduccion = 1.0
+            if self.toggle():
+                for i in enemigo:
+                    if reduccion > 0:
+                        i.recibir_dmg(self.dmg * reduccion)
+                        dmg_total += self.dmg * reduccion
+                        reduccion -= 0.4
 
-            return f'{self.nombre} dispara : {dmg_total}'
+                return f'{self.nombre} dispara : {dmg_total}'
+            else:
+                return f'{self.nombre} sobrecalentado'
         else:
-            return f'{self.nombre} sobrecalentado'
+            return None
