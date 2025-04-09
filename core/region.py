@@ -1,9 +1,8 @@
 from copy import deepcopy
-from typing import List, Dict, Optional
+from typing import List, Optional
 from recursos import Recurso # Para poder referenciar el tipo de recurso en la region
 from tropas import Tropa # Para poder referenciar el tipo de recurso en la region
 from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
-
 class Region:
     """
     Clase que representa una región del mapa.
@@ -18,11 +17,11 @@ class Region:
         Tipo de terreno de la región.
     _es_reino : bool
         Indica si la región es un reino.
-    _recursos : List[Recurso]
+    recursos : List[Recurso]
         Recursos disponibles en la región.
-    _edificios : dict
+    edificios : list[Edificio]
         Edificios construidos en la región.
-    _tropas : dict
+    tropas : List[Tropa]
         Tropas presentes en la región.
     _conexiones : list
         Lista de conexiones con otras regiones.
@@ -40,7 +39,7 @@ class Region:
             Tipo de terreno de la región.
         es_reino : bool, optional
             Indica si la región es un reino (por defecto es False).
-        recursos_base : list, optional
+        recursos_base : List[Recurso], optional
             Recursos iniciales de la región (por defecto es None).
         """
 
@@ -48,9 +47,9 @@ class Region:
         self._propietario: str = 'Neutral'
         self._tipo_terreno = tipo_terreno
         self._es_reino = es_reino
-        self._recursos = recursos_base
-        self._edificios: Dict[str, Edificio] = {}
-        self._tropas: Dict[str, Tropa] = {}
+        self.recursos = recursos_base
+        self.edificios: list[Edificio] = []
+        self.tropas: list[Tropa] = []
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
 
@@ -73,15 +72,15 @@ class Region:
 
     def get_recursos(self):
         """Devuelve los recursos de la región."""
-        return deepcopy(self._recursos)
+        return deepcopy(self.recursos)
 
     def get_edificios(self):
         """Devuelve los edificios de la región."""
-        return deepcopy(self._edificios)
+        return deepcopy(self.edificios)
 
     def get_tropas(self):
         """Devuelve las tropas de la región."""
-        return deepcopy(self._tropas)
+        return deepcopy(self.tropas)
 
     def get_conexiones(self):
         """Devuelve las conexiones de la región."""
@@ -111,15 +110,15 @@ class Region:
 
     def set_recursos(self, nuevo_recursos: List[Recurso]):
         """Establece los recursos de la región."""
-        self._recursos = nuevo_recursos
+        self.recursos = nuevo_recursos
 
-    def set_edificios(self, nuevos_edificios: Dict):
+    def set_edificios(self, nuevos_edificios: list[Edificio]):
         """Establece los edificios de la región."""
-        self._edificios = nuevos_edificios
+        self.edificios = nuevos_edificios
 
-    def set_tropas(self, nuevas_tropas: Dict):
+    def set_tropas(self, nuevas_tropas: list[Tropa]):
         """Establece las tropas de la región."""
-        self._tropas = nuevas_tropas
+        self.tropas = nuevas_tropas
 
     def set_conexiones(self, nueva_conexiones: list):
         """Establece las conexiones de la región."""
@@ -132,14 +131,23 @@ class Region:
 
     ### METODO PARA MOSTRAR INFORMACION SOBRE LA REGION ###
     def __str__(self) -> str:
-        return (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | "
-                f"Propietario: {self._propietario} | "
-                f"Recursos: {self._recursos} | "
-                f"Edificios: {self._edificios} | Tropas: {self._tropas}")
+        tropas_str = ''
+        for troop in self.tropas:
+            tropas_str += f'{troop.__str__()} \n'
+
+        recursos_str = ''
+        for resource in self.recursos:
+            recursos_str += f'{resource.__str__()} \n'
+
+        return (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | \n"
+                f"Propietario: {self._propietario} | \n "
+                f"Recursos: \n {recursos_str} | \n"
+                f"Edificios: {self.edificios} | \n"
+                f" Tropas: \n {tropas_str}")
 
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
-        return f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self._recursos})"
+        return f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self.recursos})"
 
 
 
