@@ -27,63 +27,53 @@ class Edificio:
         self.familias_asignadas = familias_asignadas
 
     def construir(self, recursos_disponibles: dict, familias_disponibles: int):
-        if self.nivel > 0:
-            print(f"{self.nombre} ya está construido.")
-            return False
-
-        if familias_disponibles < self.familias_asignadas:
-            print(f"No hay suficientes familias para construir {self.nombre}.")
-            return False
-
-        for recurso in self.costo_construccion:
-            cantidad_necesaria = self.costo_construccion[recurso]
-            if recurso in recursos_disponibles:
-                cantidad_disponible = recursos_disponibles[recurso].cantidad
-                if cantidad_disponible < cantidad_necesaria:
-                    print(f"No hay suficientes {recurso} para construir {self.nombre}.")
-                    return False
-            else:
-                print(f"Falta el recurso {recurso} para construir {self.nombre}.")
+        try:
+            if self.nivel > 0:
                 return False
 
-        for recurso in self.costo_construccion:
-            recursos_disponibles[recurso].cantidad -= self.costo_construccion[recurso]
+            if familias_disponibles < self.familias_asignadas:
+                return False
 
-        self.nivel = 1
-        print(f"{self.nombre} ha sido construido.")
-        return True
+            for recurso in self.costo_construccion:
+                cantidad_necesaria = self.costo_construccion[recurso]
+                if recurso in recursos_disponibles:
+                    cantidad_disponible = recursos_disponibles[recurso].cantidad
+                    if cantidad_disponible < cantidad_necesaria:
+                        return False
+                else:
+                    return False
+
+            for recurso in self.costo_construccion:
+                recursos_disponibles[recurso].cantidad -= self.costo_construccion[recurso]
+
+            self.nivel = 1
+            return True
+        except (TypeError, AttributeError):
+            return False
 
     def subir_nivel(self, recursos_disponibles: dict, familias_disponibles: int):
-        if self.nivel == 0:
-            print(f"{self.nombre} aún no ha sido construido.")
-            return False
-
-        if familias_disponibles < self.familias_asignadas:
-            print(f"No hay suficientes familias disponibles para mejorar {self.nombre}.")
-            return False
-
-        for recurso, cantidad in self.costo_mejora.items():
-            if recurso not in recursos_disponibles or recursos_disponibles[recurso].cantidad < cantidad:
-                print(f"No hay suficientes {recurso} para mejorar {self.nombre}.")
+        try:
+            if self.nivel == 0:
                 return False
 
-        for recurso, cantidad in self.costo_mejora.items():
-            recursos_disponibles[recurso].cantidad -= cantidad
+            if familias_disponibles < self.familias_asignadas:
+                return False
 
-        self.nivel += 1
-        print(f"El {self.nombre} ha subido al nivel {self.nivel}.")
-        return True
+            for recurso, cantidad in self.costo_mejora.items():
+                if recurso not in recursos_disponibles or recursos_disponibles[recurso].cantidad < cantidad:
+                    return False
+
+            for recurso, cantidad in self.costo_mejora.items():
+                recursos_disponibles[recurso].cantidad -= cantidad
+
+            self.nivel += 1
+            return True
+        except (TypeError, AttributeError):
+            return False
 
     def __str__(self):
         return f"{self.nombre} (Nivel {self.nivel}) - Familias asignadas: {self.familias_asignadas}"
 
-
-# Clases de edificios generadores
-
-'''
-Las siguientes clases heredan de Edificio y representan estructuras
-que producen recursos o cumplen una función en el reino.
-'''
 
 class Mina(Edificio):
     '''
@@ -103,11 +93,14 @@ class Mina(Edificio):
     '''
     def __init__(self, nivel=0):
         super().__init__("Mina", nivel, {"piedra": 10, "madera": 5}, familias_asignadas=2)
-        self.costo_mejora = {"piedra": 10 * max(nivel, 1), "madera": 5 * max(nivel, 1)}
+        self.costo_mejora = {"piedra": 10 * self.nivel, "madera": 5 * self.nivel}
         self.produccion_por_nivel = 5
 
     def producir(self):
-        return {"piedra": self.produccion_por_nivel * self.nivel}
+        try:
+            return {"piedra": self.produccion_por_nivel * self.nivel}
+        except (TypeError, AttributeError):
+            return {"piedra": 0}
 
 
 class Granja(Edificio):
@@ -118,7 +111,7 @@ class Granja(Edificio):
      ----------------------------------------
      - Recurso producido: comida
      - Construcción: 8 madera, 6 agua
-     - Mejora: 6 * nivel agua, 8 * nivel madera
+     - Mejora: 8 * nivel madera, 6 * nivel agua
      - Familias necesarias: 1
      ----------------------------------------
 
@@ -128,11 +121,14 @@ class Granja(Edificio):
     '''
     def __init__(self, nivel=0):
         super().__init__("Granja", nivel, {"madera": 8, "agua": 6}, familias_asignadas=1)
-        self.costo_mejora = {"madera": 8 * max(nivel, 1), "agua": 6 * max(nivel, 1)}
+        self.costo_mejora = {"madera": 8 * self.nivel, "agua": 6 * self.nivel}
         self.produccion_por_nivel = 10
 
     def producir(self):
-        return {"comida": self.produccion_por_nivel * self.nivel}
+        try:
+            return {"comida": self.produccion_por_nivel * self.nivel}
+        except (TypeError, AttributeError):
+            return {"comida": 0}
 
 
 class Pozo(Edificio):
@@ -153,11 +149,14 @@ class Pozo(Edificio):
     '''
     def __init__(self, nivel=0):
         super().__init__("Pozo", nivel, {"madera": 3, "piedra": 5}, familias_asignadas=1)
-        self.costo_mejora = {"madera": 3 * max(nivel, 1), "piedra": 5 * max(nivel, 1)}
+        self.costo_mejora = {"madera": 3 * self.nivel, "piedra": 5 * self.nivel}
         self.produccion_por_nivel = 10
 
     def producir(self):
-        return {"agua": self.produccion_por_nivel * self.nivel}
+        try:
+            return {"agua": self.produccion_por_nivel * self.nivel}
+        except (TypeError, AttributeError):
+            return {"agua": 0}
 
 
 class Muros(Edificio):
@@ -171,7 +170,7 @@ class Muros(Edificio):
     - Mejora: 5 * nivel madera, 5 * nivel piedra
     - Familias necesarias: 0
     - Vida: 50 * nivel
- ----------------------------------------
+    ----------------------------------------
 
     Atributos adicionales
     ---------------------
@@ -180,44 +179,27 @@ class Muros(Edificio):
     '''
     def __init__(self, nivel=0):
         super().__init__('Muros', nivel, {'madera': 5, 'piedra': 5}, familias_asignadas=0)
-        self.costo_mejora = {'madera': 5 * max(nivel, 1), 'piedra': 5 * max(nivel, 1)}
-        self.vida = 50 * max(nivel, 1)
+        self.costo_mejora = {'madera': 5 * self.nivel, 'piedra': 5 * self.nivel}
+        self.vida = 50 * self.nivel if self.nivel > 0 else 0
 
 
-class GranAlmacén(Edificio):
-    '''
-    Representa el almacén central del reino, donde se guardan recursos como el agua y la comida.
-
-    Atributos adicionales
-    ---------------------
-    capacidad_comida : int - Capacidad máxima de almacenamiento de comida.
-    capacidad_agua : int - Capacidad máxima de almacenamiento de agua.
-    cantidad_agua : int - Cantidad actual de agua almacenada.
-    cantidad_comida : int - Cantidad actual de comida almacenada.
-    '''
-    def __init__(self, capacidad_agua, capacidad_comida, cantidad_agua, cantidad_comida, nivel=1):
-        super().__init__("Almacén", nivel, {"piedra": 8, "madera": 6}, familias_asignadas=3)
-        self.costo_mejora = {"piedra": 8 * max(nivel, 1), "madera": 6 * max(nivel, 1)}
+class GranAlmacen(Edificio):
+    def __init__(self, capacidad_agua=100, capacidad_comida=100, cantidad_agua=0, cantidad_comida=0, nivel=1):
+        super().__init__("Almacén", nivel, {}, familias_asignadas=3)
+        self.costo_mejora = {"piedra": 8 * self.nivel, "madera": 6 * self.nivel}
         self.capacidad_comida = capacidad_comida
         self.capacidad_agua = capacidad_agua
         self.cantidad_agua = cantidad_agua
         self.cantidad_comida = cantidad_comida
 
     def __str__(self):
-        return (f'Nivel: {self.nivel})'
-                f'Nivel de agua: {self.cantidad_agua} / {self.capacidad_agua}'
-                f'Nivel de comida: {self.cantidad_comida} / {self.capacidad_comida}')
+        return (f'Almacén (Nivel {self.nivel})\n'
+                f'Agua: {self.cantidad_agua}/{self.capacidad_agua}\n'
+                f'Comida: {self.cantidad_comida}/{self.capacidad_comida}')
 
 
 class Castillo(Edificio):
-    '''
-    Representa el castillo del reino, el edificio principal.
-
-    Atributos adicionales
-    ---------------------
-    vida : int - Puntos de vida del castillo.
-    '''
     def __init__(self, nivel=1):
-        super().__init__('Castillo', nivel, {"piedra": 0, "madera": 0}, familias_asignadas=0)
-        self.costo_mejora = {"piedra": 15 * nivel, "madera": 10 * nivel}
-        self.vida = 100 * nivel
+        super().__init__('Castillo', nivel, {}, familias_asignadas=0)
+        self.costo_mejora = {"piedra": 15 * self.nivel, "madera": 10 * self.nivel}
+        self.vida = 100 * self.nivel
