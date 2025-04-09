@@ -2,6 +2,8 @@
 import random
 import math
 
+from core.recursos import Recurso
+
 
 # from __future__ import annotations
 class Tropa:
@@ -131,7 +133,7 @@ class Soldado(TropaAtaque):
     '''
     dmg_base = 100
     vida_base = 10
-
+    recursos = Recurso('caza',10,0)
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -140,7 +142,7 @@ class Soldado(TropaAtaque):
 class Gigante(TropaDefensa):
     dmg_base = 100
     vida_base = 500
-
+    recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -158,7 +160,7 @@ class Arquero(TropaAlcance):
     '''
     dmg_base = 80
     vida_base = 150
-
+    recursos = Recurso('caza', 5, 0)
     def __init__(self, cantidad, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -181,7 +183,7 @@ class Canon(TropaEstructura):
     '''
     dmg_base = 300
     vida_base = 500
-
+    recursos = Recurso('madera', 10, 0)
     def __init__(self, cantidad, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True
