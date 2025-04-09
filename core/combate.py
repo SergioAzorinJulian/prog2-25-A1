@@ -2,10 +2,6 @@
 
 from tropas import *
 
-
-
-
-
 class Batalla:
 
 
@@ -35,7 +31,8 @@ Soldado2=Soldado(5)
 Arquero2=Arquero(5)
 Soldado3=Soldado(5)
 
-Ejercito_Atk=[Soldado2]
-Ejercito_Def=[Soldado1,Arquero1,Gigante1,Soldado3]
+Ejercito_Atk=[Soldado1,Arquero1,Gigante1,Soldado3]
+Ejercito_Def=[Soldado2]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
+print(Ejercito_Def)
