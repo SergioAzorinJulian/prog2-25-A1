@@ -34,8 +34,8 @@ Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territori
 '''
 
 class Jugador:
-    def __init__(self,usuario,mapa,recursos : list[Recurso] = [Recurso('madera',100,0),Recurso('agua',100,0),Recurso('piedra',50,0),Recurso('hierro',25,0),Recurso('oro',25,0)] \
-                 ,conquista : list[tuple[int,int]] = []):
+    def __init__(self,usuario,mapa,recursos : list[Recurso] = [Recurso('madera',100,0),Recurso('agua',100,0),Recurso('piedra',50,0),Recurso('hierro',25,0),Recurso('oro',25,0), \
+        Recurso('caza',400,0),Recurso('recoleccion',400,0)] ,conquista : list[tuple[int,int]] = []):
         self.usuario = usuario
         self.mapa = mapa
         self.conquista = conquista #Se debe actualizar en cada interacción
@@ -43,10 +43,18 @@ class Jugador:
         self.region_actual : tuple[int,int] = None  #La zona que esta consultando el jugador dentro del bucle principal
     def mapa_grafico(self,mapa):
         pass
-    def ver_zona(self,region): #Actualiza a su vez la región actual
-        pass
+    def ver_zona(self,region : tuple[int,int]): #Actualiza a su vez la región actual
+        self.region_actual = region
+        return str(self.mapa.regiones[region])
     def añadir_tropa(self,tropa,cantidad):
-        pass
+        clases_disponibles ={} #Diccionario con Tropas
+        for key,value in globals().items():
+            if isinstance(value,Tropa):
+                clases_disponibles[key.lower()] = value
+        if tropa in clases_disponibles.keys():
+            pass
+        else:
+            return f'{tropa} no disponible'
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
         pass
     def mover_batallon(self,destino : tuple[int,int]):
