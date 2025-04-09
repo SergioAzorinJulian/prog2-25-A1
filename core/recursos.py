@@ -1,7 +1,7 @@
 
 
-class Recurso():
-    '''
+class Recurso:
+    """
     Con la clase recurso se crean los diferentes recursos
      Attributos
      -------------
@@ -20,7 +20,7 @@ class Recurso():
      __str__: muestra la info del objeto en formato str
      dict: convierte la instancia en formato de diccionario
      desde_dict: permite la construccion de la instancia desde la creacion de un diccionario con los datos
-     '''
+     """
 
     PESOS_RECURSOS_BASE = {
         "madera": 4,
