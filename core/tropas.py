@@ -1,6 +1,6 @@
 
 # from abc import ABC
-from random import random
+import random
 import math
 #from __future__ import annotations
 class Tropa:
@@ -33,12 +33,12 @@ class Tropa:
         ratio = math.ceil(self.vida / self.__class__.vida_base) # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         if self.cantidad <= 0:
-            aliado.drop(self)
+            aliado.remove(self)
 
     def atacar(self,aliado: list, enemigo : list) -> str:
         """ Ataque basico para las tropas """
         n = random.randint(0 ,len(enemigo)) # Elegimos una tropa al azar de la lista
-        enemigo[n].recibir_dmg(self.dmg)
+        enemigo[n].recibir_dmg(self.dmg,aliado)
         return f'{self.nombre} ataca a {enemigo[n].nombre} : {self.dmg}'
 
     def recibir_dmg(self ,dmg,aliado):
@@ -97,15 +97,15 @@ class TropaAtaque(Tropa):
                 return True, 2, f'{self.nombre} : Golpe crítico \n'
         return False, 1
 
-    def atacar(self,aliado: list[Tropa], enemigo: list[Tropa]) -> str:
+    def atacar(self,aliado: list[Tropa] ,enemigo: list[Tropa]) -> str:
         critico = self.critico()
-        n = random.randint(0, len(enemigo))  # Elegimos una tropa al azar de la lista
+        n = random.randint(0,len(enemigo)-1)  # Elegimos una tropa al azar de la lista
         if critico[0]:
             dmg = self.dmg * critico[1]
-            enemigo[n].recibir_dmg(dmg)
+            enemigo[n].recibir_dmg(dmg,aliado)
             return critico[2], f'{self.nombre} ataca a {enemigo[n].nombre} : {dmg}'
         else:
-            enemigo[n].recibir_dmg(self.dmg)
+            enemigo[n].recibir_dmg(self.dmg,aliado)
             return f'{self.nombre} ataca a {enemigo[n].nombre} : {self.dmg}'
 
 
@@ -173,7 +173,7 @@ class Arquero(TropaAlcance):
         n = 0
         for i in enemigo:
             if random.random() < 0.8:  # < 80% de probabilidad
-                i.recibir_dmg(self.dmg)
+                i.recibir_dmg(self.dmg,aliado)
                 n += 1
         return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
 
