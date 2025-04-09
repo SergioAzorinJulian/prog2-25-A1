@@ -46,6 +46,8 @@ class Recurso:
 
     def __str__(self) -> str:  # metodo para mostrar el recurso
         return f'{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}'
+    def __repr__(self) -> str:
+        return f'Recurso(nombre= {self.nombre}, cantidad={self.cantidad}, regeneración= {self.regeneracion})'
 
 
     def to_dict(self) -> dict:
