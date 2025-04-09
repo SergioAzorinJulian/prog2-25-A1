@@ -1,4 +1,4 @@
-# from abc import ABC
+
 import random
 import math
 
@@ -90,35 +90,45 @@ class TropaAtaque(Tropa):
 
     def critico(self) -> tuple:
         """ Probabilidad de golpe critico """
-        if self.vida < self.__class__.vida_base:
-            if random.random() < 0.8:  # < 80% de probabilidad
+        if self.vida < self.__class__.vida_base: #Para aplicar un bonus de probabilidad, calculamos si queda más de una tropa de ataque
+            if random.random() < 0.8:  # < 80% de probabilidad (el critico es más probable si solo queda una tropa de ataque)
                 return True, 2, f'{self.nombre} : Golpe crítico \n'
         else:
-            if random.random() < 0.2:  # < 20% de probabilidad
+            if random.random() < 0.2:  # < 20% de probabilidad (probabilidad base de hacer critico)
                 return True, 2, f'{self.nombre} : Golpe crítico \n'
         return False, 1
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]) -> str:
+        """atrobitps
+        --------------
+        aliado: lista con el resto de las tropas que forman parte de su ejercito
+
+        enemigo: lista con las tropas enemigas
+        """
         if enemigo != []:
-            critico = self.critico()
+            critico = self.critico()    #Guardamos lo que nos devuelve critico()
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
             nombre = enemigo[n].nombre
             if critico[0]:
-                dmg = self.dmg * critico[1]
-                enemigo[n].recibir_dmg(dmg, enemigo)
+                dmg = self.dmg * critico[1]   #Al daño se le añade el critico
+                enemigo[n].recibir_dmg(dmg, enemigo)    #Enemigo recibe daño
                 return critico[2], f'{self.nombre} ataca a {nombre} : {dmg}'
             else:
-                enemigo[n].recibir_dmg(self.dmg, enemigo)
+                enemigo[n].recibir_dmg(self.dmg, enemigo)  #Enemigo recibe daño base (no se ha realizado golpe critico)
                 return f'{self.nombre} ataca a {nombre} : {self.dmg}'
 
 
 class TropaDefensa(Tropa):
     '''
     Clase de la que heredarán las tropas de tipo "Defensa"
+
+    METODOS:
+    ---------
+    recibir_dmg: metodo que reduce el daño recibido de las tropas de tipo defensa
     '''
 
     def recibir_dmg(self, dmg, aliado, reducion=5):
-        print('hla')
+        '''Metodo donde las tropas de defensa reciben menos daño'''
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         self.actualizar_cantidad(aliado)
@@ -141,9 +151,9 @@ class Soldado(TropaAtaque):
     '''
     Soldado: Clase Default de Tropa de Atk
     '''
-    dmg_base = 100
-    vida_base = 1
-    recursos = Recurso('caza',10,0)
+    dmg_base = 100  #Daño de la tropa
+    vida_base = 150  #Vida de la tropa
+    recursos = Recurso('caza',10,0)  #Recursos que cuesta entrenarla
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -151,22 +161,26 @@ class Soldado(TropaAtaque):
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
-    vida_base = 10
+    vida_base = 250
     recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
         if enemigo != []:
-            for i in enemigo:
+            for i in enemigo:  #Detectamos la estructura en el ejercito enemigo, sino no hace daño
                 if isinstance(i, TropaEstructura):
-                    i.recibir_dmg(self.dmg, enemigo)
+                    i.recibir_dmg(self.dmg, enemigo) #Golpeamos la estructura
 
 
 # TROPAS DE ALCANCE
 class Arquero(TropaAlcance):
     '''
     Arquero: ''Dispara varias flechas''
+
+    METODOS
+    .........
+    atacar: metodo de ataque unico de la tropa arquero, ataca a todos los enemigos (si tienes suerte)
     '''
     dmg_base = 80
     vida_base = 150
@@ -176,11 +190,11 @@ class Arquero(TropaAlcance):
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
         if enemigo != []:
-            n = 0
-            for i in enemigo:
+            n = 0 #Número de veces que ataca (inicializado a 0)
+            for i in enemigo:  #Para cada enemigo
                 if random.random() < 0.8:  # < 80% de probabilidad
-                    i.recibir_dmg(self.dmg, enemigo)
-                    n += 1
+                    i.recibir_dmg(self.dmg, enemigo)  #Si tienes suerte, aciertas el disparo e inflinge daño
+                    n += 1  #Incrementamos el número de aciertos
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
         else:
             return None
@@ -190,28 +204,35 @@ class Arquero(TropaAlcance):
 class Canon(TropaEstructura):
     '''
     Cañon: ''Daño en area'' -> Ataca cada 2 Turnos (De combate)
+
+    METODOS
+    ---------
+    toggle: decide si el cañon ataca (1 turno hace daño, el siguiente recarga)
+
+    atacar: atacar único del cañón, hace daño a las tropas cercanas al frente de batalla (disminuyendo su
+            daño a las tropas más lejanas) pero descansa 1 turno
     '''
     dmg_base = 300
     vida_base = 500
     recursos = Recurso('madera', 10, 0)
     def __init__(self, cantidad, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
-        self.activo = True
+        self.activo = True  #Inicializamos el valor que nos dice si el cañon está listo
 
     def toggle(self) -> bool:  # Activa y desactiva el cañon
-        estado = self.activo
-        self.activo = not self.activo
-        return estado
+        estado = self.activo   #Cogemos el valor de self.activo (bool)
+        self.activo = not self.activo  #Invertimos su valor para la siguiente interacción
+        return estado   #Devolvemos el valor cogido
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
 
         if enemigo != []:
             dmg_total = 0
-            reduccion = 1
-            if self.toggle():
+            reduccion = 1  #Reducción del daño, aplicada a las tropas lejanas al impacto
+            if self.toggle(): #Si está activo...
                 for i in enemigo[:]: #Copia de la lista para no alterar el orden
-                    if reduccion > 0:
-                        i.recibir_dmg(self.dmg * reduccion, enemigo)
+                    if reduccion > 0:  #Si la recucción sigue existiendo
+                        i.recibir_dmg(self.dmg * reduccion, enemigo) #causa el daño por la disminución
                         reduccion -= 0.4
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
