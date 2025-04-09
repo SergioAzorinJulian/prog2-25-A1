@@ -21,22 +21,26 @@ class Tropa:
 
     METODOS:
     -----------
+    actualizar_cantidad: Sirve para actualizar el número de tropas dentro de combate despues de recibir daño
 
+    atacar: metodo que hace daño al enemigo (puedes ser diferente para algunas tropas
+
+    recibir_dmg: metodo donde ser recibie el daño
     '''
 
     def __init__(self, recursos: int, nombre: str, cantidad: int):
         self.recursos = recursos
         self.nombre = nombre
         self.cantidad = cantidad
-        self.dmg = self.__class__.dmg_base * self.cantidad
-        self.vida = self.__class__.vida_base * self.cantidad
+        self.dmg = self.__class__.dmg_base * self.cantidad   #El daño es el producto de la cantidad de tropas por el daño de cada una
+        self.vida = self.__class__.vida_base * self.cantidad  #La vida es el producto de la cantidad de tropas por la vida de cada una
 
     def actualizar_cantidad(self, aliado):
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
-        if self.cantidad < 0:
+        if self.cantidad < 0:   #Si la cantidad de tropas es < 0, asignamos a la cantidad = 0
             self.cantidad = 0
-        if self.cantidad == 0:
+        if self.cantidad == 0:   #Si la cantidad es = 0, quitamos a la tropa de la lista en el combate
             for i in aliado:
                 if i.nombre == self.nombre:
                     aliado.remove(i)
@@ -46,22 +50,22 @@ class Tropa:
         """ Ataque basico para las tropas """
         if enemigo != []:
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
-            nombre = enemigo[n].nombre
-            enemigo[n].recibir_dmg(self.dmg, aliado)
+            nombre = enemigo[n].nombre   #Cogemos el nombre de la tropa que ataca
+            enemigo[n].recibir_dmg(self.dmg, aliado)   #Hacemos que la tropa enemiga tome daño
             return f'{self.nombre} ataca a {nombre} : {self.dmg}'
 
     def recibir_dmg(self, dmg, aliado):
-        self.vida = self.vida - dmg
-        self.actualizar_cantidad(aliado)
+        self.vida = self.vida - dmg  #A la vida se le resta el daño del agresor
+        self.actualizar_cantidad(aliado)     #Llamamo a actualizar_cantidad por si a muerto alguien del grupo de tropas
 
-    def __iadd__(self, other):
+    def __iadd__(self, other):  #Metodo para añadir tropas
         if isinstance(other, Tropa):
             self.cantidad += other.cantidad
         else:
             self.cantidad += other
         return self
 
-    def __isub__(self, other):
+    def __isub__(self, other):  #Metodo para restar tropas
         self.cantidad -= other
         return self
 
@@ -76,6 +80,12 @@ class Tropa:
 class TropaAtaque(Tropa):
     '''
     Clase de la que heredarán las tropas de tipo "Ataque"
+
+    METODOS:
+    ----------
+    critico: las clases de tipo "Ataque" tienen posibilidad de asentar un golpe crítico, este metodo calcula si esto ocurre
+
+    atacar: metodo atacar modificado para las tropas de tipo ataque (
     '''
 
     def critico(self) -> tuple:
