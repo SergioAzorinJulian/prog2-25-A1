@@ -57,7 +57,7 @@ class Tropa:
         return f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}" 
 
     def __repr__(self):
-        return (f'Tropa \nNombre: {self.nombre}\n Vida:  {self.puntos_vida}\n Ataque: {self.ataque_base}\n Cantidad: {self.cantidad}')
+        return (f'Tropa \nNombre: {self.nombre}\n Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}')
 
     """
     def anadir_tropa_stats(self):
