@@ -1,7 +1,7 @@
 from mapa import Mapa
 from region import Region
 from region_manager import RegionManager
-from tipos_recursos import Recurso
+from recursos import Recurso
 '''
 PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
     VER MAPA GRÁFICO -> La idea seria mostrar tus zonas con una X, las de nadie con ? y las del enemigo con O (No es prioridad para el viernes)
@@ -33,11 +33,9 @@ PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
 Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territorio enemigo -> COMBATIR o ABORTAR
 '''
 
-#Recursos de region debe de ser una lista con los objetos recursos, no un diccionario
-#Tropas de region debería de ser una lista con el objeto el cual contenga su cantidad, añadir un método para poder sumar tropas y restar
-#Tropas tiene que tener un método que actualiza la cantidad tropas de la instancia y por ende su ataque en función de la vida que perdió ej: vida de 1 caballero 250, actualizar divide la vida total entre 250, redondear el número y esa es la cantidad
 class Jugador:
-    def __init__(self,usuario,mapa,recursos,conquista = list[tuple[int,int]]):
+    def __init__(self,usuario,mapa,recursos : list[Recurso] = [Recurso('madera',100,0),Recurso('agua',100,0),Recurso('piedra',50,0),Recurso('hierro',25,0),Recurso('oro',25,0)] \
+                 ,conquista : list[tuple[int,int]] = []):
         self.usuario = usuario
         self.mapa = mapa
         self.conquista = conquista #Se debe actualizar en cada interacción
@@ -59,7 +57,7 @@ class Jugador:
         pass
     def añadir_familia(region : tuple[int,int],familia):
         pass
-    def actualizar_recursos():
+    def regenerar_recursos():
         pass
     def actualizar_conquista():
         pass
