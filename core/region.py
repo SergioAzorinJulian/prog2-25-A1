@@ -3,6 +3,7 @@ from typing import List, Optional
 from recursos import Recurso # Para poder referenciar el tipo de recurso en la region
 from tropas import Tropa # Para poder referenciar el tipo de recurso en la region
 from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
+
 class Region:
     """
     Clase que representa una región del mapa.
