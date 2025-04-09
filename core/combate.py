@@ -20,11 +20,11 @@ class Batalla:
                 if i < len(Ejercito_Def):
                     Ejercito_Def[i].atacar(Ejercito_Def, Ejercito_Atk)
 
-        if Ejercito_Atk!=[]:
-            print('El ataque ha sido un exito')
-            return False
-        elif Ejercito_Def!=[]:
+        if Ejercito_Atk==[]:
             print('El ataque ha sido un fracaso')
+            return False
+        elif Ejercito_Def==[]:
+            print('El ataque ha sido efectivo')
             return True
 
 
