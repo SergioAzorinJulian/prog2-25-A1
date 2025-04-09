@@ -32,7 +32,9 @@ class Tropa:
     def actualizar_cantidad(self,aliado):
         ratio = math.ceil(self.vida / self.__class__.vida_base) # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
-        if self.cantidad <= 0:
+        if self.cantidad<0:
+            self.cantidad = 0
+        if self.cantidad == 0:
             for i in aliado:
                 if i.nombre == self.nombre:
                     aliado.remove(i)
@@ -65,25 +67,8 @@ class Tropa:
 
     def __repr__(self):
         return \
-            (f'Tropa \nNombre: {self.nombre}\n Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}')
+            (f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}')
 
-    """
-    def anadir_tropa_stats(self):
-        Tropa.tropa_stats[self.nombre]=self   #Añadimos al diccionario el objeto, se puede acceder a él por el nombre de tropa
-
-
-    @staticmethod
-    def rellenar_tropa_stats():
-        soldado = Soldado()    #Creamos un objeto de cada clase tropa
-        caballero = Caballero()
-        arquero = Arquero()
-        ogro = Ogro()
-        ballestero = Ballestero()
-        mago = Mago()
-        catapulta= Catapulta()
-        escudero=Escudero()
-        hueste = Hueste()
-    """
 
 
 class TropaAtaque(Tropa):
@@ -120,7 +105,8 @@ class TropaDefensa(Tropa):
     Clase de la que heredarán las tropas de tipo "Defensa"
     '''
 
-    def recibir_dmg(self, dmg,aliado, reducion=0.8):
+    def recibir_dmg(self, dmg,aliado, reducion=5):
+        print('hla')
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         self.actualizar_cantidad(aliado)
@@ -144,7 +130,7 @@ class Soldado(TropaAtaque):
     Soldado: Clase Default de Tropa de Atk
     '''
     dmg_base = 100
-    vida_base = 300
+    vida_base = 10
 
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
@@ -162,7 +148,7 @@ class Gigante(TropaDefensa):
         if enemigo !=[]:
             for i in enemigo:
                 if isinstance(i, TropaEstructura):
-                    i.recibir_dmg(self.dmg)
+                    i.recibir_dmg(self.dmg,enemigo)
 
 
 # TROPAS DE ALCANCE
@@ -193,8 +179,8 @@ class Canon(TropaEstructura):
     '''
     Cañon: ''Daño en area'' -> Ataca cada 2 Turnos (De combate)
     '''
-    dmg_base = 200
-    vida_base = 400
+    dmg_base = 300
+    vida_base = 500
 
     def __init__(self, cantidad, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
@@ -206,13 +192,16 @@ class Canon(TropaEstructura):
         return estado
 
     def atacar(self,aliado: list[Tropa],enemigo: list[Tropa]):
+        
+        
         if enemigo != []:
             dmg_total = 0
             reduccion = 1.0
             if self.toggle():
+                print('ATACA')
                 for i in enemigo:
                     if reduccion > 0:
-                        i.recibir_dmg(self.dmg * reduccion)
+                        i.recibir_dmg(self.dmg * reduccion,enemigo)
                         dmg_total += self.dmg * reduccion
                         reduccion -= 0.4
 
