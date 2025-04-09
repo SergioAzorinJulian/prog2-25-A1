@@ -1,5 +1,3 @@
- 
-
 from tropas import *
 
 class Batalla:
@@ -26,14 +24,14 @@ class Batalla:
             return True
 
 
-Soldado1=Soldado(2)
-Arquero1=Arquero(3)
-Gigante1=Gigante(2)
+Soldado1=Soldado(1)
+Arquero1=Arquero(1)
+Gigante1=Gigante(1)
 Soldado2=Soldado(3)
 Arquero2=Arquero(5)
 Soldado3=Soldado(5)
-Canon1=Canon(1)
-Ejercito_Atk=[Gigante1]
+Canon1=Canon(7)
+Ejercito_Atk=[Soldado1,Arquero1,Gigante1]
 Ejercito_Def=[Canon1]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
