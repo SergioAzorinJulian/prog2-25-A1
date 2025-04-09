@@ -65,47 +65,22 @@ class Recurso:
         return cls(nombre, cantidad, regeneracion)
 
 
-    def __sub__(self, other:int):
+    def __isub__(self, other:int):
         """restar los recursos que van a ser utilizados"""
-        try:
-            other + 0
-        except TypeError:
-            print(f'Advertencia: No se puede restar "{other}" porque no es un valor numérico.')
+        if isinstance(other,Recurso):
+            self.cantidad -= other.cantidad
         else:
-            try:
-                if other > self.cantidad:
-                    print(f'Advertencia: No tiene suficiente {self.nombre}')
-                else:
-                    self.cantidad -= other
-            except ValueError:
-                print(f'Advertencia: No tiene suficiente {self.nombre}')
-            except Exception as e:
-                print(f'Error inesperado: {e}')
-        return self.cantidad
+            self.cantidad -= other
+        return self
 
-
-    def __rsub__(self, other: int):
-        """Realiza la resta con el recurso como operando derecho."""
-        return self.__sub__(other)
-
-
-    def __add__(self, other: int):
+    def __iadd__(self, other: int):
         """agregar mas cantidad del recurso"""
-        try:
-            other + 0
-        except TypeError:
-            print(f'Advertencia: No se puede agregar "{other}" porque no es un valor numérico.')
+        if isinstance(other,Recurso):
+            self.cantidad += other.cantidad
         else:
             self.cantidad += other
-        return self.cantidad
-
-
-    def __radd__(self,other:int):
-        """Realiza la suma con el recurso como operando derecho."""
-        return self.__add__(other)
-
+        return self
 
     def regenerar(self):
-        """cantidad de regeneracion del recurso"""
-        self.cantidad = self.__add__(self.regeneracion)
-        return self.cantidad
+        """cantidad de regeneracion del recurso -> Se regenera cada turno"""
+        self.cantidad += self.regeneracion
