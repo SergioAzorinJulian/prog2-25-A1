@@ -45,9 +45,9 @@ class Jugador:
         pass
     def ver_zona(self,region : tuple[int,int]): #Actualiza a su vez la región actual
         self.region_actual = region
-        return str(self.mapa.regiones[region])
+        return str(self.mapa.regiones[self.region_actual])
     def añadir_tropa(self,tropa,cantidad):
-        clases_disponibles ={} #Diccionario con Tropas
+        clases_disponibles={} #Diccionario con Tropas
         for key,value in globals().items():
             if isinstance(value,Tropa):
                 clases_disponibles[key.lower()] = value
@@ -56,7 +56,19 @@ class Jugador:
         else:
             return f'{tropa} no disponible'
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
-        pass
+        for i in self.mapa.regiones[self.region_actual].tropas:
+            if i.nombre == tropa:
+                if cantidad < i.cantidad:
+                    i -= cantidad
+                    if i in self.mapa.regiones[destino].tropas:
+                        for y in self.mapa.regiones[destino].tropas:
+                            if y.nombre == tropa:
+                                y += cantidad
+                    else:
+            
+
+
+
     def mover_batallon(self,destino : tuple[int,int]):
         pass
     def combatir(destino : tuple[int,int]):
