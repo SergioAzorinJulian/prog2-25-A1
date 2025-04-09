@@ -56,6 +56,9 @@ class Tropa:
     def __str__(self):
         return f"{self.nombre} (Vida: {self.puntos_vida}, Ataque: {self.ataque_base}, Cantidad: {self.cantidad}"
 
+    def __repr__(self):
+        return (f'Tropa \nNombre: {self.nombre}\n Vida:  {self.puntos_vida}\n Ataque: {self.ataque_base}\n Cantidad: {self.cantidad}')
+
     """
     def anadir_tropa_stats(self):
         Tropa.tropa_stats[self.nombre]=self   #Añadimos al diccionario el objeto, se puede acceder a él por el nombre de tropa
