@@ -132,7 +132,7 @@ class Soldado(TropaAtaque):
     Soldado: Clase Default de Tropa de Atk
     '''
     dmg_base = 100
-    vida_base = 10
+    vida_base = 1
     recursos = Recurso('caza',10,0)
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
@@ -141,7 +141,7 @@ class Soldado(TropaAtaque):
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
-    vida_base = 500
+    vida_base = 10
     recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
@@ -197,17 +197,17 @@ class Canon(TropaEstructura):
 
         if enemigo != []:
             dmg_total = 0
-            reduccion = 1.0
+
             if self.toggle():
                 print('ATACA')
                 for i in enemigo:
-                    if reduccion > 0:
-                        i.recibir_dmg(self.dmg * reduccion, enemigo)
-                        dmg_total += self.dmg * reduccion
-                        reduccion -= 0.4
+                    print('h')
+                    i.recibir_dmg(self.dmg, enemigo)
+
 
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
+                print('Cargando')
                 return f'{self.nombre} sobrecalentado'
         else:
             return None
