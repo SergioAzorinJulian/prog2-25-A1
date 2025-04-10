@@ -158,6 +158,9 @@ class Soldado(TropaAtaque):
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
+    def __str__(self):
+        return Tropa.__str__(self) + ' Efecto especial: Puede hacer daño extra si tienes suerte'
+
 
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
@@ -166,6 +169,11 @@ class Gigante(TropaDefensa):
    # recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
+    def __str__(self):
+
+        return Tropa.__str__(self)+' Efecto especial: Solo ataca estructuras'
+
+
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
         n=0
@@ -191,6 +199,11 @@ class Arquero(TropaAlcance):
    # recursos = Recurso('caza', 5, 0)
     def __init__(self, cantidad, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
+
+    def __str__(self):
+
+        return Tropa.__str__(self) + ' Efecto especial: Lanza una flecha a cada enemigo'
+
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
         if enemigo != []:
@@ -243,3 +256,8 @@ class Canon(TropaEstructura):
                 return f'{self.nombre} sobrecalentado'
 
         return f'Cañon: No quedan tropas para atacar'
+
+    def __str__(self):
+
+        return Tropa.__str__(self) + ' Efecto especial: Ataca en area, pero debe recargar entre disparos'
+
