@@ -4,7 +4,7 @@ import hashlib
 
 app = Flask(__name__)
 
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this "super secret" to something else!
+app.config["JWT_SECRET_KEY"] = "contraseña"
 jwt = JWTManager(app)
 
 users = {}
