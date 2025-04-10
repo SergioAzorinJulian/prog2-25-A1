@@ -19,9 +19,9 @@ Clase que contiene el bucle del combate
         Ejercito_Def: Ejercito que va a defender (lista formada por objetos tropa)
 
         '''
-
+        texto = ''
         while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
-            texto = ''
+
             max_tropas = max(len(Ejercito_Atk), len(Ejercito_Def)) #Cogemos la longitud del ejercito más grande
             for i in range(max_tropas):  #Repetimos el bucle hasta que lleguemos a la longitud del ejercito más grande
 
@@ -47,16 +47,16 @@ Clase que contiene el bucle del combate
 
 
 
-Soldado1=Soldado(3)
+Soldado1=Soldado(9)
 Arquero1=Arquero(2)
-Arquero2=Arquero(5)
-Gigante1=Gigante(3)
-Gigante2=Gigante(2)
+Arquero2=Arquero(9)
+Gigante1=Gigante(9)
+Gigante2=Gigante(9)
 Soldado2=Soldado(3)
 
 Soldado3=Soldado(5)
-Canon1=Canon(1)
-Ejercito_Atk=[Canon1,Arquero1]
+Canon1=Canon(3)
+Ejercito_Atk=[Arquero1]
 Ejercito_Def=[Gigante1,Soldado1]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
