@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import List, Dict, Optional
 from recursos import Recurso # Para poder referenciar el tipo de recurso en la region
 from tropas import Tropa # Para poder referenciar el tipo de recurso en la region
-from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
+# from edificios import Edificio # Para poder referenciar el tipo de recurso en la region
 class Region:
     """
     Clase que representa una región del mapa.
@@ -48,7 +48,7 @@ class Region:
         self._tipo_terreno = tipo_terreno
         self._es_reino = es_reino
         self.recursos = recursos_base
-        self.edificios: list[Edificio] = []
+        self.edificios: list = []
         self.tropas: list[Tropa] = []
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
@@ -112,7 +112,7 @@ class Region:
         """Establece los recursos de la región."""
         self.recursos = nuevo_recursos
 
-    def set_edificios(self, nuevos_edificios: list[Edificio]):
+    def set_edificios(self, nuevos_edificios: list):
         """Establece los edificios de la región."""
         self.edificios = nuevos_edificios
 

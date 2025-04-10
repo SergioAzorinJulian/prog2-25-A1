@@ -2,6 +2,7 @@ from mapa import Mapa
 from region import Region
 from region_manager import RegionManager
 from recursos import Recurso
+from tropas import *
 '''
 PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
     VER MAPA GRÁFICO -> La idea seria mostrar tus zonas con una X, las de nadie con ? y las del enemigo con O (No es prioridad para el viernes)
@@ -47,28 +48,26 @@ class Jugador:
         self.region_actual = region
         return str(self.mapa.regiones[self.region_actual])
     def añadir_tropa(self,tropa,cantidad):
-        clases_disponibles={} #Diccionario con Tropas
-        for key,value in globals().items():
-            if isinstance(value,Tropa):
-                clases_disponibles[key.lower()] = value
-        if tropa in clases_disponibles.keys():
-            pass
-        else:
-            return f'{tropa} no disponible'
+        pass
+    @classmethod
+    def mostrar_catalogo(cls):
+        tropas_objetos = {
+            key.lower(): value 
+            for key,value in globals().items() 
+            if isinstance(value,type) and (
+             issubclass(value,TropaAtaque) or 
+             issubclass(value,TropaDefensa) or 
+             issubclass(value,TropaAlcance) or 
+             issubclass(value,TropaEstructura))  and value not in (TropaAtaque,TropaDefensa,TropaEstructura,TropaAlcance) } #isinstance -> objeto, issubclas-> objeto 
+        catalogo = ''
+        for i in tropas_objetos.values():
+            catalogo += str(i()) + '\n'
+
+        return tropas_objetos,catalogo
+        
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
-        for i in self.mapa.regiones[self.region_actual].tropas:
-            if i.nombre == tropa:
-                if cantidad < i.cantidad:
-                    i -= cantidad
-                    if i in self.mapa.regiones[destino].tropas:
-                        for y in self.mapa.regiones[destino].tropas:
-                            if y.nombre == tropa:
-                                y += cantidad
-                    else:
+        pass
             
-
-
-
     def mover_batallon(self,destino : tuple[int,int]):
         pass
     def combatir(destino : tuple[int,int]):
@@ -83,3 +82,4 @@ class Jugador:
         pass
     def actualizar_tropas():
         pass
+print(Jugador.mostrar_catalogo()[1])
