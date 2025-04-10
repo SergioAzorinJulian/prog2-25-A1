@@ -56,8 +56,8 @@ Soldado2=Soldado(3)
 
 Soldado3=Soldado(5)
 Canon1=Canon(3)
-Ejercito_Atk=[Arquero1]
-Ejercito_Def=[Gigante1,Soldado1]
+Ejercito_Atk=[Arquero1,Arquero2,Gigante1,Gigante2]
+Ejercito_Def=[Gigante1,Soldado1,Arquero2]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
 

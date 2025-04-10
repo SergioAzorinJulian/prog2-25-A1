@@ -174,8 +174,8 @@ class Gigante(TropaDefensa):
                 if isinstance(i, TropaEstructura):
                     n += 1
                     i.recibir_dmg(self.dmg, enemigo) #Golpeamos la estructura
-        return f'{self.nombre} golpeó {n} veces : {self.dmg * n}'
-
+                    return f'{self.nombre} golpeó {n} veces : {self.dmg * n}'
+                return f'Gigante: No hay estructuras para golpear'
 # TROPAS DE ALCANCE
 class Arquero(TropaAlcance):
     '''
