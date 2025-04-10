@@ -1,6 +1,16 @@
 from flask import Flask, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
+import copy
+
+from core.jugador import Jugador
+from core.mapa import Mapa
+from core.region import Region
+from core.region_manager import RegionManager
+from core.recursos import Recurso
+from core.tropas import Tropa
+from core.edificios import Edificio
+from core.tropas import TropaAtaque, TropaDefensa, TropaAlcance, TropaEstructura
 
 app = Flask(__name__)
 
@@ -10,6 +20,13 @@ jwt = JWTManager(app)
 users = {}
 data = {}
 
+
+diccionario = {}
+for key, value in copy.copy(globals().items()):
+    if isinstance(value, type):
+        diccionario[key] = value
+
+print(diccionario)
 
 @app.route('/')
 def hello_world():
@@ -23,27 +40,85 @@ def get_data():
 
 
 @app.route('/data/<id>', methods=['GET'])
-@jwt_required()
 def get_data_id(id):
     try:
         return data[id], 200
     except KeyError:
         return f'Dato {id} No encontrado', 404
 
+def crear_mapa():
+    """Crea el mapa por defecto y lo devuelve."""
+
+    # Inicializar el mapa con 5 filas y 5 columnas
+    map = Mapa(5, 5)
+
+    # Crear nodos y conexiones
+    nodos = map.crear_nodos()
+    conexiones = map.crear_aristas(nodos)
+
+    # Asignar terrenos a los nodos
+    map.anyadir_terreno(conexiones)
+
+    # Asignar zonas y generar recursos
+    map.asigna_zonas()
+
+    return map
+
+def to_tuple():
+    """
+    Obtiene coordenadas del usuario a través de input y las convierte en una tupla.
+    Maneja errores de formato y rango, y se mantiene en un bucle hasta que se ingrese un valor válido.
+
+    Returns:
+        tuple[int, int]: Una tupla con las coordenadas ingresadas por el usuario.
+    """
+    while True:
+        try:
+            entrada = input("Introduce las coordenadas (fila, columna): ")
+            # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
+            entrada = entrada.strip()
+            coordenadas_str = entrada.split(',')
+
+            # Verificar que haya exactamente dos coordenadas
+            if len(coordenadas_str) != 2:
+                print("Error: Debes introducir dos coordenadas separadas por una coma.")
+                continue  # Volver al inicio del bucle
+
+            # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
+            fila = int(coordenadas_str[0].strip())
+            columna = int(coordenadas_str[1].strip())
+
+            return (fila, columna)
+
+        except ValueError:
+            print("Error: Las coordenadas deben ser números enteros.")
+            continue  # Volver al inicio del bucle
 
 @app.route('/data/<id>', methods=['POST'])
 @jwt_required()
 def add_data(id):
+    global data
     if id not in data:
-        data[id] = request.args.get('value', '')
+
+        diccionario = {}
+        for key, value in globals().items():
+            if isinstance(value, type):
+                diccionario[key] = value
+
+        key = request.args.get('value', '')
+        data[id] = diccionario[key](id, crear_mapa())
+
         return f'Dato {id} añadido', 200
     else:
         return f'Dato {id} ya existe', 409
 
 @app.route('/data/ver_zona/<id>', methods=['GET'])
 def ver_zona(id):
-    jugador = get_data_id(id)
-    return jugador.ver_zona(request.args.get('value', '')), 200
+    jugador = data[id]
+    posicion = request.args.get('value', '')
+    x, y = map(int, posicion.split(','))
+    cordenada = (x, y)
+    return jugador.ver_zona(cordenada), 200
 
 
 @app.route('/data/<id>', methods=['PUT'])

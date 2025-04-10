@@ -91,7 +91,7 @@ def signin(user, password):
     print(r.status_code)
     print(r.text)
     token = r.text
-    create(str(user), Jugador(str(user), crear_mapa()))
+    create(str(user), 'jugador')
 
 def ver_zona(usuario,tupla):
     r = requests.get(f'{URL}/data/ver_zona/<{usuario}?value={tupla}>')
