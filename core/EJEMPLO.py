@@ -1,87 +1,97 @@
-import hashlib
 import requests
-from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
-import requests
-URL='http://127.0.0.1:5000'
-TOKEN =None
+
+URL = 'http://127.0.0.1:5000'
+token = ''
 
 
 
-def iniciar_sesion():
-    usuario = str(input("Usuario: "))
-    contrasena = str(input("Contraseña: "))
-    r=requests.get(f'{URL}/login?user=<usuario>&password=<contraseña>')
+
+
+def create(id, value):
+    global token
+    r = requests.post(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
     print(r.status_code)
     print(r.text)
 
 
-
-
-
-def registrarse():
-    usuario = str(input("Usuario nuevo: "))
-    contrasena = str(input("Contraseña: "))
-    r=requests.post(f"{URL}/signup?user=<string:usuario>&password=<string:contrasena>")
+def read(id):
+    global token
+    r = requests.get(f'{URL}/data/{id}', headers={'Authorization': 'Bearer ' + token})
     print(r.status_code)
     print(r.text)
 
 
+def update(id, value):
+    global token
+    r = requests.put(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
+    print(r.status_code)
+    print(r.text)
 
 
+def delete(id):
+    global token
+    r = requests.delete(f'{URL}/data/{id}', headers={'Authorization': 'Bearer ' + token})
+    print(r.status_code)
+    print(r.text)
 
 
+def singup(user, password):
+    r = requests.post(f'{URL}/signup?user={user}&password={password}')
+    print(r.status_code)
+    print(r.text)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def signin(user, password):
+    global token
+    r = requests.get(f'{URL}/signin?user={user}&password={password}')
+    print(r.status_code)
+    print(r.text)
+    token = r.text
 
 
 def menu():
-    print("1. Iniciar sesión")
-    print("2. Registrarse")
-    print("3. Listar Users")
+    while True:
+        print("\n=== MENU ===")
+
+        print("1. Signup")
+        print("2. Signin")
+        print("3. Create Data")
+        print("4. Read Data")
+        print("5. Update Data")
+        print("6. Delete Data")
+        print("7. Exit")
+
+        choice = input("Enter your choice (1-8): ")
 
 
-
+        if choice == '1':
+            user = input("Usuario Nuevo: ")
+            password = input("Contraseña: ")
+            singup(user, password)
+        elif choice == '2':
+            user = input("Usuario: ")
+            password = input("Contraseña: ")
+            signin(user, password)
+        elif choice == '3':
+            id = input("Enter ID: ")
+            value = input("Enter value: ")
+            create(id, value)
+        elif choice == '4':
+            id = input("Enter ID: ")
+            read(id)
+        elif choice == '5':
+            id = input("Enter ID: ")
+            value = input("Enter new value: ")
+            update(id, value)
+        elif choice == '6':
+            id = input("Enter ID: ")
+            delete(id)
+        elif choice == '7':
+            print("Saliendo...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
 
 if __name__ == '__main__':
-    while True:
-        menu()
-        opcion = input("Elige una opción: ")
-        if opcion == "0":
-            print("Adios......")
-            break
-
-        if opcion == "1":
-            iniciar_sesion()
-
-        if opcion == "2":
-            registrarse()
-
-
-
-
-        else:
-            print("Opción no válida.")
+    menu()
