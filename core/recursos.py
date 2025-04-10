@@ -81,7 +81,9 @@ class Recurso:
         nombre = datos["nombre"]
         cantidad = datos["cantidad"]
         regeneracion = datos["regeneracion"]
-        return cls(nombre, cantidad, regeneracion)
+        valor_maximo = datos["valor_max"]
+
+        return cls(nombre, cantidad, regeneracion, valor_maximo)
 
     def __isub__(self, other: int):
         """restar los recursos que van a ser utilizados"""

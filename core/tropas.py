@@ -7,7 +7,7 @@ from recursos import Recurso
 
 # from __future__ import annotations
 class Tropa:
-    '''
+    """
     Clase base para todas las tropas.
 
     ATRIBUTOS:
@@ -26,7 +26,7 @@ class Tropa:
     atacar: metodo que hace daño al enemigo (puedes ser diferente para algunas tropas
 
     recibir_dmg: metodo donde ser recibie el daño
-    '''
+    """
 
     def __init__(self, recursos: int, nombre: str, cantidad: int):
         self.recursos = recursos
@@ -75,6 +75,27 @@ class Tropa:
     def __repr__(self):
         return \
             (f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}')
+
+    def __sub__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+
+        return Tropa(self.recursos, self.nombre, nueva_cantidad)
+
+
+    def __add__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad += other.cantidad
+        else: # Es un entero
+            nueva_cantidad += other
+
+        return Tropa(self.recursos, self.nombre, nueva_cantidad)
 
 
 class TropaAtaque(Tropa):
@@ -153,7 +174,7 @@ class Soldado(TropaAtaque):
     '''
     dmg_base = 100  #Daño de la tropa
     vida_base = 150  #Vida de la tropa
-    recursos = Recurso('caza',10,0)  #Recursos que cuesta entrenarla
+    recursos = Recurso('caza',10,0, 150)  #Recursos que cuesta entrenarla
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -162,7 +183,7 @@ class Soldado(TropaAtaque):
 class Gigante(TropaDefensa):
     dmg_base = 100
     vida_base = 250
-    recursos = Recurso('caza', 20, 0)
+    recursos = Recurso('caza', 20, 0, 150)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -184,7 +205,7 @@ class Arquero(TropaAlcance):
     '''
     dmg_base = 80
     vida_base = 150
-    recursos = Recurso('caza', 5, 0)
+    recursos = Recurso('caza', 5, 0, 150)
     def __init__(self, cantidad, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -214,7 +235,7 @@ class Canon(TropaEstructura):
     '''
     dmg_base = 300
     vida_base = 500
-    recursos = Recurso('madera', 10, 0)
+    recursos = Recurso('madera', 10, 0, 150)
     def __init__(self, cantidad, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True  #Inicializamos el valor que nos dice si el cañon está listo
