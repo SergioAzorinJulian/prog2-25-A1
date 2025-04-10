@@ -24,6 +24,35 @@ def crear_mapa():
 
     return map
 
+def to_tuple():
+    """
+    Obtiene coordenadas del usuario a través de input y las convierte en una tupla.
+    Maneja errores de formato y rango, y se mantiene en un bucle hasta que se ingrese un valor válido.
+
+    Returns:
+        tuple[int, int]: Una tupla con las coordenadas ingresadas por el usuario.
+    """
+    while True:
+        try:
+            entrada = input("Introduce las coordenadas (fila, columna): ")
+            # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
+            entrada = entrada.strip()
+            coordenadas_str = entrada.split(',')
+
+            # Verificar que haya exactamente dos coordenadas
+            if len(coordenadas_str) != 2:
+                print("Error: Debes introducir dos coordenadas separadas por una coma.")
+                continue  # Volver al inicio del bucle
+
+            # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
+            fila = int(coordenadas_str[0].strip())
+            columna = int(coordenadas_str[1].strip())
+
+            return (fila, columna)
+
+        except ValueError:
+            print("Error: Las coordenadas deben ser números enteros.")
+            continue  # Volver al inicio del bucle
 
 
 def create(id, value):
