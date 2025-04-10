@@ -57,7 +57,7 @@ Soldado2=Soldado(3)
 
 Soldado3=Soldado(5)
 Canon1=Canon(3)
-Ejercito_Atk=[Arquero1,Gigante2]
+Ejercito_Atk=[Arquero1,Gigante2,Gigante1]
 Ejercito_Def=[Soldado1,Arquero2,Canon1]
 
 '''

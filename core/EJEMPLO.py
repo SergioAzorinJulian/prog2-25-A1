@@ -44,7 +44,7 @@ def signin(user, password):
     print(r.status_code)
     print(r.text)
     token = r.text
-    create(str(user), Jugador(str(user),))
+    create(str(user), Jugador(str(user),mapa))
 
 
 def menu():
