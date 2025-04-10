@@ -1,28 +1,43 @@
+import random
 class Recurso:
     """
     Con la clase recurso se crean los diferentes recursos
+
      Attributos
      -------------
-     creados: dict
-     atributo de clase que almacena los recursos creados
-     nombre: str
-     atributo de intancia, es el nombre del recurso
-     cantidad: int
-     atributo de instancia, es la cantidad de unidades del recurso
-     regeneracion: int
-     atributo de instancia, es la cantidad de regeneracion del  recurso
+     PESOS_RECURSOS_BASE : dict
+        Atributo de clase que define los pesos para la generación de recursos base.
+    RECURSOS_ESPECIALES : list
+        Atributo de clase que define los recursos especiales.
+    creados : dict
+        Atributo de clase que almacena los recursos creados.
+    nombre : str
+        Nombre del recurso.
+    cantidad : int
+        Cantidad de unidades del recurso.
+    regeneracion : int
+        Cantidad de regeneración del recurso por turno.
+    valor_max : int
+        valor maximo de regeneracion de un recurso
+
 
      Metodos
      ---------
-     __init__: constructor de la instancia
-     __str__: muestra la info del objeto en formato str
-     to_dict: convierte la instancia en formato de diccionario
-     desde_dict: permite la construccion de la instancia desde la creacion de un diccionario con los datos
-     __sub__: metodo para gestionar el uso de recursos, concretamente para el momento en que hay que gastar recursos
-     __rsub__: metodo para realizar operaciones aritmeticas correctas con el recurso
-     __add__: gestion de recursos, en este caso para sumar un recurso obtenido al mismo ya regustristrado
-     __radd__: metodo para realizar operaciones de suma correctas con la cantidad de un recurso
-     """
+     __init__(nombre: str, cantidad: int, regeneracion: int)
+        Constructor de la clase Recurso.
+    __str__() -> str
+        Retorna una representación en cadena del recurso.
+    to_dict() -> dict
+        Convierte la instancia del recurso en un diccionario.
+    desde_dict(datos: dict)
+        Crea una instancia de Recurso a partir de un diccionario.
+    __isub__(other: int)
+        Resta la cantidad especificada al recurso.
+    __iadd__(other: int)
+        Añade la cantidad especificada al recurso.
+    regenerar()
+        Regenera el recurso en la cantidad definida en el atributo 'regeneracion'.
+    """
 
     PESOS_RECURSOS_BASE = {
         "madera": 4,
@@ -30,44 +45,49 @@ class Recurso:
         "recolección": 3,
         "agua": 3,
         "piedra": 2,
-        "hierro": 2
+        "hierro": 2,
     }
 
     RECURSOS_ESPECIALES = ["oro"]
 
-
     creados = {}
-    def __init__(self, nombre: str, cantidad:int, regeneracion: int): # constructor del objeto recurso
+
+    def __init__(self, nombre: str, cantidad: int, regeneracion: int, valor_max: int):
+        """constructor del objeto recurso"""
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
+        self.valor_max = valor_max
         self.creados[self.nombre] = self.to_dict()
 
-
-    def __str__(self) -> str:  # metodo para mostrar el recurso
-        return f'{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}'
-
+    def __str__(self) -> str:
+        """metodo para mostrar el recurso"""
+        return f"{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}"
+    def __repr__(self) -> str:
+        """metodo para mostrar el recurso"""
+        return f"Recurso(nombre = {self.nombre}, cantidad = {self.cantidad}, regeneracion = {self.regeneracion})"
 
     def to_dict(self) -> dict:
         """introduce la instancia en un diccionario"""
         return {
-            'nombre': self.nombre,
-            'cantidad': self.cantidad,
-            'regeneracion': self.regeneracion
-    }
-
+            "nombre": self.nombre,
+            "cantidad": self.cantidad,
+            "regeneracion": self.regeneracion,
+        }
 
     @classmethod
     def desde_dict(cls, datos: dict):
-        nombre = datos['nombre']
-        cantidad = datos['cantidad']
-        regeneracion = datos['regeneracion']
-        return cls(nombre, cantidad, regeneracion)
+        """metodo para construir el objeto desde un diccionario"""
+        nombre = datos["nombre"]
+        cantidad = datos["cantidad"]
+        regeneracion = datos["regeneracion"]
+        valor_maximo = datos["valor_max"]
 
+        return cls(nombre, cantidad, regeneracion, valor_maximo)
 
-    def __isub__(self, other:int):
+    def __isub__(self, other: int):
         """restar los recursos que van a ser utilizados"""
-        if isinstance(other,Recurso):
+        if isinstance(other, Recurso):
             self.cantidad -= other.cantidad
         else:
             self.cantidad -= other
@@ -75,12 +95,18 @@ class Recurso:
 
     def __iadd__(self, other: int):
         """agregar mas cantidad del recurso"""
-        if isinstance(other,Recurso):
+        if isinstance(other, Recurso):
             self.cantidad += other.cantidad
         else:
             self.cantidad += other
         return self
 
-    def regenerar(self):
+    def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
-        self.cantidad += self.regeneracion
+        percent = porcentaje / 100
+        cant_regenerada = self.regeneracion * percent
+        self.cantidad += cant_regenerada
+        
+        if self.cantidad > self.valor_max:
+            self.cantidad = self.valor_max
+

@@ -47,24 +47,34 @@ class Jugador:
     def ver_zona(self,region : tuple[int,int]): #Actualiza a su vez la región actual
         self.region_actual = region
         return str(self.mapa.regiones[self.region_actual])
-    def añadir_tropa(self,tropa,cantidad):
-        pass
     @classmethod
     def mostrar_catalogo(cls):
-        tropas_objetos = {
-            key.lower(): value 
-            for key,value in globals().items() 
-            if isinstance(value,type) and (
-             issubclass(value,TropaAtaque) or 
-             issubclass(value,TropaDefensa) or 
-             issubclass(value,TropaAlcance) or 
-             issubclass(value,TropaEstructura))  and value not in (TropaAtaque,TropaDefensa,TropaEstructura,TropaAlcance) } #isinstance -> objeto, issubclas-> objeto 
+        if not hasattr(cls,'tropas_objetos'):
+            cls.tropas_objetos = {
+                key.lower(): value 
+                for key,value in globals().items() 
+                if isinstance(value,type) and (
+                issubclass(value,TropaAtaque) or 
+                issubclass(value,TropaDefensa) or 
+                issubclass(value,TropaAlcance) or 
+                issubclass(value,TropaEstructura))  and value not in (TropaAtaque,TropaDefensa,TropaEstructura,TropaAlcance) } #isinstance -> objeto, issubclas-> objeto 
         catalogo = ''
-        for i in tropas_objetos.values():
+        for i in cls.tropas_objetos.values():
             catalogo += str(i()) + '\n'
 
-        return tropas_objetos,catalogo
-        
+        return cls.tropas_objetos,catalogo
+    
+    def añadir_tropa(self,cls,tropa,cantidad):
+        if tropa in self.__class__.tropas_obetos.keys():
+            for recurso in self.recursos:
+                if recurso.nombre == self.__class__.tropas_objetos[tropa].recursos.nombre:
+                    if recurso.cantidad >= self.__class__.tropas_objetos[tropa].recursos.cantidad * cantidad: 
+                        recurso -= self.__class__.tropas_objetos[tropa].recursos * cantidad
+                    else:
+                        return f'Cantidad insuficiente de {self.__class__.tropas_objetos[tropa].recursos.nombre}'
+            nueva_tropa =
+        else:
+            return f'Tropa: {tropa} no disponible'
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
         pass
             
@@ -82,4 +92,3 @@ class Jugador:
         pass
     def actualizar_tropas():
         pass
-print(Jugador.mostrar_catalogo()[1])

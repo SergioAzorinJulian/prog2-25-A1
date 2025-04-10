@@ -64,6 +64,27 @@ class Tropa:
     def __isub__(self, other):
         self.cantidad -= other
         return self
+    
+    def __sub__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+
+
+    def __add__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad += other.cantidad
+        else: # Es un entero
+            nueva_cantidad += other
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
 
     def __str__(self):
         return f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}"
@@ -108,7 +129,6 @@ class TropaDefensa(Tropa):
     '''
 
     def recibir_dmg(self, dmg, aliado, reducion=5):
-        print('hla')
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         self.actualizar_cantidad(aliado)
@@ -208,3 +228,5 @@ class Canon(TropaEstructura):
                 return f'{self.nombre} sobrecalentado'
         else:
             return None
+
+
