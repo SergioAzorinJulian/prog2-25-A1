@@ -1,11 +1,11 @@
 import requests
 import combate
 import jugador
-import mapa
+
 URL = 'http://127.0.0.1:5000'
 token = ''
 
-
+coches= {1,'toyota'}
 
 
 
@@ -44,15 +44,15 @@ def signin(user, password):
     print(r.status_code)
     print(r.text)
     token = r.text
-    create(str(user), Jugador(mapa))
+    create(str(user), coches)
 
 
 def menu():
     while True:
         print("\n=== MENU ===")
 
-        print("1. Signup")
-        print("2. Signin")
+        print("1. REGISTRATE")
+        print("2. INICIAR SESIÓN")
         print("3. Read Data")
         print("4. Exit")
 
