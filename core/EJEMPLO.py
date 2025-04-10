@@ -4,7 +4,7 @@ URL = 'http://127.0.0.1:5000'
 token = ''
 
 
-
+coches={1:'toyota',2:'mercedes'}
 
 
 def create(id, value):
@@ -74,7 +74,7 @@ def menu():
             signin(user, password)
         elif choice == '3':
             id = input("Enter ID: ")
-            value = input("Enter value: ")
+            value = coches
             create(id, value)
         elif choice == '4':
             id = input("Enter ID: ")

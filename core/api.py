@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
-
+import mapa
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this "super secret" to something else!
