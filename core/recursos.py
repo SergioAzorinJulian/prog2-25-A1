@@ -18,10 +18,8 @@ class Recurso:
      __str__: muestra la info del objeto en formato str
      to_dict: convierte la instancia en formato de diccionario
      desde_dict: permite la construccion de la instancia desde la creacion de un diccionario con los datos
-     __sub__: metodo para gestionar el uso de recursos, concretamente para el momento en que hay que gastar recursos
-     __rsub__: metodo para realizar operaciones aritmeticas correctas con el recurso
-     __add__: gestion de recursos, en este caso para sumar un recurso obtenido al mismo ya regustristrado
-     __radd__: metodo para realizar operaciones de suma correctas con la cantidad de un recurso
+     __isub__: metodo para gestionar el uso de recursos, concretamente para el momento en que hay que gastar recursos
+     __iadd__: gestion de recursos, en este caso para sumar un recurso obtenido al mismo ya regustristrado
      """
 
     PESOS_RECURSOS_BASE = {
@@ -37,16 +35,19 @@ class Recurso:
 
 
     creados = {}
-    def __init__(self, nombre: str, cantidad:int, regeneracion: int): # constructor del objeto recurso
+    def __init__(self, nombre: str, cantidad:int, regeneracion: int):
+        """constructor del objeto recurso"""
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
         self.creados[self.nombre] = self.to_dict()
 
 
-    def __str__(self) -> str:  # metodo para mostrar el recurso
+    def __str__(self) -> str:
+        """metodo para mostrar el recurso en formato str"""
         return f'{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}'
     def __repr__(self) -> str:
+        """metodo para mostrar el recurso"""
         return f'Recurso(nombre= {self.nombre}, cantidad={self.cantidad}, regeneración= {self.regeneracion})'
 
 
@@ -61,6 +62,7 @@ class Recurso:
 
     @classmethod
     def desde_dict(cls, datos: dict):
+        """metodo para construir el objeto desde un diccionario"""
         nombre = datos['nombre']
         cantidad = datos['cantidad']
         regeneracion = datos['regeneracion']
