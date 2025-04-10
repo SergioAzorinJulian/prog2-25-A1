@@ -37,12 +37,12 @@ Clase que contiene el bucle del combate
         if Ejercito_Atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
             texto += '\n'
             texto+='Ataque fracaso'
-            print(texto)
+
             return texto  #Devolvemos que el ataque ha sido un fracaso
         elif Ejercito_Def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
             texto+='\n'
             texto+='Ataque exitoso'
-            print(texto)
+
             return texto    #Devolvemos que el ataque ha sido un exito
 
 
