@@ -94,7 +94,7 @@ def signin(user, password):
     create(str(user), 'jugador')
 
 def ver_zona(usuario,tupla):
-    r = requests.get(f'{URL}/data/ver_zona/<{usuario}?value={tupla}>')
+    r = requests.get(f'{URL}/data/ver_zona/{usuario}?value={tupla}')
     print(r)
 def menu():
     while True:
@@ -121,7 +121,7 @@ def menu():
                 print('2. VOLVER')
                 choice = input('Elige una opción (1-2):')
                 if choice == '1':
-                    tupla = to_tuple()
+                    tupla = input('Tupla')
                     ver_zona(user,tupla)
                 elif choice == '2':
                     break

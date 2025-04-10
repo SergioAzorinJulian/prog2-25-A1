@@ -3,14 +3,14 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import hashlib
 import copy
 
-from core.jugador import Jugador
-from core.mapa import Mapa
-from core.region import Region
-from core.region_manager import RegionManager
-from core.recursos import Recurso
-from core.tropas import Tropa
-from core.edificios import Edificio
-from core.tropas import TropaAtaque, TropaDefensa, TropaAlcance, TropaEstructura
+from jugador import Jugador
+from mapa import Mapa
+from region import Region
+from region_manager import RegionManager
+from recursos import Recurso
+from tropas import Tropa
+from edificios import Edificio
+from tropas import TropaAtaque, TropaDefensa, TropaAlcance, TropaEstructura
 
 app = Flask(__name__)
 
@@ -21,12 +21,11 @@ users = {}
 data = {}
 
 
-diccionario = {}
-for key, value in copy.copy(globals().items()):
-    if isinstance(value, type):
-        diccionario[key] = value
+diccionario = {
+                key.lower(): value
+                for key, value in globals().items()
+                if isinstance(value, type) }
 
-print(diccionario)
 
 @app.route('/')
 def hello_world():
@@ -98,13 +97,8 @@ def to_tuple():
 @jwt_required()
 def add_data(id):
     global data
+    global diccionario
     if id not in data:
-
-        diccionario = {}
-        for key, value in globals().items():
-            if isinstance(value, type):
-                diccionario[key] = value
-
         key = request.args.get('value', '')
         data[id] = diccionario[key](id, crear_mapa())
 
@@ -114,6 +108,7 @@ def add_data(id):
 
 @app.route('/data/ver_zona/<id>', methods=['GET'])
 def ver_zona(id):
+    global data
     jugador = data[id]
     posicion = request.args.get('value', '')
     x, y = map(int, posicion.split(','))
@@ -167,3 +162,4 @@ def login():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
