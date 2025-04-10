@@ -104,6 +104,11 @@ class Recurso:
         self.cantidad *= other
         return self
 
+    def __eq__(self, other):
+        if isinstance(other, Recurso):
+            return self.nombre == other.nombre
+        return False
+
     def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
         percent = porcentaje / 100
