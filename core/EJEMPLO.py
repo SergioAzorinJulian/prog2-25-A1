@@ -103,7 +103,7 @@ def menu():
         print("3. Read Data")
         print("4. Exit")
 
-        choice = input("Enter your choice (1-8): ")
+        choice = input('Elige una opción (1-4): ')
 
 
         if choice == '1':
@@ -114,6 +114,16 @@ def menu():
             user = input("Usuario: ")
             password = input("Contraseña: ")
             signin(user, password)
+            while True:
+                print('1. VER REGIÓN')
+                print('2. VOLVER')
+                choice = input('Elige una opción (1-2):')
+                if choice == '1':
+                    tupla = to_tuple()
+                elif choice == '2'
+                    break
+                else:
+                    print('Opción invalida')
         elif choice == '3':
             id = user
             read(id)
