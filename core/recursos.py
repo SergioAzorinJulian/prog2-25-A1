@@ -100,6 +100,9 @@ class Recurso:
         else:
             self.cantidad += other
         return self
+    def __imul__(self, other : int):
+        self.cantidad *= other
+        return self
 
     def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
