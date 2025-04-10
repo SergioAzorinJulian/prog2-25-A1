@@ -84,7 +84,7 @@ class Tropa:
         else: # Es un entero
             nueva_cantidad -= other
 
-        return Tropa(self.recursos, self.nombre, nueva_cantidad)
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
 
 
     def __add__(self, other):
@@ -95,7 +95,7 @@ class Tropa:
         else: # Es un entero
             nueva_cantidad += other
 
-        return Tropa(self.recursos, self.nombre, nueva_cantidad)
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
 
 
 class TropaAtaque(Tropa):
@@ -175,7 +175,7 @@ class Soldado(TropaAtaque):
     dmg_base = 100  #Daño de la tropa
     vida_base = 150  #Vida de la tropa
     recursos = Recurso('caza',10,0, 150)  #Recursos que cuesta entrenarla
-    def __init__(self, cantidad, recursos=50, nombre='Soldado'):
+    def __init__(self, cantidad=0, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
 
@@ -184,7 +184,7 @@ class Gigante(TropaDefensa):
     dmg_base = 100
     vida_base = 250
     recursos = Recurso('caza', 20, 0, 150)
-    def __init__(self, cantidad, recursos=50, nombre='Gigante'):
+    def __init__(self, cantidad=0, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
@@ -206,7 +206,7 @@ class Arquero(TropaAlcance):
     dmg_base = 80
     vida_base = 150
     recursos = Recurso('caza', 5, 0, 150)
-    def __init__(self, cantidad, recursos=50, nombre='Arquero'):
+    def __init__(self, cantidad=0, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
@@ -236,7 +236,7 @@ class Canon(TropaEstructura):
     dmg_base = 300
     vida_base = 500
     recursos = Recurso('madera', 10, 0, 150)
-    def __init__(self, cantidad, recursos=100, nombre='Cañon'):
+    def __init__(self, cantidad=0, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True  #Inicializamos el valor que nos dice si el cañon está listo
 
