@@ -101,8 +101,12 @@ class Recurso:
             self.cantidad += other
         return self
 
-    def regenerar(self):
+    def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
-        porcentaje = random.randint(20,100)
-        self.valor_max /= (porcentaje / 100)
-        self.cantidad += self.valor_max
+        percent = porcentaje / 100
+        cant_regenerada = self.regeneracion * percent
+        self.cantidad += cant_regenerada
+        
+        if self.cantidad > self.valor_max:
+            self.cantidad = self.valor_max
+
