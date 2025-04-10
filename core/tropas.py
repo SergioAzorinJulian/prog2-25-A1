@@ -132,6 +132,7 @@ class TropaDefensa(Tropa):
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         self.actualizar_cantidad(aliado)
+        return ' Gigante: Se ha reducido el daño recibido'
 
 
 class TropaAlcance(Tropa):
@@ -175,7 +176,7 @@ class Gigante(TropaDefensa):
                     n += 1
                     i.recibir_dmg(self.dmg, enemigo) #Golpeamos la estructura
                     return f'{self.nombre} golpeó {n} veces : {self.dmg * n}'
-                return f'Gigante: No hay estructuras para golpear'
+
 # TROPAS DE ALCANCE
 class Arquero(TropaAlcance):
     '''
@@ -199,8 +200,7 @@ class Arquero(TropaAlcance):
                     i.recibir_dmg(self.dmg, enemigo)  #Si tienes suerte, aciertas el disparo e inflinge daño
                     n += 1  #Incrementamos el número de aciertos
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
-        else:
-            return None
+
 
 
 # TROPAS DE ESTRUCTURA
@@ -241,5 +241,5 @@ class Canon(TropaEstructura):
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
                 return f'{self.nombre} sobrecalentado'
-        else:
-            return None
+
+        return f'Cañon: No quedan tropas para atacar'
