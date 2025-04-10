@@ -40,6 +40,11 @@ def add_data(id):
     else:
         return f'Dato {id} ya existe', 409
 
+@app.route('/data/ver_zona/<id>', methods=['GET'])
+def ver_zona(id):
+    jugador = get_data_id(id)
+    return jugador.ver_zona(request.args.get('value', '')), 200
+
 
 @app.route('/data/<id>', methods=['PUT'])
 @jwt_required()

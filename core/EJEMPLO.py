@@ -93,7 +93,9 @@ def signin(user, password):
     token = r.text
     create(str(user), Jugador(str(user), crear_mapa()))
 
-
+def ver_zona(usuario,tupla):
+    r = requests.get(f'{URL}/data/ver_zona/<{usuario}?value={tupla}>')
+    print(r)
 def menu():
     while True:
         print("\n=== MENU ===")
@@ -120,7 +122,8 @@ def menu():
                 choice = input('Elige una opción (1-2):')
                 if choice == '1':
                     tupla = to_tuple()
-                elif choice == '2'
+                    ver_zona(user,tupla)
+                elif choice == '2':
                     break
                 else:
                     print('Opción invalida')
