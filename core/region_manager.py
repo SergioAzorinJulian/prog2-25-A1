@@ -55,10 +55,10 @@ class RegionManager:
                     cantidad = 3 if random.random() < 0.8 else 4
 
                     # Recursos base que estaran en todos los reinos
-                    recursos.append(Recurso("oro", random.randint(100, 300), 2))
-                    recursos.append(Recurso("agua", random.randint(200, 500), 5))
+                    recursos.append(Recurso("oro", random.randint(100, 300), 2, 300))
+                    recursos.append(Recurso("agua", random.randint(200, 500), 5, 500))
                     comida = random.choice(["caza", "recolección"])
-                    recursos.append(Recurso(comida, random.randint(200, 500), 5))
+                    recursos.append(Recurso(comida, random.randint(200, 500), 5, 500))
 
                     cantidad -= 3  # Ya hemos asignado 3 recursos base, si hay extra, se sumarán con seleccionar_recursos()
                     # No contabilizamos si un recurso (comida o agua) ha aparecido en un reino
@@ -118,7 +118,7 @@ class RegionManager:
 
             # Asignar el recurso si no está ya presente
             if recurso_seleccionado not in [recurso.nombre for recurso in recursos_generados]:
-                recursos_generados.append(Recurso(recurso_seleccionado, cantidad_recurso, regeneracion_recurso))
+                recursos_generados.append(Recurso(recurso_seleccionado, cantidad_recurso, regeneracion_recurso, cantidad_recurso))
                 self.recurso_presente[recurso_seleccionado] = True
 
         return recursos_generados
@@ -143,7 +143,7 @@ class RegionManager:
                     nuevos_recursos = region_aleatoria.get_recursos()  # Se optiene el diccionario con los recursos de la region
                     cantidad_recurso = random.randint(200, 400)
                     regeneracion_recurso = random.randint(1, 10)
-                    nuevos_recursos.append(Recurso(recurso, cantidad_recurso, regeneracion_recurso))  # Cantidades estandar para el nuevo recurso
+                    nuevos_recursos.append(Recurso(recurso, cantidad_recurso, regeneracion_recurso, cantidad_recurso))  # Cantidades estandar para el nuevo recurso
                     region_aleatoria.set_recursos(nuevos_recursos)
 
                     self.recurso_presente[recurso] = True  # Ahora ya si que ha aparecido, por lo que cambiamos a True

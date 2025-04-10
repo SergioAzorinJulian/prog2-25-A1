@@ -37,11 +37,11 @@ Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territori
 
 
 class Jugador:
-    def __init__(self, usuario, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0), Recurso('agua', 100, 0),
-                                                                 Recurso('piedra', 50, 0), Recurso('hierro', 25, 0),
-                                                                 Recurso('oro', 25, 0), \
-                                                                 Recurso('caza', 400, 0),
-                                                                 Recurso('recoleccion', 400, 0)],
+    def __init__(self, usuario, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
+                                                                 Recurso('piedra', 50, 0, 100), Recurso('hierro', 25, 0, 100),
+                                                                 Recurso('oro', 25, 0, 100), \
+                                                                 Recurso('caza', 400, 0, 400),
+                                                                 Recurso('recoleccion', 400, 0, 400)],
                  conquista: list[tuple[int, int]] = []):
         self.usuario = usuario
         self.mapa = mapa

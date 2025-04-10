@@ -1,11 +1,28 @@
 import requests
-import combate
-import jugador
+from combate import Batalla
+from jugador import Jugador
+from mapa import Mapa
 
 URL = 'http://127.0.0.1:5000'
 token = ''
 
-coches= {1,'toyota'}
+def crear_mapa():
+    """Crea el mapa por defecto y lo devuelve."""
+
+    # Inicializar el mapa con 6 filas y 6 columnas
+    map = Mapa(5, 5)
+
+    # Crear nodos y conexiones
+    nodos = map.crear_nodos()
+    conexiones = map.crear_aristas(nodos)
+
+    # Asignar terrenos a los nodos
+    map.anyadir_terreno(conexiones)
+
+    # Asignar zonas y generar recursos
+    map.asigna_zonas()
+
+    return map
 
 
 
@@ -44,7 +61,7 @@ def signin(user, password):
     print(r.status_code)
     print(r.text)
     token = r.text
-    create(str(user), Jugador(str(user),mapa))
+    create(str(user), Jugador(str(user), crear_mapa()))
 
 
 def menu():
