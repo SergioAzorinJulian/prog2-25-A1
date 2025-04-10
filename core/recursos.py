@@ -1,3 +1,4 @@
+import random
 class Recurso:
     """
     Con la clase recurso se crean los diferentes recursos
@@ -16,6 +17,9 @@ class Recurso:
         Cantidad de unidades del recurso.
     regeneracion : int
         Cantidad de regeneración del recurso por turno.
+    valor_max : int
+        valor maximo de regeneracion de un recurso
+
 
      Metodos
      ---------
@@ -48,16 +52,20 @@ class Recurso:
 
     creados = {}
 
-    def __init__(
-        self, nombre: str, cantidad: int, regeneracion: int
-    ):  # constructor del objeto recurso
+    def __init__(self, nombre: str, cantidad: int, regeneracion: int, valor_max: int):
+        """constructor del objeto recurso"""
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
+        self.valor_max = valor_max
         self.creados[self.nombre] = self.to_dict()
 
-    def __str__(self) -> str:  # metodo para mostrar el recurso
+    def __str__(self) -> str:
+        """metodo para mostrar el recurso"""
         return f"{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}"
+    def __repr__(self) -> str:
+        """metodo para mostrar el recurso"""
+        return f"Recurso(nombre = {self.nombre}, cantidad = {self.cantidad}, regeneracion = {self.regeneracion})"
 
     def to_dict(self) -> dict:
         """introduce la instancia en un diccionario"""
@@ -69,6 +77,7 @@ class Recurso:
 
     @classmethod
     def desde_dict(cls, datos: dict):
+        """metodo para construir el objeto desde un diccionario"""
         nombre = datos["nombre"]
         cantidad = datos["cantidad"]
         regeneracion = datos["regeneracion"]
@@ -92,4 +101,6 @@ class Recurso:
 
     def regenerar(self):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
-        self.cantidad += self.regeneracion
+        porcentaje = random.randint(20,100)
+        self.valor_max /= (porcentaje / 100)
+        self.cantidad += self.valor_max
