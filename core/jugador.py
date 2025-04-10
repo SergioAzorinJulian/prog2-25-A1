@@ -67,12 +67,17 @@ class Jugador:
     def añadir_tropa(self,cls,tropa,cantidad):
         if tropa in self.__class__.tropas_obetos.keys():
             for recurso in self.recursos:
-                if recurso.nombre == self.__class__.tropas_objetos[tropa].recursos.nombre:
+                if recurso == self.__class__.tropas_objetos[tropa].recursos:
                     if recurso.cantidad >= self.__class__.tropas_objetos[tropa].recursos.cantidad * cantidad: 
                         recurso -= self.__class__.tropas_objetos[tropa].recursos * cantidad
                     else:
                         return f'Cantidad insuficiente de {self.__class__.tropas_objetos[tropa].recursos.nombre}'
-            nueva_tropa =
+            nueva_tropa = self.__class__.tropas_objetos[tropa](cantidad=cantidad)
+            for tropa in self.mapa.regiones[self.region_actual].tropas:
+                if nueva_tropa == tropa:
+                    tropa += nueva_tropa
+                    return f'Tropa añadida correctamente'
+            return self.mapa.regiones[self.region_actual].tropas.append(nueva_tropa)
         else:
             return f'Tropa: {tropa} no disponible'
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
