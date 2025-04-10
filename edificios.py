@@ -26,7 +26,7 @@ class Edificio:
         self.costo_mejora = {}
         self.familias_asignadas = familias_asignadas
 
-    def construir(self, recursos_disponibles: dict, familias_disponibles: int):
+    def construir(self, recursos: dict, familias_disponibles: int):
         try:
             if self.nivel > 0:
                 return False
@@ -34,24 +34,19 @@ class Edificio:
             if familias_disponibles < self.familias_asignadas:
                 return False
 
-            for recurso in self.costo_construccion:
-                cantidad_necesaria = self.costo_construccion[recurso]
-                if recurso in recursos_disponibles:
-                    cantidad_disponible = recursos_disponibles[recurso].cantidad
-                    if cantidad_disponible < cantidad_necesaria:
-                        return False
-                else:
+            for recurso, cantidad in self.costo_construccion.items():
+                if recursos.get(recurso, 0) < cantidad:
                     return False
 
-            for recurso in self.costo_construccion:
-                recursos_disponibles[recurso].cantidad -= self.costo_construccion[recurso]
+            for recurso, cantidad in self.costo_construccion.items():
+                recursos[recurso] -= cantidad
 
             self.nivel = 1
             return True
         except (TypeError, AttributeError):
             return False
 
-    def subir_nivel(self, recursos_disponibles: dict, familias_disponibles: int):
+    def subir_nivel(self, recursos: dict, familias_disponibles: int):
         try:
             if self.nivel == 0:
                 return False
@@ -60,11 +55,11 @@ class Edificio:
                 return False
 
             for recurso, cantidad in self.costo_mejora.items():
-                if recurso not in recursos_disponibles or recursos_disponibles[recurso].cantidad < cantidad:
+                if recursos.get(recurso, 0) < cantidad:
                     return False
 
             for recurso, cantidad in self.costo_mejora.items():
-                recursos_disponibles[recurso].cantidad -= cantidad
+                recursos[recurso] -= cantidad
 
             self.nivel += 1
             return True
@@ -180,7 +175,10 @@ class Muros(Edificio):
     def __init__(self, nivel=0):
         super().__init__('Muros', nivel, {'madera': 5, 'piedra': 5}, familias_asignadas=0)
         self.costo_mejora = {'madera': 5 * self.nivel, 'piedra': 5 * self.nivel}
-        self.vida = 50 * self.nivel if self.nivel > 0 else 0
+        if self.nivel > 0:
+            self.vida = 50 * self.nivel
+        else:
+            self.vida=0
 
 
 class GranAlmacen(Edificio):
@@ -203,3 +201,4 @@ class Castillo(Edificio):
         super().__init__('Castillo', nivel, {}, familias_asignadas=0)
         self.costo_mejora = {"piedra": 15 * self.nivel, "madera": 10 * self.nivel}
         self.vida = 100 * self.nivel
+
