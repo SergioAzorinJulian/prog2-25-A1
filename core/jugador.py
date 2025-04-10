@@ -64,7 +64,7 @@ class Jugador:
 
         return cls.tropas_objetos,catalogo
     
-    def añadir_tropa(self,cls,tropa,cantidad):
+    def add_tropa(self,cls,tropa,cantidad):
         if tropa in self.__class__.tropas_obetos.keys():
             for recurso in self.recursos:
                 if recurso == self.__class__.tropas_objetos[tropa].recursos:
@@ -73,15 +73,42 @@ class Jugador:
                     else:
                         return f'Cantidad insuficiente de {self.__class__.tropas_objetos[tropa].recursos.nombre}'
             nueva_tropa = self.__class__.tropas_objetos[tropa](cantidad=cantidad)
-            for tropa in self.mapa.regiones[self.region_actual].tropas:
-                if nueva_tropa == tropa:
-                    tropa += nueva_tropa
+            for i in self.mapa.regiones[self.region_actual].tropas:
+                if nueva_tropa == i:
+                    i += nueva_tropa
                     return f'Tropa añadida correctamente'
             return self.mapa.regiones[self.region_actual].tropas.append(nueva_tropa)
         else:
-            return f'Tropa: {tropa} no disponible'
+            return f'Tropa: {tropa} no existe'
+        
     def mover_tropa(self,destino : tuple[int,int],tropa,cantidad):
-        pass
+        #AÑADIR COMPROBACIÓN: destino pertenece a conquista + self.mapa.regiones[self.region_actual].get_conexiones
+        if tropa in self.__class__.tropas_obetos.keys():
+            for i in self.mapa.regiones[self.region_actual].tropas:
+                if i.nombre.lower() == tropa: #tropa debe ser minúscula
+                    if i.cantidad > cantidad:
+                        nueva_tropa = i - cantidad
+                        for tropa_destino in self.mapa.regiones[destino].tropas:
+                            if nueva_tropa == tropa_destino:
+                                tropa_destino += nueva_tropa
+                                return f'Tropa movida a {destino}'
+                        self.mapa.regiones[destino].tropas.append(nueva_tropa)
+                        return f'Tropa movida a {destino}'
+                    elif i.cantidad == cantidad:
+                        nueva_tropa = i
+                        self.mapa.regiones[self.region_actual].tropas.remove(i)
+                        for tropa_destino in self.mapa.regiones[destino].tropas:
+                            if nueva_tropa == tropa_destino:
+                                tropa_destino += nueva_tropa
+                                return f'Tropa movida a {destino}'
+                        self.mapa.regiones[destino].tropas.append(nueva_tropa)
+                        return f'Tropa movida a {destino}'
+
+                    else:
+                        return f'No dispones de {cantidad} {i.nombre}'
+            return f'No dispones de {tropa} en la region'
+        else:
+            return f'Tropa: {tropa} no existe'
             
     def mover_batallon(self,destino : tuple[int,int]):
         pass
@@ -89,7 +116,7 @@ class Jugador:
         pass
     def construir_edificio(self,edificio):
         pass
-    def añadir_familia(region : tuple[int,int],familia):
+    def add_familia(region : tuple[int,int],familia):
         pass
     def regenerar_recursos():
         pass
