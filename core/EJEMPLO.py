@@ -85,7 +85,7 @@ def menu():
             password = input("Contraseña: ")
             signin(user, password)
         elif choice == '3':
-            id = input("Enter ID: ")
+            id = user
             read(id)
 
         elif choice == '4':
