@@ -36,6 +36,7 @@ def create(id, value):
 def read(id):
     global token
     r = requests.get(f'{URL}/data/{id}', headers={'Authorization': 'Bearer ' + token})
+
     print(r.status_code)
     print(r.text)
 

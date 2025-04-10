@@ -49,6 +49,9 @@ class Jugador:
         self.recursos = recursos
         self.region_actual: tuple[int, int] = None  # La zona que esta consultando el jugador dentro del bucle principal
 
+    def __str__(self):
+        return f'Usuario: {self.usuario}, Mapa: {self.mapa}'
+
     def mapa_grafico(self, mapa):
         pass
 
