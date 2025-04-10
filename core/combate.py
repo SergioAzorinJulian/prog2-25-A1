@@ -50,14 +50,14 @@ Clase que contiene el bucle del combate
 Soldado1=Soldado(3)
 Arquero1=Arquero(2)
 Arquero2=Arquero(5)
-Gigante1=Gigante(6)
+Gigante1=Gigante(3)
 Gigante2=Gigante(2)
 Soldado2=Soldado(3)
 
 Soldado3=Soldado(5)
 Canon1=Canon(1)
-Ejercito_Atk=[Arquero1]
-Ejercito_Def=[Gigante1]
+Ejercito_Atk=[Canon1,Arquero1]
+Ejercito_Def=[Gigante1,Soldado1]
 
 Batalla.combate(Ejercito_Atk,Ejercito_Def)
 
