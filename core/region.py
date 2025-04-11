@@ -134,22 +134,21 @@ class Region:
     def __str__(self) -> str:
         tropas_str = ''
         for troop in self.tropas:
-            tropas_str += f'{troop.__str__()} \n'
+            tropas_str += f' {troop.__str__()} |\n'
 
         recursos_str = ''
         for resource in self.recursos:
-            recursos_str += f'{resource.__str__()} \n'
+            recursos_str += f' {resource.__str__()} |\n'
 
         return (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | \n"
-                f"Propietario: {self._propietario} | \n "
-                f"Recursos: \n {recursos_str} | \n"
+                f"Propietario: {self._propietario} |\n"
+                f"Recursos: \n {recursos_str}"
                 f"Edificios: {self.edificios} | \n"
-                f" Tropas: \n {tropas_str}")
+                f"Tropas: \n {tropas_str}")
 
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
         return f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self.recursos})"
-
 
 
 

@@ -78,20 +78,31 @@ class Jugador:
 
         return cls.tropas_objetos, catalogo
 
-    def add_tropa(self, cls, tropa, cantidad):
-        if tropa in self.__class__.tropas_obetos.keys():
+    def add_tropa(self, tropa, cantidad):
+        tropas_objetos = {
+                key.lower(): value
+                for key, value in globals().items()
+                if isinstance(value, type) and (
+                        issubclass(value, TropaAtaque) or
+                        issubclass(value, TropaDefensa) or
+                        issubclass(value, TropaAlcance) or
+                        issubclass(value, TropaEstructura)) and value not in (
+                   TropaAtaque, TropaDefensa, TropaEstructura,
+                   TropaAlcance)}
+        if tropa in tropas_objetos.keys():
             for recurso in self.recursos:
-                if recurso == self.__class__.tropas_objetos[tropa].recursos:
-                    if recurso.cantidad >= self.__class__.tropas_objetos[tropa].recursos.cantidad * cantidad:
-                        recurso -= self.__class__.tropas_objetos[tropa].recursos * cantidad
+                if recurso == tropas_objetos[tropa].recursos:
+                    if recurso.cantidad >= tropas_objetos[tropa].recursos.cantidad * cantidad:
+                        recurso -= tropas_objetos[tropa].recursos * cantidad
                     else:
-                        return f'Cantidad insuficiente de {self.__class__.tropas_objetos[tropa].recursos.nombre}'
-            nueva_tropa = self.__class__.tropas_objetos[tropa](cantidad=cantidad)
+                        return f'Cantidad insuficiente de {tropas_objetos[tropa].recursos.nombre}'
+            nueva_tropa = tropas_objetos[tropa](cantidad=cantidad)
             for i in self.mapa.regiones[self.region_actual].tropas:
                 if nueva_tropa == i:
                     i += nueva_tropa
                     return f'Tropa añadida correctamente'
-            return self.mapa.regiones[self.region_actual].tropas.append(nueva_tropa)
+            self.mapa.regiones[self.region_actual].tropas.append(nueva_tropa)
+            return f'Tropa añadida correctamente'
         else:
             return f'Tropa: {tropa} no existe'
 

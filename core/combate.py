@@ -64,5 +64,6 @@ Ejercito_Def=[Soldado1,Arquero2,Canon1]
 Ejercito_Atk=[Arquero1,Gigante2]
 Ejercito_Def=[Soldado1,Arquero2,Canon1]
 '''
-Batalla.combate_ejemplo(Ejercito_Atk,Ejercito_Def)
+if __name__ == '__main__':
+    Batalla.combate_ejemplo(Ejercito_Atk,Ejercito_Def)
 

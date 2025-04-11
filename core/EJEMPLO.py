@@ -84,18 +84,26 @@ def singup(user, password):
     print(r.text)
 
 
-def signin(user, password):
+def login(user, password):
     global token
-    r = requests.get(f'{URL}/signin?user={user}&password={password}')
-
-    print(r.status_code)
-    print(r.text)
+    r = requests.get(f'{URL}/login?user={user}&password={password}')
     token = r.text
-    create(str(user), 'jugador')
+    if r.status_code == 200:
+        create(str(user), 'jugador')
+        return True
+    else:
+        return False
+
 
 def ver_zona(usuario,tupla):
     r = requests.get(f'{URL}/data/ver_zona/{usuario}?value={tupla}')
-    print(r)
+    print(r.text)
+def mostrar_catalogo(usuario):
+    r = requests.get(f'{URL}/data/ver_zona/catalogo/{usuario}')
+    return r.text
+def add_tropa(usuario,tropa,cantidad):
+    r = requests.post(f'{URL}/data/ver_zona/add_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}')
+    return r.text
 def menu():
     while True:
         print("\n=== MENU ===")
@@ -115,18 +123,30 @@ def menu():
         elif choice == '2':
             user = input("Usuario: ")
             password = input("Contraseña: ")
-            signin(user, password)
-            while True:
-                print('1. VER REGIÓN')
-                print('2. VOLVER')
-                choice = input('Elige una opción (1-2):')
-                if choice == '1':
-                    tupla = input('Tupla')
-                    ver_zona(user,tupla)
-                elif choice == '2':
-                    break
-                else:
-                    print('Opción invalida')
+            if login(user, password):
+                while True:
+                    print('1. VER REGIÓN')
+                    print('2. VOLVER')
+                    choice = input('Elige una opción (1-2):')
+                    if choice == '1':
+                        tupla = input('Tupla')
+                        ver_zona(user,tupla)
+                        while True:
+                            print('1. AÑADIR TROPA')
+                            print('2.VOLVER')
+                            choice = input('Elige una opción (1-2):')
+                            if choice == '1':
+                                print(mostrar_catalogo(user))
+                                tropa = input('Que tropa desea añadir???: ').lower()
+                                cantidad = int(input('Que cantidad???: '))
+                                print(add_tropa(user,tropa,cantidad))
+                            elif choice == '2':
+                                break
+
+                    elif choice == '2':
+                        break
+                    else:
+                        print('Opción invalida')
         elif choice == '3':
             id = user
             read(id)
