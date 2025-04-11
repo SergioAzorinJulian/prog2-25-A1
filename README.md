@@ -41,3 +41,12 @@
 [//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
 [//]: # (Para la evaluación por pares, indicaréis aquí las diferentes opciones de vuestro menú textual, especificando para qué sirve cada una de ellas)
  
+## Requirements.text
+Aqui se muestran las dependencias (librerias) que necesitan
+ser instaladas para ejecutar correctamente nuestro codigo
+
+Para **generar un archivo requirements.txt**
+`pip freeze > requirements.txt`
+
+Para **instalar las dependencias** en un nuevo entorno virtual
+`pip install -r requirements.txt`
