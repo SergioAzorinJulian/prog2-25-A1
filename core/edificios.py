@@ -1,4 +1,4 @@
-'''
+"""
 La clase Edificio representa cualquier estructura dentro del reino.
 Es la clase base para todos los edificios.
 
@@ -16,7 +16,7 @@ __init__ : Constructor de la instancia.
 construir : Construye el edificio si hay suficientes recursos y familias disponibles.
 subir_nivel : Sube el nivel del edificio si hay suficientes recursos y familias disponibles.
 __str__ : Devuelve información del edificio.
-'''
+"""
 
 class Edificio:
     def __init__(self, nombre: str, nivel: int, costo_construccion: dict, familias_asignadas: int):
