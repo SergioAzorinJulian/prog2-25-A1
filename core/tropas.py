@@ -37,6 +37,7 @@ class Tropa:
     def actualizar_cantidad(self, aliado):
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
+        self.daño=self.__class__.dmg_base*self.cantidad
         if self.cantidad < 0:
             self.cantidad = 0
         if self.cantidad == 0:
