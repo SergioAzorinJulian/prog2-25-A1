@@ -2,12 +2,20 @@
 import random
 import math
 
+<<<<<<< HEAD
 from core.recursos import Recurso
+=======
+from recursos import Recurso
+>>>>>>> develope
 
 
 # from __future__ import annotations
 class Tropa:
+<<<<<<< HEAD
     '''
+=======
+    """
+>>>>>>> develope
     Clase base para todas las tropas.
 
     ATRIBUTOS:
@@ -22,7 +30,18 @@ class Tropa:
     METODOS:
     -----------
 
+<<<<<<< HEAD
     '''
+=======
+<<<<<<< HEAD
+    atacar: metodo que hace daño al enemigo (puedes ser diferente para algunas tropas
+
+    recibir_dmg: metodo donde ser recibie el daño
+    """
+=======
+    '''
+>>>>>>> features-api
+>>>>>>> develope
 
     def __init__(self, recursos: int, nombre: str, cantidad: int):
         self.recursos = recursos
@@ -64,7 +83,44 @@ class Tropa:
     def __isub__(self, other):
         self.cantidad -= other
         return self
+<<<<<<< HEAD
 
+=======
+    
+<<<<<<< HEAD
+    def __eq__(self, other):
+        if isinstance(other, Tropa):
+            return self.nombre == other.nombre
+        return False
+=======
+    def __sub__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+>>>>>>> features-api
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+
+
+    def __add__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad += other.cantidad
+        else: # Es un entero
+            nueva_cantidad += other
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+    
+    def __eq__(self, other):
+        if isinstance(other, Tropa):
+            return self.nombre == other.nombre
+        return False
+    
+>>>>>>> develope
     def __str__(self):
         return f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}"
 
@@ -72,6 +128,30 @@ class Tropa:
         return \
             (f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}')
 
+<<<<<<< HEAD
+=======
+    def __sub__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+
+
+    def __add__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad += other.cantidad
+        else: # Es un entero
+            nueva_cantidad += other
+
+        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+
+>>>>>>> develope
 
 class TropaAtaque(Tropa):
     '''
@@ -108,7 +188,10 @@ class TropaDefensa(Tropa):
     '''
 
     def recibir_dmg(self, dmg, aliado, reducion=5):
+<<<<<<< HEAD
         print('hla')
+=======
+>>>>>>> develope
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         self.actualizar_cantidad(aliado)
@@ -131,19 +214,43 @@ class Soldado(TropaAtaque):
     '''
     Soldado: Clase Default de Tropa de Atk
     '''
+<<<<<<< HEAD
     dmg_base = 100
     vida_base = 1
     recursos = Recurso('caza',10,0)
     def __init__(self, cantidad, recursos=50, nombre='Soldado'):
+=======
+<<<<<<< HEAD
+    dmg_base = 100  #Daño de la tropa
+    vida_base = 150  #Vida de la tropa
+    recursos = Recurso('caza',10,0, 150)  #Recursos que cuesta entrenarla
+=======
+    dmg_base = 100
+    vida_base = 1
+    recursos = Recurso('caza',10,0)
+>>>>>>> features-api
+    def __init__(self, cantidad=0, recursos=50, nombre='Soldado'):
+>>>>>>> develope
         super().__init__(recursos, nombre, cantidad)
 
 
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
+<<<<<<< HEAD
     vida_base = 10
     recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad, recursos=50, nombre='Gigante'):
+=======
+<<<<<<< HEAD
+    vida_base = 250
+    recursos = Recurso('caza', 20, 0, 150)
+=======
+    vida_base = 10
+    recursos = Recurso('caza', 20, 0)
+>>>>>>> features-api
+    def __init__(self, cantidad=0, recursos=50, nombre='Gigante'):
+>>>>>>> develope
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
@@ -160,8 +267,17 @@ class Arquero(TropaAlcance):
     '''
     dmg_base = 80
     vida_base = 150
+<<<<<<< HEAD
     recursos = Recurso('caza', 5, 0)
     def __init__(self, cantidad, recursos=50, nombre='Arquero'):
+=======
+<<<<<<< HEAD
+    recursos = Recurso('caza', 5, 0, 150)
+=======
+    recursos = Recurso('caza', 5, 0)
+>>>>>>> features-api
+    def __init__(self, cantidad=0, recursos=50, nombre='Arquero'):
+>>>>>>> develope
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
@@ -173,7 +289,11 @@ class Arquero(TropaAlcance):
                     n += 1
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
         else:
+<<<<<<< HEAD
             return None
+=======
+            return ''
+>>>>>>> develope
 
 
 # TROPAS DE ESTRUCTURA
@@ -183,8 +303,17 @@ class Canon(TropaEstructura):
     '''
     dmg_base = 300
     vida_base = 500
+<<<<<<< HEAD
     recursos = Recurso('madera', 10, 0)
     def __init__(self, cantidad, recursos=100, nombre='Cañon'):
+=======
+<<<<<<< HEAD
+    recursos = Recurso('madera', 10, 0, 150)
+=======
+    recursos = Recurso('madera', 10, 0)
+>>>>>>> features-api
+    def __init__(self, cantidad=0, recursos=100, nombre='Cañon'):
+>>>>>>> develope
         super().__init__(recursos, nombre, cantidad)
         self.activo = True
 
@@ -197,6 +326,7 @@ class Canon(TropaEstructura):
 
         if enemigo != []:
             dmg_total = 0
+<<<<<<< HEAD
 
             if self.toggle():
                 print('ATACA')
@@ -211,3 +341,19 @@ class Canon(TropaEstructura):
                 return f'{self.nombre} sobrecalentado'
         else:
             return None
+=======
+            reduccion = 1
+            if self.toggle():
+                for i in enemigo[:]: #Copia de la lista para no alterar el orden
+                    if reduccion > 0:
+                        i.recibir_dmg(self.dmg * reduccion, enemigo)
+                        dmg_total += self.dmg * reduccion
+                        reduccion -= 0.4
+                return f'{self.nombre} dispara : {dmg_total}'
+            else:
+                return f'{self.nombre} sobrecalentado'
+        else:
+            return ''
+
+
+>>>>>>> develope
