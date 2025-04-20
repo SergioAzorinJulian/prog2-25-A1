@@ -52,7 +52,7 @@ class Recurso:
 
     creados = {}
 
-    def __init__(self, nombre: str, cantidad: int, regeneracion: int, valor_max: int):
+    def __init__(self, nombre: str, cantidad: int, regeneracion: int, valor_max: int = 300):
         """constructor del objeto recurso"""
         self.nombre = nombre
         self.cantidad = cantidad

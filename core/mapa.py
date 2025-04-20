@@ -1,5 +1,5 @@
-from core.region_manager import RegionManager
-from core.region import Region
+from region_manager import RegionManager
+from region import Region
 
 from random import randint, choice
 from typing import List, Dict
