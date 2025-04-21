@@ -160,6 +160,19 @@ class Mapa:
 
         return deepcopy(self.regiones)
 
+    def get_reinos(self) -> list[Region]:
+        """
+        Devuelve una copia del listado de reinos del mapa.
+
+        Returns
+        -------
+        list[Region]
+            Una copia del listado de reinos del mapa.
+        """
+
+        return deepcopy(self.reinos)
+
+
     ### FUNCIONES PARA ESTABLECER NUEVOS VALORES A LOS ATRIBUTOS PROTEGIDOS ###
     def set_filas(self, filas: int):
         """
