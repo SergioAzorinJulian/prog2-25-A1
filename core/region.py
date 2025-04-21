@@ -30,7 +30,7 @@ class Region:
         Lugar especial presente en la región.
     """
 
-    def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: List[Recurso] = None):
+    def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: List[Recurso] = None, nombre_especifico: Optional[str] = None):
         """
         Parameters
         ----------
@@ -53,6 +53,8 @@ class Region:
         self.tropas: list[Tropa] = []
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
+        if self._es_reino:
+            self._nombre_especifico = nombre_especifico
 
     ### GETTERS ###
     def get_posicion(self):
@@ -90,6 +92,10 @@ class Region:
     def get_lugar_especial(self):
         """Devuelve el lugar especial de la región."""
         return self._lugar_especial
+
+    def get_nombre_especifico(self):
+        """Devuelve el nombre especifico de la region."""
+        return self._nombre_especifico
 
 
     ### SETTERS ###
@@ -129,6 +135,10 @@ class Region:
         """Establece el lugar especial de la región."""
         self._lugar_especial = nuevo_lugar
 
+    def set_nombre_especifico(self, nuevo_nombre: str):
+        """Establece el nombre especifico de la region."""
+        self._nombre_especifico = nuevo_nombre
+
 
     ### METODO PARA MOSTRAR INFORMACION SOBRE LA REGION ###
     def __str__(self) -> str:
@@ -148,7 +158,8 @@ class Region:
 
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
-        return f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self.recursos})"
+        mensaje = f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self.recursos})"
+        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_especifico()}"
 
 
 
