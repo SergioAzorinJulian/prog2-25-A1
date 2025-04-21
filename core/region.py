@@ -28,6 +28,8 @@ class Region:
         Lista de conexiones con otras regiones.
     _lugar_especial : Optional[str]
         Lugar especial presente en la región.
+    _nombre_especifico : Optional[str]
+        Nombre específico de la región si es un reino.
     """
 
     def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: List[Recurso] = None, nombre_especifico: Optional[str] = None):
@@ -42,6 +44,8 @@ class Region:
             Indica si la región es un reino (por defecto es False).
         recursos_base : List[Recurso], optional
             Recursos iniciales de la región (por defecto es None).
+        nombre_especifico : Optional[str]
+            Nombre específico de la región si es un reino (por defecto es None).
         """
 
         self._posicion = posicion
