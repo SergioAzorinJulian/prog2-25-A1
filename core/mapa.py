@@ -241,10 +241,26 @@ class Mapa:
             nuevos_tipos (list[str]): La nueva lista de tipos de terreno.
 
         Raises:
-            TypeError: Si el argumento proporcionado no es una lista de strings.
+            TypeError: Si el argumento proporcionado no es una lista o
+                       si alguno de los elementos de la lista no es un string.
         """
-        if not isinstance(nuevos_tipos, list) or not all(isinstance(t, str) for t in nuevos_tipos):
-            raise TypeError("El argumento 'nuevos_tipos' debe ser una lista de strings.")
+
+        # Comprobamos si el nuevos_tipos es una lista
+        if not isinstance(nuevos_tipos, list):
+            raise TypeError("El argumento 'nuevos_tipos' debe ser una lista.")
+
+        # Si es una lista, comprobamos si todos sus elementos son strings
+        # Iteramos sobre cada elemento usando la función enumerate para obtener índice y valor
+        for indice, tipo in enumerate(nuevos_tipos):
+            if not isinstance(tipo, str):
+                # Si encontramos un elemento que no es string, lanzamos un error
+                # indicando cuál es el problemático y su tipo, usando el nombre 'indice'.
+                raise TypeError(
+                    f"El elemento en el índice {indice} de la lista ('{tipo}') no es un string, "
+                    f"es de tipo {type(tipo).__name__}."
+                )
+
+        # Si ambas comprobaciones pasan, asignamos la nueva lista
         self._tipos_terreno = nuevos_tipos
 
 
