@@ -82,6 +82,8 @@ class Mapa:
             Diccionario con las regiones del mapa.
         self.region_manager : RegionManager
             Instancia de la clase RegionManager encargada de gestionar las regiones y sus recursos.
+        self.reinos : list[Region]
+            Listado con los objetos Region que sean reinos en el mapa (2).
         """
 
         self._filas = 0 # Inicializamos el numero de filas a 0
@@ -91,6 +93,7 @@ class Mapa:
         self._conexiones: dict[tuple, list[tuple]] = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
         self._terrenos: dict[tuple, str] = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
         self.regiones: dict[tuple, Region] = {} # Diccionario con los nodos como clave y el objeto Region como valor
+        self.reinos: list[Region] = [] # Listado de reinos del mapa (2)
 
         # Crear instancia de RegionManager con referencia a este mapa
         self.region_manager = RegionManager(self)
@@ -433,6 +436,9 @@ class Mapa:
                 region.set_conexiones(self._conexiones.get(punto, []))
                 # Anyadimos la region al diccionario del mapa
                 self.regiones[punto] = region
+                # Si la region es un reino, la anyadimos a la lista de reinos
+                if es_reino:
+                    self.reinos.append(region)
 
         # Generar recursos para cada región
         self.region_manager.regiones = self.regiones
