@@ -22,14 +22,10 @@ class Tropa:
     METODOS:
     -----------
 
-<<<<<<< HEAD
     atacar: metodo que hace daño al enemigo (puedes ser diferente para algunas tropas
 
     recibir_dmg: metodo donde ser recibie el daño
     """
-=======
-    '''
->>>>>>> features-api
 
     def __init__(self, recursos: int, nombre: str, cantidad: int):
         self.recursos = recursos
@@ -41,6 +37,7 @@ class Tropa:
     def actualizar_cantidad(self, aliado):
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
+        self.dmg=self.__class__.dmg_base*self.cantidad
         if self.cantidad < 0:
             self.cantidad = 0
         if self.cantidad == 0:
@@ -72,12 +69,12 @@ class Tropa:
         self.cantidad -= other
         return self
     
-<<<<<<< HEAD
+
     def __eq__(self, other):
         if isinstance(other, Tropa):
             return self.nombre == other.nombre
         return False
-=======
+
     def __sub__(self, other):
         """Devuelve una nueva instancia de Tropa con la cantidad restada."""
         nueva_cantidad = self.cantidad
@@ -85,7 +82,6 @@ class Tropa:
             nueva_cantidad -= other.cantidad
         else: # Es un entero
             nueva_cantidad -= other
->>>>>>> features-api
 
         return self.__class__(self.recursos, self.nombre, nueva_cantidad)
 
@@ -191,15 +187,12 @@ class Soldado(TropaAtaque):
     '''
     Soldado: Clase Default de Tropa de Atk
     '''
-<<<<<<< HEAD
     dmg_base = 100  #Daño de la tropa
     vida_base = 150  #Vida de la tropa
     recursos = Recurso('caza',10,0, 150)  #Recursos que cuesta entrenarla
-=======
     dmg_base = 100
     vida_base = 1
     recursos = Recurso('caza',10,0)
->>>>>>> features-api
     def __init__(self, cantidad=0, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -207,13 +200,10 @@ class Soldado(TropaAtaque):
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
-<<<<<<< HEAD
     vida_base = 250
     recursos = Recurso('caza', 20, 0, 150)
-=======
     vida_base = 10
     recursos = Recurso('caza', 20, 0)
->>>>>>> features-api
     def __init__(self, cantidad=0, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -231,11 +221,8 @@ class Arquero(TropaAlcance):
     '''
     dmg_base = 80
     vida_base = 150
-<<<<<<< HEAD
     recursos = Recurso('caza', 5, 0, 150)
-=======
     recursos = Recurso('caza', 5, 0)
->>>>>>> features-api
     def __init__(self, cantidad=0, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
 
@@ -258,11 +245,8 @@ class Canon(TropaEstructura):
     '''
     dmg_base = 300
     vida_base = 500
-<<<<<<< HEAD
     recursos = Recurso('madera', 10, 0, 150)
-=======
     recursos = Recurso('madera', 10, 0)
->>>>>>> features-api
     def __init__(self, cantidad=0, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True
