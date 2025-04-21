@@ -382,7 +382,8 @@ class Mapa:
 
 
         # Listado con todos los terrenos disponibles dentro del juego
-        terrenos_disponibles = ['terreno1', 'terreno2', 'terreno3', 'terreno4', 'terreno5', 'terreno6', 'terreno7', 'terreno8','terrenoN']
+        terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'terreno1', 'terreno2', 'terreno3',
+                                'terrenoN']
 
         if self.get_tipos_terreno(): # Si el usuario me ha pasado un listado de terrenos específicos ...
             try:
@@ -520,9 +521,9 @@ class Mapa:
             for columna in range(self._columnas):
                 punto = (fila, columna)  # Posición actual en el mapa
                 if punto in self._terrenos:
-                    map_str += f"{self._terrenos[punto]} "
+                    map_str += f"{self._terrenos[punto]:<10} "
                 else:
-                    map_str += "None "
+                    map_str += f"{'None':<10}"
             map_str += '\n'  # Nueva línea al final de cada fila
         return map_str
 
