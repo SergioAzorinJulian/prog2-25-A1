@@ -68,5 +68,4 @@ Ejercito_Def=[Soldado1,Arquero2,Cannon1]
 
 if __name__ == '__main__':
     lista = Batalla.combate_ejemplo(Ejercito_Atk,Ejercito_Def)
-    mostrar_texto(lista)
-
+    mostrar_texto(lista)    
