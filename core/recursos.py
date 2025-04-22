@@ -84,6 +84,15 @@ class Recurso:
         valor_maximo = datos["valor_max"]
 
         return cls(nombre, cantidad, regeneracion, valor_maximo)
+    
+    def __sub__(self,other : int):
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Recurso): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+
+        return self.__class__(self.nombre,nueva_cantidad,self.regeneracion,self.valor_max)
 
     def __isub__(self, other: int):
         """restar los recursos que van a ser utilizados"""
@@ -100,6 +109,10 @@ class Recurso:
         else:
             self.cantidad += other
         return self
+    
+    def __mul__(self,other : int):
+        return self.__class__(self.nombre,self.cantidad * other,self.regeneracion,self.valor_max)
+    
     def __imul__(self, other : int):
         self.cantidad *= other
         return self
@@ -108,7 +121,10 @@ class Recurso:
         if isinstance(other, Recurso):
             return self.nombre == other.nombre
         return False
-
+    def __ge__(self, other):
+        if isinstance(other, Recurso):
+            return self.cantidad >= other.cantidad
+        return False
     def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
         percent = porcentaje / 100

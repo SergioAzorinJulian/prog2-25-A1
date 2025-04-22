@@ -3,6 +3,7 @@ from region import Region
 from region_manager import RegionManager
 from recursos import Recurso
 from tropas import *
+from edificios import *
 
 '''
 PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
@@ -37,9 +38,10 @@ Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territori
 
 
 class Jugador:
+
     def __init__(self, usuario, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
                                                                  Recurso('piedra', 50, 0, 100), Recurso('hierro', 25, 0, 100),
-                                                                 Recurso('oro', 25, 0, 100), \
+                                                                 Recurso('oro', 50, 0, 100), \
                                                                  Recurso('caza', 400, 0, 400),
                                                                  Recurso('recoleccion', 400, 0, 400)],
                  conquista: list[tuple[int, int]] = []):
@@ -75,9 +77,23 @@ class Jugador:
         catalogo = ''
         for i in cls.tropas_objetos.values():
             catalogo += str(i()) + '\n'
-
         return cls.tropas_objetos, catalogo
 
+    @classmethod
+    def mostrar_catalogo_edificios(cls):
+        if not hasattr(cls,'edificios_objetos'):
+            cls.edificios_objetos = {
+            key.lower(): value
+                for key, value in globals().items()
+                if isinstance(value,type) and
+                        (issubclass(value, Edificio))
+                        and value is not Edificio
+        }
+        catalogo = ''
+        for i in cls.edificios_objetos.values():
+            catalogo += str(i()) + '\n'
+        return cls.edificios_objetos, catalogo
+    
     def add_tropa(self, tropa, cantidad):
         tropas_objetos = {
                 key.lower(): value
@@ -142,17 +158,17 @@ class Jugador:
         pass
 
     def construir_edificio(self, edificio):
-        pass
-
-    def add_familia(region: tuple[int, int], familia):
-        pass
-'''
-    def regenerar_recursos():
-        pass
+        costo = self.__class__.edificios_objetos[edificio].costo
+        if edificio in self.__class__.edificios_objetos.keys():
+            if all(self.recursos[self.recursos.index(recurso)] >= recurso for recurso in costo):
+                for recurso in costo:
+                    self.recursos[self.recursos.index(recurso)] -= recurso
+                self.mapa.regiones[self.region_actual].edificios.append(self.__class__.edificios_objetos[edificio]())
+            else:
+                return 'Recursos insuficientes'
+            
+        else:
+            return f'Edificio: {edificio} no reconocido'
 
     def actualizar_conquista():
         pass
-
-    def actualizar_tropas():
-        pass
-'''

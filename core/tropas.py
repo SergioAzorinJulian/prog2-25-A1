@@ -1,7 +1,6 @@
 # from abc import ABC
 import random
 import math
-
 from recursos import Recurso
 
 
@@ -38,25 +37,27 @@ class Tropa:
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         self.dmg=self.__class__.dmg_base*self.cantidad
-        if self.cantidad < 0:
-            self.cantidad = 0
         if self.cantidad == 0:
             for i in aliado:
                 if i.nombre == self.nombre:
                     aliado.remove(i)
                     break
+            return f'Las tropas {self.nombre} murieron'
+        return f'{self.nombre}: {self.cantidad}'
 
     def atacar(self, aliado: list, enemigo: list) -> str:
         """ Ataque basico para las tropas """
         if enemigo != []:
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
             nombre = enemigo[n].nombre
-            enemigo[n].recibir_dmg(self.dmg, aliado)
-            return f'{self.nombre} ataca a {nombre} : {self.dmg}'
+            txt_cantidad = enemigo[n].recibir_dmg(self.dmg, aliado)
+            return f'{self.nombre} ataca a {nombre} : {self.dmg} \n' + txt_cantidad
 
     def recibir_dmg(self, dmg, aliado):
         self.vida = self.vida - dmg
-        self.actualizar_cantidad(aliado)
+        if self.vida <= 0:
+            self.vida = 0
+        return self.actualizar_cantidad(aliado)
 
     def __iadd__(self, other):
         if isinstance(other, Tropa):
@@ -152,11 +153,11 @@ class TropaAtaque(Tropa):
             nombre = enemigo[n].nombre
             if critico[0]:
                 dmg = self.dmg * critico[1]
-                enemigo[n].recibir_dmg(dmg, enemigo)
-                return critico[2], f'{self.nombre} ataca a {nombre} : {dmg}'
+                txt_cantidad = enemigo[n].recibir_dmg(dmg, enemigo)
+                return critico[2] + f'{self.nombre} ataca a {nombre} : {dmg} \n' + txt_cantidad
             else:
-                enemigo[n].recibir_dmg(self.dmg, enemigo)
-                return f'{self.nombre} ataca a {nombre} : {self.dmg}'
+                txt_cantidad = enemigo[n].recibir_dmg(self.dmg, enemigo)
+                return f'{self.nombre} ataca a {nombre} : {self.dmg} \n' + txt_cantidad
 
 
 class TropaDefensa(Tropa):
@@ -164,10 +165,12 @@ class TropaDefensa(Tropa):
     Clase de la que heredarán las tropas de tipo "Defensa"
     '''
 
-    def recibir_dmg(self, dmg, aliado, reducion=5):
+    def recibir_dmg(self, dmg, aliado, reducion=0.8):
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
-        self.actualizar_cantidad(aliado)
+        if self.vida <= 0:
+            self.vida = 0
+        return self.actualizar_cantidad(aliado)
 
 
 class TropaAlcance(Tropa):
@@ -189,9 +192,6 @@ class Soldado(TropaAtaque):
     '''
     dmg_base = 100  #Daño de la tropa
     vida_base = 150  #Vida de la tropa
-    recursos = Recurso('caza',10,0, 150)  #Recursos que cuesta entrenarla
-    dmg_base = 100
-    vida_base = 1
     recursos = Recurso('caza',10,0)
     def __init__(self, cantidad=0, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
@@ -201,17 +201,19 @@ class Soldado(TropaAtaque):
 class Gigante(TropaDefensa):
     dmg_base = 100
     vida_base = 250
-    recursos = Recurso('caza', 20, 0, 150)
-    vida_base = 10
     recursos = Recurso('caza', 20, 0)
     def __init__(self, cantidad=0, recursos=50, nombre='Gigante'):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
         if enemigo != []:
+            txt = None
             for i in enemigo:
                 if isinstance(i, TropaEstructura):
-                    i.recibir_dmg(self.dmg, enemigo)
+                    if txt == None:
+                        txt = ''
+                    txt += f'{self.nombre} ataca a {i.nombre} \n' + i.recibir_dmg(self.dmg, enemigo)
+            return txt
 
 
 # TROPAS DE ALCANCE
@@ -221,7 +223,6 @@ class Arquero(TropaAlcance):
     '''
     dmg_base = 80
     vida_base = 150
-    recursos = Recurso('caza', 5, 0, 150)
     recursos = Recurso('caza', 5, 0)
     def __init__(self, cantidad=0, recursos=50, nombre='Arquero'):
         super().__init__(recursos, nombre, cantidad)
@@ -234,19 +235,16 @@ class Arquero(TropaAlcance):
                     i.recibir_dmg(self.dmg, enemigo)
                     n += 1
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
-        else:
-            return ''
 
 
 # TROPAS DE ESTRUCTURA
-class Canon(TropaEstructura):
+class Cannon(TropaEstructura):
     '''
     Cañon: ''Daño en area'' -> Ataca cada 2 Turnos (De combate)
     '''
     dmg_base = 300
     vida_base = 500
-    recursos = Recurso('madera', 10, 0, 150)
-    recursos = Recurso('madera', 10, 0)
+    recursos = Recurso('madera', 100, 0)
     def __init__(self, cantidad=0, recursos=100, nombre='Cañon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True
@@ -257,7 +255,6 @@ class Canon(TropaEstructura):
         return estado
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
-
         if enemigo != []:
             dmg_total = 0
             reduccion = 1
@@ -270,7 +267,5 @@ class Canon(TropaEstructura):
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
                 return f'{self.nombre} sobrecalentado'
-        else:
-            return ''
 
 
