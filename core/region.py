@@ -53,8 +53,7 @@ class Region:
         self.tropas: list[Tropa] = []
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
-        if self._es_reino:
-            self._nombre_especifico = nombre_especifico
+        self._nombre_especifico = nombre_especifico if self._es_reino else f""
 
     ### GETTERS ###
     def get_posicion(self):
