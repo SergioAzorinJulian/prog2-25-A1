@@ -32,7 +32,7 @@ class Region:
         Nombre específico de la región si es un reino.
     """
 
-    def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: List[Recurso] = None, nombre_especifico: Optional[str] = None):
+    def __init__(self, posicion: tuple[int, int], tipo_terreno: str, es_reino: bool = False, recursos_base: List[Recurso] = None, nombre_reino: Optional[str] = None, propietario: str = 'Neutral'):
         """
         Parameters
         ----------
@@ -49,7 +49,7 @@ class Region:
         """
 
         self._posicion = posicion
-        self._propietario: str = 'Neutral'
+        self._propietario: str = propietario
         self._tipo_terreno = tipo_terreno
         self._es_reino = es_reino
         self.recursos = recursos_base
@@ -57,7 +57,7 @@ class Region:
         self.tropas: list[Tropa] = []
         self._conexiones: list = []
         self._lugar_especial: Optional[str] = None
-        self._nombre_especifico = nombre_especifico if self._es_reino else f""
+        self._nombre_reino = nombre_reino if self._es_reino else f""
 
     ### GETTERS ###
     def get_posicion(self):
@@ -96,9 +96,9 @@ class Region:
         """Devuelve el lugar especial de la región."""
         return self._lugar_especial
 
-    def get_nombre_especifico(self):
+    def get_nombre_reino(self):
         """Devuelve el nombre especifico de la region."""
-        return self._nombre_especifico
+        return self._nombre_reino
 
 
     ### SETTERS ###
@@ -138,9 +138,9 @@ class Region:
         """Establece el lugar especial de la región."""
         self._lugar_especial = nuevo_lugar
 
-    def set_nombre_especifico(self, nuevo_nombre: str):
+    def set_nombre_reino(self, nuevo_nombre: str):
         """Establece el nombre especifico de la region."""
-        self._nombre_especifico = nuevo_nombre
+        self._nombre_reino = nuevo_nombre
 
 
     ### METODO PARA MOSTRAR INFORMACION SOBRE LA REGION ###
@@ -164,7 +164,7 @@ class Region:
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
         mensaje = f"Region(pos={self._posicion}, terreno={self._tipo_terreno}, reino={self._es_reino}, recursos={self.recursos})"
-        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_especifico()}"
+        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_reino()}"
 
 
 
