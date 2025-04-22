@@ -100,7 +100,8 @@ class Tropa:
     def __eq__(self, other):
         if isinstance(other, Tropa):
             return self.nombre == other.nombre
-        return False
+        else:
+            return self.nombre.lower() == other
     
     def __str__(self):
         return f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}"

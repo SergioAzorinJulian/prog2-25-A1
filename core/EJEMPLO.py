@@ -58,7 +58,6 @@ def to_tuple():
 def create(id, value):
     global token
     r = requests.post(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
-    print(r.status_code)
     print(r.text)
 
 
@@ -98,11 +97,23 @@ def login(user, password):
 def ver_zona(usuario,tupla):
     r = requests.get(f'{URL}/data/ver_zona/{usuario}?value={tupla}')
     print(r.text)
+def ver_recursos(usuario):
+    r = requests.get(f'{URL}/data/ver_recursos/{usuario}')
+    return r.text
 def mostrar_catalogo(usuario):
     r = requests.get(f'{URL}/data/ver_zona/catalogo/{usuario}')
     return r.text
+def mostrar_catalogo_edificios(usuario):
+    r = requests.get(f'{URL}/data/ver_zona/catalogo_edificios/{usuario}')
+    return r.text
 def add_tropa(usuario,tropa,cantidad):
     r = requests.post(f'{URL}/data/ver_zona/add_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}')
+    return r.text
+def mover_tropa(usuario,tropa,cantidad,destino):
+    r = requests.put(f'{URL}/data/ver_zona/mover_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}&tupla={destino}')
+    return r.text
+def crear_edificio(usuario,edificio):
+    r = requests.post(f'{URL}/data/ver_zona/crear_edificio/{usuario}?edificio={edificio}')
     return r.text
 def menu():
     while True:
@@ -126,24 +137,38 @@ def menu():
             if login(user, password):
                 while True:
                     print('1. VER REGIÓN')
-                    print('2. VOLVER')
+                    print('2. VER RECURSOS')
+                    print('3. VOLVER')
                     choice = input('Elige una opción (1-2):')
                     if choice == '1':
-                        tupla = input('Tupla')
-                        ver_zona(user,tupla)
+                        tupla = input('Tupla: ')
+                        ver_zona(user,tupla) #FALTA DEVOLVER TRUE PARA MOSTRAR MENU, TAMBIÉN COMPROBAR QUE ES TU ZONA PARA VER LAS OPCIONES
                         while True:
                             print('1. AÑADIR TROPA')
-                            print('2.VOLVER')
-                            choice = input('Elige una opción (1-2):')
+                            print('2. MOVER TROPA')
+                            print('3.CREAR EDIFICIO')
+                            print('4.VOLVER')
+                            choice = input('Elige una opción (1-3):')
                             if choice == '1':
                                 print(mostrar_catalogo(user))
                                 tropa = input('Que tropa desea añadir???: ').lower()
                                 cantidad = int(input('Que cantidad???: '))
                                 print(add_tropa(user,tropa,cantidad))
-                            elif choice == '2':
+                            elif choice =='2':
+                                tropa = input('Que tropa desea mover???: ').lower()
+                                cantidad = int(input('Que cantidad???: '))
+                                tupla = input('Tupla destino: ')
+                                print(mover_tropa(user,tropa,cantidad,tupla))
+                            elif choice == '3':
+                                print(mostrar_catalogo_edificios(user))
+                                edificio = input('Que edificio desea crear???: ').lower()
+                                print(crear_edificio(user,edificio))
+                            elif choice == '4':
                                 break
 
                     elif choice == '2':
+                        print(ver_recursos(user))
+                    elif choice == '3':
                         break
                     else:
                         print('Opción invalida')
@@ -155,7 +180,7 @@ def menu():
             print("Saliendo...")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("Opción invalida.")
 
 
 if __name__ == '__main__':

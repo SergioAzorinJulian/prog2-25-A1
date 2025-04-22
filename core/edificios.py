@@ -48,7 +48,7 @@ class Mina(Edificio):
      - produce: piedra
      - costo: 15 piedra
     '''
-    costo = Recurso('piedra',15,0)
+    costo = [Recurso('piedra',15,0)]
     produce = Recurso('piedra',0,0)
     def __init__(self, nombre = 'Mina', nivel = 1, efectividad = 0.5):
         super().__init__(nombre, nivel, efectividad)
@@ -62,7 +62,7 @@ class Pozo(Edificio):
     - Recurso producido: agua
     - Construcción: 15 madera
     '''
-    costo = Recurso('madera',15,0)
+    costo = [Recurso('madera',15,0)]
     produce = Recurso('agua',0,0)
     def __init__(self, nombre = 'Pozo', nivel = 1, efectividad = 0.5):
         super().__init__(nombre, nivel, efectividad)

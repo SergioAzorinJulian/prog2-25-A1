@@ -76,6 +76,11 @@ def add_data(id):
         return f'Sesión creada', 200
     else:
         return f' Ya existe la sesión', 409
+@app.route('/data/ver_recursos/<id>',methods=['GET'])
+def ver_recursos(id):
+    global data
+    jugador = data[id]
+    return jugador.mostrar_recursos(),200
 
 @app.route('/data/ver_zona/<id>', methods=['GET'])
 def ver_zona(id):
@@ -95,12 +100,36 @@ def add_tropas(id):
     cantidad= request.args.get('cantidad', '')
     resultado = jugador.add_tropa(tropa,cantidad)
     return resultado,200
+@app.route('/data/ver_zona/mover_tropa/<id>', methods=['PUT'])
+def mover_tropas(id):
+    global data
+    jugador = data[id]
+    tropa= request.args.get('tropa', '')
+    cantidad= request.args.get('cantidad', '')
+    destino = request.args.get('tupla','')
+    x, y = map(int, destino.split(','))
+    cordenada = (x,y)
+    resultado = jugador.mover_tropa(cordenada,tropa,cantidad)
+    return resultado[0],200
+
 @app.route('/data/ver_zona/catalogo/<id>', methods=['GET'])
 def catalogo_tropas(id):
     global data
     jugador = data[id]
     catalogo = jugador.mostrar_catalogo()[1]
     return catalogo,200
+@app.route('/data/ver_zona/catalogo_edificios/<id>', methods=['GET'])
+def catalogo_edificios(id):
+    global data
+    jugador = data[id]
+    catalogo = jugador.mostrar_catalogo_edificios()[1]
+    return catalogo,200
+@app.route('/data/ver_zona/crear_edificio/<id>', methods=['POST'])
+def crear_edificio(id):
+    global data
+    jugador = data[id]
+    edificio = request.args.get('edificio','')
+    return jugador.construir_edificio(edificio),200
 @app.route('/data/<id>', methods=['PUT'])
 @jwt_required()
 def update_data(id):
