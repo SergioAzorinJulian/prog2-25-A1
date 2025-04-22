@@ -28,7 +28,7 @@ class Region:
         Lista de conexiones con otras regiones.
     _lugar_especial : Optional[str]
         Lugar especial presente en la región.
-    _nombre_especifico : Optional[str]
+    _nombre_reino : Optional[str]
         Nombre específico de la región si es un reino.
     """
 
@@ -44,8 +44,10 @@ class Region:
             Indica si la región es un reino (por defecto es False).
         recursos_base : List[Recurso], optional
             Recursos iniciales de la región (por defecto es None).
-        nombre_especifico : Optional[str]
+        nombre_reino : Optional[str]
             Nombre específico de la región si es un reino (por defecto es None).
+        propietario : str, optional
+            Nombre del propietario de la región (por defecto es 'Neutral').
         """
 
         self._posicion = posicion
@@ -159,7 +161,7 @@ class Region:
                 f"Edificios: {self.edificios} | \n"
                 f"Tropas: \n {tropas_str}")
 
-        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_especifico()}"
+        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_reino()}"
 
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
