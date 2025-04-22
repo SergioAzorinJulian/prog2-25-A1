@@ -171,7 +171,8 @@ Verifique las credenciales o cree una cuenta en la opción 1.')
                     #    estado_partida = response.json() # Contiene status, current_turn, player_state etc.
                     #    nombre_oponente = estado_partida['opponent'] # Campo asumido
                     #    # TODO: Obtener el nombre del reino del jugador si está guardado/se necesita
-                    #    nombre_reino_jugador_actual = "Mi Reino" # Valor provisional
+                    #    nombre_reino_jugador_actual = param('Introduzca el nombre de su reino', str, 1) # Valor provisional
+                         
 
                     #    if estado_partida['status'] == 'waiting_for_opponent':
                     #        print(f"Esperando a que {nombre_oponente} se una...")
