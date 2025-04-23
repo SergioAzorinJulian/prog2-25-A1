@@ -1,59 +1,65 @@
 import requests
-from combate import Batalla
-from jugador import Jugador
-from mapa import Mapa
-
+import getpass
+import os
+from typing import *
+import time
 URL = 'http://127.0.0.1:5000'
 token = ''
 
-def crear_mapa():
-    """Crea el mapa por defecto y lo devuelve."""
+#------------FUNCIONES------------
 
-    # Inicializar el mapa con 6 filas y 6 columnas
-    map = Mapa(5, 5)
-
-    # Crear nodos y conexiones
-    nodos = map.crear_nodos()
-    conexiones = map.crear_aristas(nodos)
-
-    # Asignar terrenos a los nodos
-    map.anyadir_terreno(conexiones)
-
-    # Asignar zonas y generar recursos
-    map.asigna_zonas()
-
-    return map
-
-def to_tuple():
+def param(
+        nombre: str,
+        tipo: type,
+        lon_min: int = 0,
+        is_password: bool = False,
+        valores_validos: Union[list, tuple, None] = None,
+) -> Any:
     """
-    Obtiene coordenadas del usuario a través de input y las convierte en una tupla.
-    Maneja errores de formato y rango, y se mantiene en un bucle hasta que se ingrese un valor válido.
-
-    Returns:
-        tuple[int, int]: Una tupla con las coordenadas ingresadas por el usuario.
+    Solicita un valor por consola para la variable indicada, validando su tipo y longitud mínima.
     """
-    while True:
+    valido = False
+    out = None
+    while not valido:
+        prompt = (
+            f'{nombre} (Longitud mínima: {lon_min}): '
+            if lon_min
+            else f'{nombre}: '
+        )
+        entrada = getpass.getpass(prompt) if is_password else input(prompt)
+        if len(entrada) < lon_min:
+            print(f'Longitud menor que la requerida: {lon_min}')
+            continue
         try:
-            entrada = input("Introduce las coordenadas (fila, columna): ")
-            # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
-            entrada = entrada.strip()
-            coordenadas_str = entrada.split(',')
+            out = tipo(entrada)
+        except (ValueError, TypeError):
+            print('El tipo de dato no es válido.')
+            continue
+        if valores_validos and out not in valores_validos:
+            print(f'La entrada {out} no está presente en las opciones válidas {valores_validos}')
+            continue
+        valido = True
+    return out
 
-            # Verificar que haya exactamente dos coordenadas
-            if len(coordenadas_str) != 2:
-                print("Error: Debes introducir dos coordenadas separadas por una coma.")
-                continue  # Volver al inicio del bucle
+def limpiar_pantalla():
+    # Para Windows
+    if os.name == 'nt':
+        os.system('cls')
+    # Para Unix/Linux/macOS
+    else:
+        os.system('clear')
 
-            # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
-            fila = int(coordenadas_str[0].strip())
-            columna = int(coordenadas_str[1].strip())
+def mostrar_texto(lista : list[str]):
+    for texto in lista:
+        if texto == None:
+            continue
+        else:
+            for caracter in texto:
+                print(caracter,end='',flush=True)
+                time.sleep(0.1)
+            print('\n',end='')
 
-            return (fila, columna)
-
-        except ValueError:
-            print("Error: Las coordenadas deben ser números enteros.")
-            continue  # Volver al inicio del bucle
-
+#------------REQUESTS------------
 
 def create(id, value):
     global token
@@ -78,9 +84,7 @@ def update(id, value):
 
 def singup(user, password):
     r = requests.post(f'{URL}/signup?user={user}&password={password}')
-
-    print(r.status_code)
-    print(r.text)
+    return (r.text)
 
 
 def login(user, password):
@@ -115,25 +119,28 @@ def mover_tropa(usuario,tropa,cantidad,destino):
 def crear_edificio(usuario,edificio):
     r = requests.post(f'{URL}/data/ver_zona/crear_edificio/{usuario}?edificio={edificio}')
     return r.text
+
 def menu():
     while True:
         print("\n=== MENU ===")
 
         print("1. REGISTRATE")
         print("2. INICIAR SESIÓN")
-        print("3. Read Data")
-        print("4. Exit")
+        print("3. Exit")
 
-        choice = input('Elige una opción (1-4): ')
+        choice = input('Elige una opción (1-3): ')
 
 
         if choice == '1':
-            user = input("Usuario Nuevo: ")
-            password = input("Contraseña: ")
-            singup(user, password)
+            user = param("Usuario Nuevo: ",str,4)
+            password = param("Contraseña: ",str,8,is_password=True)
+            mostrar_texto([singup(user, password)])
+            limpiar_pantalla()
+
         elif choice == '2':
-            user = input("Usuario: ")
-            password = input("Contraseña: ")
+            user = param("Usuario: ",str,4)
+            password = param("Contraseña: ",str,8,is_password=True)
+            limpiar_pantalla()
             if login(user, password):
                 while True:
                     print('1. VER REGIÓN')
@@ -173,10 +180,6 @@ def menu():
                     else:
                         print('Opción invalida')
         elif choice == '3':
-            id = user
-            read(id)
-
-        elif choice == '4':
             print("Saliendo...")
             break
         else:
