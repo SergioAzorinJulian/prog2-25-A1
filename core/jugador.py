@@ -24,13 +24,6 @@ PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
 
         CONSTRUIR EDIFICIO -> Construye edificios, escribir aquí edificios y recursos que consumen crearlos -> []
 
-        AÑADIR FAMILIA -> Añade familias, escribir aquí que recurso consume añadir cada familia -> []
-            Sistema de generación de familias:
-                Se parte de una cantidad inicial (6 o las que se definan) y cada 2 o 3 (o X) turnos se hace "recuento" de recursos del reino;
-                es decir, si se tiene comida y agua "de sobra" (superavit) vendra 1 o 2 (o Y) familias nuevas al reino; de igual manera, si para 
-                el turno X no tienes suficiente agua y comida para sustentar al pueblo (déficit) se empezaran a ir las familias del reino; pero 
-                más paulatinamente, porque sino podría llegar un punto crítico en el que no haya familias, y por tanto tampoco quien trabaje ...
-
         VOLVER
 
 Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territorio enemigo -> COMBATIR o ABORTAR
@@ -152,12 +145,31 @@ class Jugador:
     def mover_batallon(self, destino: tuple[int, int]):
         pass
 
-    def combatir(destino: tuple[int, int]):
-        pass
+    def combatir(self,destino: tuple[int, int]):
+        Ejercito_Atk = self.mapa.regiones[self.region_actual].tropas
+        Ejercito_Def = self.mapa.regiones[destino].tropas
+        texto_lista = []
+        while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
+
+            max_tropas = max(len(Ejercito_Atk), len(Ejercito_Def)) #Cogemos la longitud del ejercito más grande
+            for i in range(max_tropas):  #Repetimos el bucle hasta que lleguemos a la longitud del ejercito más grande
+                if i < len(Ejercito_Atk):
+                    texto_lista.append(Ejercito_Atk[i].atacar(Ejercito_Atk, Ejercito_Def))  #La tropa 'i' ataca al ejercito enemigo
+
+                if i < len(Ejercito_Def):
+                    texto_lista.append(Ejercito_Def[i].atacar(Ejercito_Def, Ejercito_Atk))  #La tropa 'i' ataca al ejercito enemigo
+
+
+        if Ejercito_Atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
+            texto_lista.append('El ataque fracasó.')
+            return texto_lista  
+        elif Ejercito_Def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
+            texto_lista.append('Ataque exitoso.')
+            return texto_lista
 
     def construir_edificio(self, edificio):
-        costo = self.__class__.edificios_objetos[edificio].costo
         if edificio in self.__class__.edificios_objetos.keys():
+            costo = self.__class__.edificios_objetos[edificio].costo
             if all(self.recursos[self.recursos.index(recurso)] >= recurso for recurso in costo):
                 for recurso in costo:
                     self.recursos[self.recursos.index(recurso)] -= recurso
