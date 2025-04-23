@@ -2,7 +2,8 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
 import copy
-
+import os
+import csv
 from jugador import Jugador
 from mapa import Mapa
 from region import Region
@@ -120,21 +121,44 @@ def delete_data(id):
     else:
         return f'Dato {id} No encontrado', 404
 
+def check_csv():
+    if os.path.exists('Users.csv'):
+        with open('Users.csv', mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if len(row) == 2:
+                    user,hashed = row
+                    users[user] = hashed
+                    print(users)
+
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    check_csv()
+    # Obtener parámetros de la URL
     user = request.args.get('user', '')
+
+    password = request.args.get('password', '')
+
+    if not user or not password:
+        return 'Faltan datos: user o password', 400
+
     if user in users:
         return f'Usuario {user} ya existe', 409
-    else:
-        password = request.args.get('password', '')
-        hashed = hashlib.sha256(password.encode()).hexdigest()
-        users[user] = hashed
-        return f'Usuario {user} registrado', 200
+
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    users[user] =hashed
+
+    with open('Users.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([user,hashed])
+
+    return f'Usuario {user} registrado con éxito', 200
 
 
 @app.route('/login', methods=['GET'])
 def login():
+    check_csv()
     user = request.args.get('user', '')
     password = request.args.get('password', '')
     hashed = hashlib.sha256(password.encode()).hexdigest()
