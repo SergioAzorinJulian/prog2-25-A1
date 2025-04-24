@@ -4,7 +4,6 @@ import os
 from typing import *
 import time
 URL = 'http://127.0.0.1:5000'
-token = ''
 
 #------------FUNCIONES------------
 
@@ -41,7 +40,7 @@ def param(
         valido = True
     return out
 
-def limpiar_pantalla():
+def limpiar_pantalla() -> None:
     # Para Windows
     if os.name == 'nt':
         os.system('cls')
@@ -49,141 +48,189 @@ def limpiar_pantalla():
     else:
         os.system('clear')
 
-def mostrar_texto(lista : list[str]):
+def mostrar_texto(lista : list[str] | str,enumerado : bool = False) -> None:
+    n = 1
+    if isinstance(lista, str):
+        lista = [lista]
     for texto in lista:
-        if texto == None:
+        if texto is None:
             continue
         else:
+            if enumerado:
+                num = f'{n}. '
+                for letra in num:
+                    print(letra, end='',flush=True)
+                n += 1
             for caracter in texto:
                 print(caracter,end='',flush=True)
-                time.sleep(0.1)
+                time.sleep(0.05)
             print('\n',end='')
+            
 
 #------------REQUESTS------------
-
-def create(id, value):
-    global token
-    r = requests.post(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
-    print(r.text)
-
-
-def read(id):
-    global token
-    r = requests.get(f'{URL}/data/{id}', headers={'Authorization': 'Bearer ' + token})
-
-    print(r.status_code)
-    print(r.text)
-
-
-def update(id, value):
-    global token
-    r = requests.put(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
-    print(r.status_code)
-    print(r.text)
-
-
-def singup(user, password):
-    r = requests.post(f'{URL}/signup?user={user}&password={password}')
-    return (r.text)
-
+# AUTENTICACIÓN
+def signup(user, password):
+    r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
+    return r.text
 
 def login(user, password):
-    global token
-    r = requests.get(f'{URL}/login?user={user}&password={password}')
-    token = r.text
+    r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
-        create(str(user), 'jugador')
-        return True
-    else:
-        return False
-
-
-def ver_zona(usuario,tupla):
-    r = requests.get(f'{URL}/data/ver_zona/{usuario}?value={tupla}')
-    print(r.text)
-def ver_recursos(usuario):
-    r = requests.get(f'{URL}/data/ver_recursos/{usuario}')
+        return r.text, True
+    return r.text, False
+#USERS
+#   BUZON
+def notificaciones(token):
+    r = requests.get(f'{URL}/users/mail/notificaciones',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def mostrar_catalogo(usuario):
-    r = requests.get(f'{URL}/data/ver_zona/catalogo/{usuario}')
+def obtener_buzon(token):
+    r = requests.get(f'{URL}/users/mail',headers={'Authorization': f'Bearer {token}'})
+    mensajes = r.json()
+    return mensajes  
+def marcar_leido(token):
+    r = requests.put(f'{URL}/users/mail',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def mostrar_catalogo_edificios(usuario):
-    r = requests.get(f'{URL}/data/ver_zona/catalogo_edificios/{usuario}')
+#USERS
+#   AMIGOS
+def obtener_amigos(token):
+    r = requests.get(f'{URL}/users/friends',headers={'Authorization': f'Bearer {token}'})
+    amigos = r.json()
+    return amigos
+def obtener_solicitudes(token):
+    r = requests.get(f'{URL}/users/friend-requests',headers={'Authorization': f'Bearer {token}'})
+    solicitudes = r.json()
+    return solicitudes
+def enviar_solicitud(token,usuario):
+    r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def add_tropa(usuario,tropa,cantidad):
-    r = requests.post(f'{URL}/data/ver_zona/add_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}')
+def aceptar_solicitud(token,nuevo_amigo):
+    r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def mover_tropa(usuario,tropa,cantidad,destino):
-    r = requests.put(f'{URL}/data/ver_zona/mover_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}&tupla={destino}')
+def rechazar_solicitud(token,usuario):
+    r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def crear_edificio(usuario,edificio):
-    r = requests.post(f'{URL}/data/ver_zona/crear_edificio/{usuario}?edificio={edificio}')
-    return r.text
-
 def menu():
     while True:
-        print("\n=== MENU ===")
-
-        print("1. REGISTRATE")
-        print("2. INICIAR SESIÓN")
-        print("3. Exit")
-
-        choice = input('Elige una opción (1-3): ')
-
-
-        if choice == '1':
-            user = param("Usuario Nuevo: ",str,4)
-            password = param("Contraseña: ",str,8,is_password=True)
-            mostrar_texto([singup(user, password)])
+        print('=== MENU ===')
+        print('1. REGISTRARSE')
+        print('2. INICIAR SESIÓN')
+        print('3. Exit')
+        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+        if choice == 1:
+            user = param('Usuario: ',str)
+            password = param('Contraseña: ',str,is_password=True)
+            mostrar_texto(signup(user, password))
             limpiar_pantalla()
-
-        elif choice == '2':
-            user = param("Usuario: ",str,4)
-            password = param("Contraseña: ",str,8,is_password=True)
-            limpiar_pantalla()
-            if login(user, password):
+        elif choice == 2:
+            user = param('Usuario: ',str)
+            password = param('Contraseña: ',str,is_password=True)
+            log_in = login(user,password)
+            if log_in[1]:
+                token = log_in[0]
+                limpiar_pantalla()
                 while True:
-                    print('1. VER REGIÓN')
-                    print('2. VER RECURSOS')
-                    print('3. VOLVER')
-                    choice = input('Elige una opción (1-2):')
-                    if choice == '1':
-                        tupla = input('Tupla: ')
-                        ver_zona(user,tupla) #FALTA DEVOLVER TRUE PARA MOSTRAR MENU, TAMBIÉN COMPROBAR QUE ES TU ZONA PARA VER LAS OPCIONES
+                    mostrar_texto(notificaciones(token))
+                    print('1. JUGAR')
+                    print('2. PERFIL')
+                    print('3. LOG OUT')
+                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                    if choice == 1:
+                        pass
+                    elif choice == 2:
+                        limpiar_pantalla()
                         while True:
-                            print('1. AÑADIR TROPA')
-                            print('2. MOVER TROPA')
-                            print('3.CREAR EDIFICIO')
-                            print('4.VOLVER')
-                            choice = input('Elige una opción (1-3):')
-                            if choice == '1':
-                                print(mostrar_catalogo(user))
-                                tropa = input('Que tropa desea añadir???: ').lower()
-                                cantidad = int(input('Que cantidad???: '))
-                                print(add_tropa(user,tropa,cantidad))
-                            elif choice =='2':
-                                tropa = input('Que tropa desea mover???: ').lower()
-                                cantidad = int(input('Que cantidad???: '))
-                                tupla = input('Tupla destino: ')
-                                print(mover_tropa(user,tropa,cantidad,tupla))
-                            elif choice == '3':
-                                print(mostrar_catalogo_edificios(user))
-                                edificio = input('Que edificio desea crear???: ').lower()
-                                print(crear_edificio(user,edificio))
-                            elif choice == '4':
+                            print('1. BUZÓN')
+                            print('2. AMIGOS')
+                            print('3. VOLVER')
+                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            if choice == 1:
+                                limpiar_pantalla()
+                                while True:
+                                    buzon = obtener_buzon(token)
+                                    if buzon != []:
+                                        mostrar_texto(buzon)
+                                        print('1. MARCAR COMO LEÍDO')
+                                        print('2. VOLVER')
+                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        if choice == 1:
+                                            mostrar_texto(marcar_leido(token))
+                                        elif choice == 2:
+                                            limpiar_pantalla()
+                                            break
+                                    else:
+                                        mostrar_texto('No tienes ningún mensaje')
+                                        print('1. RECARGAR')
+                                        print('2. VOLVER')
+                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        if choice == 1:
+                                            continue
+                                        else:
+                                            limpiar_pantalla()
+                                            break
+                            elif choice == 2:
+                                limpiar_pantalla()
+                                while True:
+                                    amigos = obtener_amigos(token)
+                                    if amigos != []:
+                                        mostrar_texto(amigos)
+                                    else:
+                                        mostrar_texto('Todavía no tienes amigos')
+                                    print('1. SOLICITUDES DE AMISTAD')
+                                    print('2. ENVIAR SOLICITUD DE AMISTAD')
+                                    print('3. VOLVER')
+                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                    if choice == 1:
+                                        limpiar_pantalla()
+                                        while True:
+                                            solicitudes = obtener_solicitudes(token)
+                                            if solicitudes !=[]:
+                                                mostrar_texto(solicitudes,enumerado=True)
+                                                mostrar_texto(f'{len(solicitudes)+1}. VOLVER')
+                                                valores_validos = [num for num in range(0,len(solicitudes) + 2)]
+                                                choice = param('Eliga una opción: ',int,valores_validos=valores_validos)
+                                                if choice != valores_validos[-1]:
+                                                    solicitud = solicitudes[choice - 1] #Porque las listas empiezan en 0
+                                                    print('1. ACEPTAR SOLICITUD')
+                                                    print('2. RECHAZAR SOLICITUD')
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                    if choice == 1:
+                                                        mostrar_texto(aceptar_solicitud(token,solicitud))
+                                                        limpiar_pantalla()
+                                                    elif choice == 2:
+                                                        mostrar_texto(rechazar_solicitud(token,solicitud))
+                                                        limpiar_pantalla()
+                                                else:
+                                                    limpiar_pantalla()
+                                                    break
+                                            else:
+                                                mostrar_texto('No tienes ninguna solicitud de amistad')
+                                                print('1. RECARGAR')
+                                                print('2. VOLVER')
+                                                choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                if choice == 1:
+                                                    continue
+                                                else:
+                                                    limpiar_pantalla()
+                                                    break
+                                    elif choice == 2:
+                                        usuario = param('Introduzca el usuario: ',str)
+                                        mostrar_texto(enviar_solicitud(token,usuario))
+                                        limpiar_pantalla()
+                                    elif choice == 3:
+                                        limpiar_pantalla()
+                                        break
+                            elif choice == 3:
+                                limpiar_pantalla()
                                 break
-
-                    elif choice == '2':
-                        print(ver_recursos(user))
-                    elif choice == '3':
+                    elif choice == 3:
+                        limpiar_pantalla()
                         break
-                    else:
-                        print('Opción invalida')
-        elif choice == '3':
-            print("Saliendo...")
+            else:
+                mostrar_texto(log_in[0])
+                limpiar_pantalla()            
+        elif choice == 3:
+            print('Saliendo...')
             break
-        else:
-            print("Opción invalida.")
 
 
 if __name__ == '__main__':

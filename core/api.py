@@ -1,156 +1,22 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
-import copy
 
 from jugador import Jugador
-from mapa import Mapa
-from region import Region
-from region_manager import RegionManager
-from recursos import Recurso
-from tropas import Tropa
-from edificios import Edificio
-from tropas import TropaAtaque, TropaDefensa, TropaAlcance, TropaEstructura
-
 app = Flask(__name__)
 
-app.config["JWT_SECRET_KEY"] = "contraseña"
+app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
 jwt = JWTManager(app)
 
-users = {}
-data = {}
-
-
-diccionario = {
-                key.lower(): value
-                for key, value in globals().items()
-                if isinstance(value, type) }
-
-
+#DATOS
+users={}
+buzon={}
+partidas={}
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
-
-
-@app.route('/data', methods=['GET'])
-@jwt_required()
-def get_data():
-    return list(data.keys()), 200
-
-
-@app.route('/data/<id>', methods=['GET'])
-def get_data_id(id):
-    try:
-        return data[id], 200
-    except KeyError:
-        return f'Dato {id} No encontrado', 404
-
-def crear_mapa():
-    """Crea el mapa por defecto y lo devuelve."""
-
-    # Inicializar el mapa con 5 filas y 5 columnas
-    map = Mapa(5, 5)
-
-    # Crear nodos y conexiones
-    nodos = map.crear_nodos()
-    conexiones = map.crear_aristas(nodos)
-
-    # Asignar terrenos a los nodos
-    map.anyadir_terreno(conexiones)
-
-    # Asignar zonas y generar recursos
-    map.asigna_zonas()
-
-    return map
-
-
-@app.route('/data/<id>', methods=['POST'])
-@jwt_required()
-def add_data(id):
-    global data
-    global diccionario
-    if id not in data:
-        key = request.args.get('value', '')
-        data[id] = diccionario[key](id, crear_mapa())
-
-        return f'Sesión creada', 200
-    else:
-        return f' Ya existe la sesión', 409
-@app.route('/data/ver_recursos/<id>',methods=['GET'])
-def ver_recursos(id):
-    global data
-    jugador = data[id]
-    return jugador.mostrar_recursos(),200
-
-@app.route('/data/ver_zona/<id>', methods=['GET'])
-def ver_zona(id):
-    global data
-    jugador = data[id]
-    posicion = request.args.get('value', '')
-    x, y = map(int, posicion.split(','))
-    cordenada = (x, y)
-    regionstr = jugador.ver_zona(cordenada)
-    return regionstr,200
-
-@app.route('/data/ver_zona/add_tropa/<id>', methods=['POST'])
-def add_tropas(id):
-    global data
-    jugador = data[id]
-    tropa= request.args.get('tropa', '')
-    cantidad= request.args.get('cantidad', '')
-    resultado = jugador.add_tropa(tropa,cantidad)
-    return resultado,200
-@app.route('/data/ver_zona/mover_tropa/<id>', methods=['PUT'])
-def mover_tropas(id):
-    global data
-    jugador = data[id]
-    tropa= request.args.get('tropa', '')
-    cantidad= request.args.get('cantidad', '')
-    destino = request.args.get('tupla','')
-    x, y = map(int, destino.split(','))
-    cordenada = (x,y)
-    resultado = jugador.mover_tropa(cordenada,tropa,cantidad)
-    return resultado[0],200
-
-@app.route('/data/ver_zona/catalogo/<id>', methods=['GET'])
-def catalogo_tropas(id):
-    global data
-    jugador = data[id]
-    catalogo = jugador.mostrar_catalogo()[1]
-    return catalogo,200
-@app.route('/data/ver_zona/catalogo_edificios/<id>', methods=['GET'])
-def catalogo_edificios(id):
-    global data
-    jugador = data[id]
-    catalogo = jugador.mostrar_catalogo_edificios()[1]
-    return catalogo,200
-@app.route('/data/ver_zona/crear_edificio/<id>', methods=['POST'])
-def crear_edificio(id):
-    global data
-    jugador = data[id]
-    edificio = request.args.get('edificio','')
-    return jugador.construir_edificio(edificio),200
-@app.route('/data/<id>', methods=['PUT'])
-@jwt_required()
-def update_data(id):
-    if id in data:
-        data[id] = request.args.get('value', '')
-        return f'Dato {id} actualizado', 200
-    else:
-        return f'Dato {id} No encontrado', 404
-
-
-@app.route('/data/<id>', methods=['DELETE'])
-@jwt_required()
-def delete_data(id):
-    if id in data:
-        del data[id]
-        return f'Dato {id} eliminado', 200
-    else:
-        return f'Dato {id} No encontrado', 404
-
-
-@app.route('/signup', methods=['POST'])
+def kingdom_craft():
+    return 'KINGDOM CRAFT'
+#AUTENTICACIÓN
+@app.route('/auth/signup', methods=['POST'])
 def signup():
     user = request.args.get('user', '')
     if user in users:
@@ -158,20 +24,104 @@ def signup():
     else:
         password = request.args.get('password', '')
         hashed = hashlib.sha256(password.encode()).hexdigest()
-        users[user] = hashed
+        users[user] = {
+            'hashed': hashed,
+            'amigos': [],
+            'solicitudes_enviadas': [],
+            'solicitudes_recibidas': []
+        }
+        buzon[user] = []
         return f'Usuario {user} registrado', 200
 
-
-@app.route('/login', methods=['GET'])
+@app.route('/auth/login', methods=['GET'])
 def login():
     user = request.args.get('user', '')
     password = request.args.get('password', '')
     hashed = hashlib.sha256(password.encode()).hexdigest()
 
-    if user in users and users[user] == hashed:
+    if user in users and users[user]['hashed'] == hashed:
         return create_access_token(identity=user), 200
     else:
         return f'Usuario o contraseña incorrectos', 401
+
+#USUARIOS
+#   AMIGOS
+@app.route('/users/friends', methods=['GET'])
+@jwt_required()
+def amigos():
+    amigos = users[get_jwt_identity()]['amigos']
+    return jsonify(amigos),200    
+
+@app.route('/users/friend-requests', methods=['POST'])
+@jwt_required()
+def enviar_solicitud():
+    id_solicitud = request.args.get('id_solicitud','')
+    if id_solicitud in users:
+        user = get_jwt_identity()
+        if id_solicitud not in users[user]['solicitudes_recibidas']:
+            users[user]['solicitudes_enviadas'].append(id_solicitud)
+            users[id_solicitud]['solicitudes_recibidas'].append(user)
+            buzon[id_solicitud].append({'mensaje': f'{user} quiere ser tu amigo','leido': False})
+            return 'Solicitud enviada',200
+        else:
+            return f'{id_solicitud} ya quiere ser tu amigo'
+    else:
+        return 'Usuario no encontrado',404
+
+@app.route('/users/friend-requests', methods=['GET'])
+@jwt_required()
+def solicitudes():
+    solicitudes = users[get_jwt_identity()]['solicitudes_recibidas']
+    return jsonify(solicitudes),200
+   
+@app.route('/users/friend-requests/<id>/accept', methods=['POST'])
+@jwt_required()
+def aceptar_solicitud(id):
+    user = get_jwt_identity()
+    users[user]['solicitudes_recibidas'].remove(id)
+    users[user]['amigos'].append(id)
+    users[id]['solicitudes_enviadas'].remove(user)
+    users[id]['amigos'].append(user)
+    buzon[id].append({'mensaje':f'{user} ahora es tu amigo','leido': False})
+    return f'Ahora eres amigo de {id}',200
+
+@app.route('/users/friend-requests/<id>/reject', methods=['POST'])
+@jwt_required()
+def rechazar_solicitud(id):
+    user = get_jwt_identity()
+    users[user]['solicitudes_recibidas'].remove(id)
+    users[id]['solicitudes_enviadas'].remove(user)
+    buzon[id].append({'mensaje':f'{user} rechazo tu solicitud de amistad','leido': False})
+    return 'Solicitud de amistad rechazada',200
+#USUARIOS
+#   BUZON
+@app.route('/users/mail/notificaciones', methods=['GET'])
+@jwt_required()
+def notificaciones():
+    user = get_jwt_identity()
+    notificaciones = 0
+    for mensaje in buzon[user]:
+        if mensaje['leido'] == False:
+            notificaciones += 1
+    return f'\nTienes {notificaciones} notificaciones nuevas',200
+
+@app.route('/users/mail', methods=['PUT'])
+@jwt_required()
+def marcar_leido():
+    user = get_jwt_identity()
+    for mensaje in buzon[user]:
+        mensaje['leido'] = True
+    return 'Mensajes marcados como leído',200
+
+@app.route('/users/mail', methods=['GET'])
+@jwt_required()
+def ver_buzon():
+    user = get_jwt_identity()
+    mensajes = []
+    for mensaje in buzon[user]:
+        if mensaje['leido'] == False:
+            mensajes.append(mensaje['mensaje'])
+    return jsonify(mensajes),200
 
 
 if __name__ == '__main__':
