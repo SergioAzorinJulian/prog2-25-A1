@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
-
+import random
 from jugador import Jugador
+from partida import Partida
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
@@ -12,6 +13,16 @@ jwt = JWTManager(app)
 users={}
 buzon={}
 partidas={}
+#FUNCIONES
+def id_partida() -> str:
+    while True:
+        n = random.randint(0,999)
+        if n not in partidas.keys():
+            n = str(n)
+            return n
+        else:
+            continue
+#API
 @app.route('/')
 def kingdom_craft():
     return 'KINGDOM CRAFT'
@@ -28,7 +39,9 @@ def signup():
             'hashed': hashed,
             'amigos': [],
             'solicitudes_enviadas': [],
-            'solicitudes_recibidas': []
+            'solicitudes_recibidas': [],
+            'partidas': [],
+            'invitaciones_partida':[]
         }
         buzon[user] = []
         return f'Usuario {user} registrado', 200
@@ -122,6 +135,75 @@ def ver_buzon():
         if mensaje['leido'] == False:
             mensajes.append(mensaje['mensaje'])
     return jsonify(mensajes),200
+#USUARIOS
+#   GAMES
+@app.route('/users/game_requests', methods=['GET'])
+@jwt_required()
+def invitaciones_privadas():
+    user = get_jwt_identity()
+    id_privadas = users[user]['invitaciones_partida']
+    partidas_privadas = {key : str(value) for key,value in partidas.items() if key in id_privadas}
+    return jsonify(partidas_privadas),200
+#PARTIDA
+@app.route('/games',methods=['POST'])
+@jwt_required()
+def crear_partida():
+    user = get_jwt_identity()
+    id = id_partida()
+    parametros_partida = request.get_json()
+    if parametros_partida['privada']:
+        try:
+            invitado = parametros_partida['invitado']
+            buzon[invitado].append({'mensaje': f'{user} te ha invitado a una partida privada, aceptala desde tu perfil','leido':False})
+            users[invitado]['invitaciones_partida'].append(id)
+        except KeyError:
+            return f'Usuario {invitado} no encontrado',404
+        partidas[id] = Partida(id=id,privada=True,host=user)
+    else:
+        partidas[id] = Partida(id=id,host=user)
+    partidas[id].inicializar_mapa(parametros_partida['size'],parametros_partida['terrenos'])
+    partidas[id].add_jugador(user,parametros_partida['reino'])
+    users[user]['partidas'].append(id)
+    return f'Partida de id: {id} creada correctamente'
+@app.route('/games',methods=['GET'])
+@jwt_required()
+def partidas_publicas():
+    publicas = {key:str(value) for key, value in partidas.items() if value.privada == False and value.estado == 'Esperando'}
+    return jsonify(publicas),200
+
+@app.route('/games/<id>/join',methods=['PUT'])
+@jwt_required()
+def unirse_partida(id):
+    user = get_jwt_identity()
+    reino = request.args.get('reino','')
+    try:
+        partidas[id].add_jugador(user,reino)
+        host = partidas[id].host
+        buzon[host].append({'mensaje':f'{user} se ha unido a tu partida de id: {id}','leido':False})
+        if id in users[user]['invitaciones_partida']:
+            users[user]['invitaciones_partida'].remove(id)
+        users[user]['partidas'].append(id)
+        return f'Te has unido ha partida: {id}',200
+    except KeyError:
+        return f'Partida {id} no encontrada',404
+@app.route('/games/<id>/start',methods=['PUT'])
+@jwt_required()
+def iniciar_partida(id):
+    jugador = partidas[id].inicializar_partida()
+    return f'Partida {id} inicializada, comienza {jugador}',200
+@app.route('/games/<id>/cancel',methods=['POST'])
+@jwt_required()
+def cancelar_partida(id):
+    try:
+        user = get_jwt_identity()
+        partidas[id].cancelar_partida()
+        users[user]['invitaciones_partida'].remove(id)
+        host = partidas[id].host
+        buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación'})
+        users[host]['partidas'].remove(id)
+        del partidas[id]
+    except KeyError:
+        return f'Partida {id} no encontrada',404
 
 
 if __name__ == '__main__':

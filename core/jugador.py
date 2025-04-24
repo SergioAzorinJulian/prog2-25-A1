@@ -32,27 +32,36 @@ Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territori
 
 class Jugador:
 
-    def __init__(self, usuario, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
+    def __init__(self, usuario, reino, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
                                                                  Recurso('piedra', 50, 0, 100), Recurso('hierro', 25, 0, 100),
                                                                  Recurso('oro', 50, 0, 100), \
                                                                  Recurso('caza', 400, 0, 400),
                                                                  Recurso('recoleccion', 400, 0, 400)],
                  conquista: list[tuple[int, int]] = []):
         self.usuario = usuario
+        self.reino = reino
         self.mapa = mapa
         self.conquista = conquista  # Se debe actualizar en cada interacción
         self.recursos = recursos
         self.region_actual: tuple[int, int] = None  # La zona que esta consultando el jugador dentro del bucle principal
 
     def __str__(self):
-        return f'Usuario: {self.usuario}, Mapa: {self.mapa}'
+        return f'Usuario: {self.usuario}'
 
     def mapa_grafico(self, mapa):
         pass
-
+    def establecer_reino(self):
+        '''
+        Establece su reino, es decir, su primer territorio en el que maniobrar
+        '''
+        for region in self.mapa.reinos:
+            if region.get_propietario() == 'Neutral':
+                region.set_propietario(self.usuario)  
+                region.set_nombre_reino(self.reino)
+            break
     def ver_zona(self, region: tuple[int, int]):  # Actualiza a su vez la región actual
         self.region_actual = region
-        return str(self.mapa.regiones[self.region_actual])
+        return str(self.mapa.regiones[self.region_actual]), True if self.mapa.regiones[self.region_actual].get_propietario() == self.nombre else False
 
     @classmethod
     def mostrar_catalogo(cls):
@@ -190,3 +199,8 @@ class Jugador:
         for recurso in self.recursos:
             recursos_str += str(recurso) + '\n'
         return recursos_str
+    def __eq__(self,other):
+        if self.usuario == other:
+            return True
+        else:
+            return False
