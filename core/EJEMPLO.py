@@ -244,24 +244,33 @@ def menu():
                                         id_user_partida = param('Introduzca el id de la partida: ',str)
                                         estado_partida = get_estado_partida(token,id_user_partida)
                                         if estado_partida == 'Empezada':
-                                            if get_estado_jugador(token,id_user_partida):
-                                                mostrar_texto('Bienvenido a Kingdom Craft')
-                                                limpiar_pantalla()
-                                                while True:
-                                                    print('===KINGDOM CRAFT===')
-                                                    print('1. VER ZONA')
-                                                    print('2.VER RECURSOS')
-                                                    print('3. SALIR')
-                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                            while True:
+                                                if get_estado_jugador(token,id_user_partida):
+                                                    mostrar_texto('Bienvenido a Kingdom Craft')
+                                                    limpiar_pantalla()
+                                                    while True:
+                                                        print('===KINGDOM CRAFT===')
+                                                        print('1. VER ZONA')
+                                                        print('2.VER RECURSOS')
+                                                        print('3. SALIR')
+                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                                        if choice == 1:
+                                                            pass
+                                                        elif choice == 2:
+                                                            pass
+                                                        else:
+                                                            limpiar_pantalla()
+                                                            break
+                                                else:
+                                                    mostrar_texto('Todavía no es tu turno')
+                                                    print('1. RECARGAR')
+                                                    print('2. VOLVER')
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
                                                     if choice == 1:
-                                                        pass
-                                                    elif choice == 2:
-                                                        pass
+                                                        continue
                                                     else:
                                                         limpiar_pantalla()
                                                         break
-                                            else:
-                                                mostrar_texto('Todavía no es tu turno')
                                         elif estado_partida == 'Esperando':
                                             mostrar_texto('Esperando a que se una otro jugador')
                                             limpiar_pantalla()
