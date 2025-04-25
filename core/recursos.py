@@ -62,7 +62,11 @@ class Recurso:
 
     def __str__(self) -> str:
         """metodo para mostrar el recurso"""
-        return f"{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}"
+        if self.regeneracion > 0:
+            return f"{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}"
+        else:
+            return f"{self.nombre}: {self.cantidad} unidades"
+     
     def __repr__(self) -> str:
         """metodo para mostrar el recurso"""
         return f"Recurso(nombre = {self.nombre}, cantidad = {self.cantidad}, regeneracion = {self.regeneracion})"

@@ -197,9 +197,12 @@ def unirse_partida(id):
 @app.route('/games/<id>/start',methods=['PUT'])
 @jwt_required()
 def iniciar_partida(id): #Poner un mensaje al jugador que comienza el turno
-    jugador = partidas[id].inicializar_partida()
-    buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
-    return f'Partida {id} inicializada, comienza {jugador}',200
+    try:
+        jugador = partidas[id].inicializar_partida()
+        buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
+        return f'Partida {id} inicializada, comienza {jugador}',200
+    except KeyError:
+        return None,404
 @app.route('/games/<id>/cancel',methods=['POST'])
 @jwt_required()
 def cancelar_partida(id):
@@ -223,6 +226,24 @@ def estado_partida(id):
 def estado_jugador(id):
     user = get_jwt_identity()
     return jsonify(partidas[id].estado_jugador(user)),200
+#/games/<id>/player/
+@app.route('/games/<id>/player/ver_zona',methods=['POST'])
+@jwt_required()
+def ver_zona(id):
+    zona = request.get_json()
+    zona = tuple(zona['zona'])
+    if zona in partidas[id].mapa.regiones.keys():
+        user = get_jwt_identity()
+        jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+        return jsonify(jugador.ver_zona(zona)),200
+    else:
+        return jsonify({'error': f'Zona {zona} no encontrada'}),404
+@app.route('/games/<id>/player/ver_recursos',methods=['GET'])
+@jwt_required()
+def ver_recursos(id):
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    return jsonify(jugador.ver_recursos()),200
 if __name__ == '__main__':
     app.run(debug=True)
     

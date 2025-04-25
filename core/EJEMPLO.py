@@ -6,7 +6,28 @@ import time
 URL = 'http://127.0.0.1:5000'
 
 #------------FUNCIONES------------
+def to_tuple():
+    while True:
+        try:
+                entrada = input("Introduce las coordenadas (fila, columna): ")
+                # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
+                entrada = entrada.strip()
+                coordenadas_str = entrada.split(',')
 
+                # Verificar que haya exactamente dos coordenadas
+                if len(coordenadas_str) != 2:
+                    print("Error: Debes introducir dos coordenadas separadas por una coma.")
+                    continue  # Volver al inicio del bucle
+
+                # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
+                fila = int(coordenadas_str[0].strip())
+                columna = int(coordenadas_str[1].strip())
+                return (fila, columna)
+        except (ValueError, TypeError):
+            print('El tipo de dato no es válido.')
+            continue
+
+                
 def param(
         nombre: str,
         tipo: type,
@@ -63,7 +84,7 @@ def mostrar_texto(lista : list[str] | str,enumerado : bool = False) -> None:
                 n += 1
             for caracter in texto:
                 print(caracter,end='',flush=True)
-                time.sleep(0.05)
+                time.sleep(0.03)
             print('\n',end='')
 
 #------------REQUESTS------------
@@ -120,7 +141,7 @@ def mis_partidas(token):
     partidas = r.json()
     return partidas
 #PARTIDA
-def crear_partida(token,privada,reino, invitado = None, size=4, terrenos=None):
+def crear_partida(token,privada,reino, invitado = None, size=3, terrenos=None):
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -152,6 +173,15 @@ def get_estado_jugador(token,id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/player_state',headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
     return estado
+#/game/<id>/player
+def ver_zona(token,id_partida,coordenada):
+    dict = {'zona': coordenada}
+    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona',headers={'Authorization': f'Bearer {token}'},json=(dict))
+    zona = r.json()
+    return zona,r.status_code
+def ver_recursos(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos',headers={'Authorization': f'Bearer {token}'})
+    return r.json()
 def menu():
     while True:
         print('=== MENU ===')
@@ -248,16 +278,55 @@ def menu():
                                                 if get_estado_jugador(token,id_user_partida):
                                                     mostrar_texto('Bienvenido a Kingdom Craft')
                                                     limpiar_pantalla()
-                                                    while True:
+                                                    while get_estado_jugador(token,id_user_partida) == True:
                                                         print('===KINGDOM CRAFT===')
                                                         print('1. VER ZONA')
                                                         print('2.VER RECURSOS')
                                                         print('3. SALIR')
                                                         choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
                                                         if choice == 1:
-                                                            pass
+                                                            coordenada = to_tuple()
+                                                            zona,estado = ver_zona(token,id_user_partida,coordenada)
+                                                            if estado == 200:
+                                                                while True:
+                                                                    if zona[1]:
+                                                                        print(zona[0])
+                                                                        print('1. AÑADIR TROPA')
+                                                                        print('2. MOVER TROPA')
+                                                                        print('3. MOVER BATALLÓN')
+                                                                        print('4. CONSTRUIR EDIFICIO')
+                                                                        print('5. VOLVER')
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5])
+                                                                        match choice:
+                                                                            case 1:
+                                                                                pass
+                                                                            case 2:
+                                                                                pass
+                                                                            case 3:
+                                                                                pass
+                                                                            case 4:
+                                                                                pass
+                                                                            case 5:
+                                                                                limpiar_pantalla()
+                                                                                break
+                                                                    
+                                                                    else:
+                                                                        print(zona[0])
+                                                                        print('1. VOLVER')
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                                                        if choice == 1:
+                                                                            limpiar_pantalla()
+                                                                            break
+                                                            elif estado == 404:
+                                                                mostrar_texto(zona['error'])
+                                                                continue
                                                         elif choice == 2:
-                                                            pass
+                                                            mostrar_texto(ver_recursos(token,id_user_partida),enumerado=True)
+                                                            print('1. VOLVER')
+                                                            choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                                            if choice == 1:
+                                                                limpiar_pantalla()
+                                                                break
                                                         else:
                                                             limpiar_pantalla()
                                                             break

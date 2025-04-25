@@ -154,7 +154,7 @@ class Jugador:
     def mover_batallon(self, destino: tuple[int, int]):
         pass
 
-    def combatir(self,destino: tuple[int, int]):
+    def combatir(self,destino: tuple[int, int]): #AÑADIR CONDICIÓN DE COMBATE CONTRA REINO, SI GANA ATK SE ACABÓ LA PARTIDA
         Ejercito_Atk = self.mapa.regiones[self.region_actual].tropas
         Ejercito_Def = self.mapa.regiones[destino].tropas
         texto_lista = []
@@ -194,11 +194,11 @@ class Jugador:
         for coordenada,region in self.mapa.regiones.items():
             if region.get_propietario() == self.usuario:
                 self.conquista.append(coordenada)
-    def mostrar_recursos(self) -> str:
-        recursos_str = ''
+    def ver_recursos(self) -> str:
+        recursos_list = []
         for recurso in self.recursos:
-            recursos_str += str(recurso) + '\n'
-        return recursos_str
+            recursos_list.append(str(recurso))
+        return recursos_list
     def __eq__(self,other):
         if self.usuario == other:
             return True
