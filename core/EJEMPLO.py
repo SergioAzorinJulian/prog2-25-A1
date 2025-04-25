@@ -23,7 +23,7 @@ def param(
         prompt = (
             f'{nombre} (Longitud mínima: {lon_min}): '
             if lon_min
-            else f'{nombre}: '
+            else f'{nombre}'
         )
         entrada = getpass.getpass(prompt) if is_password else input(prompt)
         if len(entrada) < lon_min:
@@ -114,6 +114,11 @@ def invitaciones_privadas(token):
     r = requests.get(f'{URL}/users/game_requests',headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
     return invitaciones
+#   MY GAMES
+def mis_partidas(token):
+    r = requests.get(f'{URL}/users/my_games',headers={'Authorization': f'Bearer {token}'})
+    partidas = r.json()
+    return partidas
 #PARTIDA
 def crear_partida(token,privada,reino, invitado = None, size=4, terrenos=None):
     parametros_partida = {
@@ -139,6 +144,14 @@ def iniciar_partida(token,id_partida):
 def cancelar_partida(token,id_partida):
     r = requests.post(f'{URL}/games/{id_partida}/cancel',headers={'Authorization': f'Bearer {token}'})
     return r.text
+def get_estado_partida(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/game_state',headers={'Authorization': f'Bearer {token}'})
+    estado = r.text
+    return estado
+def get_estado_jugador(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player_state',headers={'Authorization': f'Bearer {token}'})
+    estado = r.json()
+    return estado
 def menu():
     while True:
         print('=== MENU ===')
@@ -220,10 +233,48 @@ def menu():
                                         mostrar_texto(iniciar_partida(token,id_partida))
                                         limpiar_pantalla()
                                     elif choice == 2:
-                                        mostrar_texto('Kingdom Craft esta trabajando en ello')
+                                        user_partidas = mis_partidas(token)
+                                        if user_partidas != {}:
+                                            str_partidas = [partida for partida in user_partidas.values()]
+                                            mostrar_texto(str_partidas)
+                                        else:
+                                            mostrar_texto('Todavía no te has unido a ninguna partida')
+                                            limpiar_pantalla()
+                                            continue
+                                        id_user_partida = param('Introduzca el id de la partida: ',str)
+                                        estado_partida = get_estado_partida(token,id_user_partida)
+                                        if estado_partida == 'Empezada':
+                                            if get_estado_jugador(token,id_user_partida):
+                                                mostrar_texto('Bienvenido a Kingdom Craft')
+                                                limpiar_pantalla()
+                                                while True:
+                                                    print('===KINGDOM CRAFT===')
+                                                    print('1. VER ZONA')
+                                                    print('2.VER RECURSOS')
+                                                    print('3. SALIR')
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                                    if choice == 1:
+                                                        pass
+                                                    elif choice == 2:
+                                                        pass
+                                                    else:
+                                                        limpiar_pantalla()
+                                                        break
+                                            else:
+                                                mostrar_texto('Todavía no es tu turno')
+                                        elif estado_partida == 'Esperando':
+                                            mostrar_texto('Esperando a que se una otro jugador')
+                                            limpiar_pantalla()
+                                            continue
+                                        elif estado_partida == 'Finalizada':
+                                            mostrar_texto('Kingdom Craft esta trabajando en ello')
+                                            limpiar_pantalla()
+                                            continue
                                     else:
+                                        limpiar_pantalla()
                                         break
                             elif choice == 3:
+                                limpiar_pantalla()
                                 break
 
                     elif choice == 2:
@@ -244,6 +295,7 @@ def menu():
                                         choice = param('Eliga una opción: ',int,valores_validos=[1,2])
                                         if choice == 1:
                                             mostrar_texto(marcar_leido(token))
+                                            limpiar_pantalla()
                                         elif choice == 2:
                                             limpiar_pantalla()
                                             break

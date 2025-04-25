@@ -61,7 +61,7 @@ class Jugador:
             break
     def ver_zona(self, region: tuple[int, int]):  # Actualiza a su vez la región actual
         self.region_actual = region
-        return str(self.mapa.regiones[self.region_actual]), True if self.mapa.regiones[self.region_actual].get_propietario() == self.nombre else False
+        return str(self.mapa.regiones[self.region_actual]), True if self.mapa.regiones[self.region_actual].get_propietario() == self.usuario else False
 
     @classmethod
     def mostrar_catalogo(cls):

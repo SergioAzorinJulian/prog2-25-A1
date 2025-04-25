@@ -30,11 +30,8 @@ class Partida:
             return True
         else:
             return False
-    def estado_partida(self):
-        if self.estado == 'Empezada':
-            return True
-        else:
-            return False
+    def estado_partida(self): 
+        return self.estado
     def cambiar_turno(self):
         if self.turno == self.jugadores[0]:
             self.turno = self.jugadores[1].usuario

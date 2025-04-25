@@ -144,6 +144,13 @@ def invitaciones_privadas():
     id_privadas = users[user]['invitaciones_partida']
     partidas_privadas = {key : str(value) for key,value in partidas.items() if key in id_privadas}
     return jsonify(partidas_privadas),200
+@app.route('/users/my_games', methods=['GET'])
+@jwt_required()
+def mis_partidas():
+    user = get_jwt_identity()
+    id_partidas_user = users[user]['partidas']
+    partidas_user = {key : str(value) for key,value in partidas.items() if key in id_partidas_user}
+    return jsonify(partidas_user),200
 #PARTIDA
 @app.route('/games',methods=['POST'])
 @jwt_required()
@@ -168,7 +175,8 @@ def crear_partida():
 @app.route('/games',methods=['GET'])
 @jwt_required()
 def partidas_publicas():
-    publicas = {key:str(value) for key, value in partidas.items() if value.privada == False and value.estado == 'Esperando'}
+    user = get_jwt_identity()
+    publicas = {key: str(value) for key, value in partidas.items() if not value.privada and value.estado == 'Esperando' and value.host != user}
     return jsonify(publicas),200
 
 @app.route('/games/<id>/join',methods=['PUT'])
@@ -188,8 +196,9 @@ def unirse_partida(id):
         return f'Partida {id} no encontrada',404
 @app.route('/games/<id>/start',methods=['PUT'])
 @jwt_required()
-def iniciar_partida(id):
+def iniciar_partida(id): #Poner un mensaje al jugador que comienza el turno
     jugador = partidas[id].inicializar_partida()
+    buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
     return f'Partida {id} inicializada, comienza {jugador}',200
 @app.route('/games/<id>/cancel',methods=['POST'])
 @jwt_required()
@@ -204,8 +213,16 @@ def cancelar_partida(id):
         del partidas[id]
     except KeyError:
         return f'Partida {id} no encontrada',404
-
-
+@app.route('/games/<id>/game_state',methods=['GET'])
+@jwt_required()
+def estado_partida(id):
+    estado = partidas[id].estado_partida()
+    return estado,200
+@app.route('/games/<id>/player_state',methods=['GET'])
+@jwt_required()
+def estado_jugador(id):
+    user = get_jwt_identity()
+    return jsonify(partidas[id].estado_jugador(user)),200
 if __name__ == '__main__':
     app.run(debug=True)
     
