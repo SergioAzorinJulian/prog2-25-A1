@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import hashlib
 import random
-from jugador import Jugador
 from partida import Partida
 app = Flask(__name__)
 
@@ -214,6 +213,7 @@ def cancelar_partida(id):
         buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación'})
         users[host]['partidas'].remove(id)
         del partidas[id]
+        return f'Partida {id} cancelada con éxito',200
     except KeyError:
         return f'Partida {id} no encontrada',404
 @app.route('/games/<id>/game_state',methods=['GET'])

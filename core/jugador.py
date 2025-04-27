@@ -34,7 +34,7 @@ class Jugador:
 
     def __init__(self, usuario, reino, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
                                                                  Recurso('piedra', 50, 0, 100), Recurso('hierro', 25, 0, 100),
-                                                                 Recurso('oro', 50, 0, 100), \
+                                                                 Recurso('oro', 50, 0, 100),
                                                                  Recurso('caza', 400, 0, 400),
                                                                  Recurso('recoleccion', 400, 0, 400)],
                  conquista: list[tuple[int, int]] = []):
@@ -43,7 +43,7 @@ class Jugador:
         self.mapa = mapa
         self.conquista = conquista  # Se debe actualizar en cada interacción
         self.recursos = recursos
-        self.region_actual: tuple[int, int] = None  # La zona que esta consultando el jugador dentro del bucle principal
+        self.region_actual: tuple[int, int] | None = None  # La zona que esta consultando el jugador dentro del bucle principal
 
     def __str__(self):
         return f'Usuario: {self.usuario}'
@@ -51,9 +51,9 @@ class Jugador:
     def mapa_grafico(self, mapa):
         pass
     def establecer_reino(self):
-        '''
+        """
         Establece su reino, es decir, su primer territorio en el que maniobrar
-        '''
+        """
         for region in self.mapa.reinos:
             if region.get_propietario() == 'Neutral':
                 region.set_propietario(self.usuario)  
@@ -155,24 +155,24 @@ class Jugador:
         pass
 
     def combatir(self,destino: tuple[int, int]): #AÑADIR CONDICIÓN DE COMBATE CONTRA REINO, SI GANA ATK SE ACABÓ LA PARTIDA
-        Ejercito_Atk = self.mapa.regiones[self.region_actual].tropas
-        Ejercito_Def = self.mapa.regiones[destino].tropas
+        ejercito_atk = self.mapa.regiones[self.region_actual].tropas
+        ejercito_def = self.mapa.regiones[destino].tropas
         texto_lista = []
-        while Ejercito_Atk!=[] and Ejercito_Def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
+        while ejercito_atk!=[] and ejercito_def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
 
-            max_tropas = max(len(Ejercito_Atk), len(Ejercito_Def)) #Cogemos la longitud del ejercito más grande
+            max_tropas = max(len(ejercito_atk), len(ejercito_def)) #Cogemos la longitud del ejercito más grande
             for i in range(max_tropas):  #Repetimos el bucle hasta que lleguemos a la longitud del ejercito más grande
-                if i < len(Ejercito_Atk):
-                    texto_lista.append(Ejercito_Atk[i].atacar(Ejercito_Atk, Ejercito_Def))  #La tropa 'i' ataca al ejercito enemigo
+                if i < len(ejercito_atk):
+                    texto_lista.append(ejercito_atk[i].atacar(ejercito_atk, ejercito_def))  #La tropa 'i' ataca al ejercito enemigo
 
-                if i < len(Ejercito_Def):
-                    texto_lista.append(Ejercito_Def[i].atacar(Ejercito_Def, Ejercito_Atk))  #La tropa 'i' ataca al ejercito enemigo
+                if i < len(ejercito_def):
+                    texto_lista.append(ejercito_def[i].atacar(ejercito_def, ejercito_atk))  #La tropa 'i' ataca al ejercito enemigo
 
 
-        if Ejercito_Atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
+        if ejercito_atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
             texto_lista.append('El ataque fracasó.')
             return texto_lista  
-        elif Ejercito_Def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
+        elif ejercito_def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
             texto_lista.append('Ataque exitoso.')
             return texto_lista
 
@@ -194,7 +194,7 @@ class Jugador:
         for coordenada,region in self.mapa.regiones.items():
             if region.get_propietario() == self.usuario:
                 self.conquista.append(coordenada)
-    def ver_recursos(self) -> str:
+    def ver_recursos(self) -> list:
         recursos_list = []
         for recurso in self.recursos:
             recursos_list.append(str(recurso))

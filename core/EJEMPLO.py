@@ -9,20 +9,20 @@ URL = 'http://127.0.0.1:5000'
 def to_tuple():
     while True:
         try:
-                entrada = input("Introduce las coordenadas (fila, columna): ")
-                # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
-                entrada = entrada.strip()
-                coordenadas_str = entrada.split(',')
+            entrada = input("Introduce las coordenadas (fila, columna): ")
+            # Eliminar espacios en blanco al principio y al final y luego dividir la cadena por la coma
+            entrada = entrada.strip()
+            coordenadas_str = entrada.split(',')
 
-                # Verificar que haya exactamente dos coordenadas
-                if len(coordenadas_str) != 2:
-                    print("Error: Debes introducir dos coordenadas separadas por una coma.")
-                    continue  # Volver al inicio del bucle
+            # Verificar que haya exactamente dos coordenadas
+            if len(coordenadas_str) != 2:
+                print("Error: Debes introducir dos coordenadas separadas por una coma.")
+                continue  # Volver al inicio del bucle
 
-                # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
-                fila = int(coordenadas_str[0].strip())
-                columna = int(coordenadas_str[1].strip())
-                return (fila, columna)
+            # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
+            fila = int(coordenadas_str[0].strip())
+            columna = int(coordenadas_str[1].strip())
+            return (fila, columna)
         except (ValueError, TypeError):
             print('El tipo de dato no es válido.')
             continue
@@ -175,8 +175,8 @@ def get_estado_jugador(token,id_partida):
     return estado
 #/game/<id>/player
 def ver_zona(token,id_partida,coordenada):
-    dict = {'zona': coordenada}
-    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona',headers={'Authorization': f'Bearer {token}'},json=(dict))
+    diccionario = {'zona': coordenada}
+    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
     zona = r.json()
     return zona,r.status_code
 def ver_recursos(token,id_partida):
