@@ -48,8 +48,44 @@ class Jugador:
     def __str__(self):
         return f'Usuario: {self.usuario}'
 
-    def mapa_grafico(self, mapa):
-        pass
+    def mapa_grafico(self):
+        """
+        Muestra el mapa gráfico del jugador, donde:
+        - X representa las regiones del jugador
+        - ? representa las regiones neutrales
+        - O representa las regiones del enemigo
+        """
+        map_graf = '' # Inicializamos el mapa gráfico como una cadena vacía
+        fila_previa = -1 # Inicializamos la fila previa a -1
+        coordenadas = self.mapa.get_regiones().keys() # Obtenemos todas las coordenadas de las regiones
+        coordenadas = sorted(coordenadas)  # Ordenamos las coordenadas por filas y columnas
+        todas_regiones = self.mapa.get_regiones() # Obtenemos todas las regiones del mapa
+
+        for coordenada in coordenadas:
+            fila_actual = coordenada[0] # Guardamos la fila actual
+
+            # Obtenemos el objeto Region y su propietario
+            region = todas_regiones[coordenada]
+            propietario = region.get_propietario()
+
+            # Si cambiamos de fila y no es la primera iteración, añadimos un salto de línea
+            if fila_actual != fila_previa and fila_previa != -1:
+                map_graf += '\n'
+
+            # Actualizamos la fila previa a la actual para la siguiente iteración
+            fila_previa = fila_actual
+
+            # Determinamos el símbolo a mostrar en función del propietario de la región
+            if propietario == self.usuario:
+                map_graf += 'X '
+            elif propietario == 'Neutral':
+                map_graf += '? '
+            else:
+                map_graf += 'O '
+
+        # Eliminamos el último espacio en blanco y devolvemos el mapa gráfico
+        return map_graf.strip()
+
     def establecer_reino(self):
         """
         Establece su reino, es decir, su primer territorio en el que maniobrar
@@ -58,7 +94,8 @@ class Jugador:
             if region.get_propietario() == 'Neutral':
                 region.set_propietario(self.usuario)  
                 region.set_nombre_reino(self.reino)
-            break
+                break
+
     def ver_zona(self, region: tuple[int, int]):  # Actualiza a su vez la región actual
         self.region_actual = region
         return str(self.mapa.regiones[self.region_actual]), True if self.mapa.regiones[self.region_actual].get_propietario() == self.usuario else False
