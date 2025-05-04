@@ -247,9 +247,9 @@ def ver_zona(id):
     else:
         return jsonify({'error': f'Zona {zona} no encontrada'}),404
 
-@app.route('/games/<id>/player/todos_mis_recursos',methods=['GET'])
+@app.route('/games/<id>/player/ver_recursos',methods=['GET'])
 @jwt_required()
-def todos_mis_recursos(id):
+def ver_recursos(id):
     """
     Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
     Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
@@ -268,14 +268,8 @@ def todos_mis_recursos(id):
     """
     user = get_jwt_identity()
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    recursos_totales = jugador.ver_recursos()
 
-    mis_recursos = ''
-
-    for recurso in recursos_totales:
-        mis_recursos += f"{recurso}\n"
-
-    return mis_recursos, 200
+    return jsonify(jugador.ver_recursos()),200
 
 @app.route('/games/<id>/player/ver_mapa',methods=['GET'])
 @jwt_required()

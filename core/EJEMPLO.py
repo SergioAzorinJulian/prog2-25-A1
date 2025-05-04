@@ -213,15 +213,6 @@ def cambiar_turno(token, id_partida):
         print("Respuesta recibida: ", r.text)
         return None
 
-def todos_mis_recursos(token, id_partida):
-    r = requests.get(f'{URL}/games/{id_partida}/player/todos_mis_recursos',headers={'Authorization': f'Bearer {token}'})
-    if r.status_code == 200:
-        return r.text
-    else:
-        print(f"Error al obtener todos los recursos: {r.status_code}")
-        print("Respuesta recibida: ", r.text)
-        return None
-
 
 ### MENU PRINCIPAL ###
 def menu():
@@ -373,7 +364,7 @@ def menu():
                                                                 continue
 
                                                         elif choice == 2:
-                                                            mostrar_texto(todos_mis_recursos(token, id_user_partida))
+                                                            mostrar_texto(ver_recursos(token, id_user_partida))
                                                             param('Presione "Enter" para continuar ...', str, valores_validos=[''])
                                                             limpiar_pantalla()
                                                             continue

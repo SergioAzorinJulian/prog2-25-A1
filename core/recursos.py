@@ -1,4 +1,3 @@
-import random
 class Recurso:
     """
     Con la clase recurso se crean los diferentes recursos
@@ -81,13 +80,13 @@ class Recurso:
     def __str__(self) -> str:
         """Metodo para mostrar información del recurso"""
         if self.regeneracion > 0:
-            return f"{self.nombre.capitalize()}: {self.cantidad} unidades | Tasa de regeneración: {self.regeneracion}"
+            return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
         else:
-            return f"{self.nombre.capitalize()}: {self.cantidad} unidades"
+            return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades"
 
     def __repr__(self) -> str:
         """Metodo para mostrar información del recurso y su valor maximo"""
-        return f"{self.nombre.capitalize()}: {self.cantidad}/{self.valor_max} unidades | Tasa de regeneración: {self.regeneracion}"
+        return f"{self.nombre.capitalize():<11}: {self.cantidad:<4}/{self.valor_max:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
 
     def __sub__(self,other : int):
         nueva_cantidad = self.cantidad
