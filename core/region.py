@@ -157,9 +157,9 @@ class Region:
 
         mensaje = (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | \n"
                 f"Propietario: {self._propietario} |\n"
-                f"Recursos: \n {recursos_str}"
+                f"Recursos: \n{recursos_str}"
                 f"Edificios: {self.edificios} | \n"
-                f"Tropas: \n {tropas_str}")
+                f"Tropas: \n{tropas_str}")
 
         return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_reino()}"
 
