@@ -213,6 +213,15 @@ def cambiar_turno(token, id_partida):
         print("Respuesta recibida: ", r.text)
         return None
 
+def todos_mis_recursos(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/todos_mis_recursos',headers={'Authorization': f'Bearer {token}'})
+    if r.status_code == 200:
+        return r.text
+    else:
+        print(f"Error al obtener todos los recursos: {r.status_code}")
+        print("Respuesta recibida: ", r.text)
+        return None
+
 
 ### MENU PRINCIPAL ###
 def menu():
@@ -321,14 +330,14 @@ def menu():
                                                         print('===KINGDOM CRAFT===')
                                                         print('0. SALIR')
                                                         print('1. VER ZONA')
-                                                        print('2. VER RECURSOS')
+                                                        print('2. VER MIS RECURSOS')
                                                         print('3. VER MAPA')
                                                         print('4. FINALIZAR MI TURNO')
                                                         choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2, 3, 4])
                                                         print()
                                                         if choice == 1:
                                                             coordenada = to_tuple()
-                                                            zona,estado = ver_zona(token,id_user_partida,coordenada)
+                                                            zona, estado = ver_zona(token,id_user_partida,coordenada)
                                                             if estado == 200:
                                                                 while True:
                                                                     if zona[1]:
@@ -351,7 +360,7 @@ def menu():
                                                                                 pass
                                                                             case 4:
                                                                                 pass
-                                                                    
+
                                                                     else:
                                                                         print(zona[0])
                                                                         print('1. VOLVER')
@@ -362,24 +371,23 @@ def menu():
                                                             elif estado == 404:
                                                                 mostrar_texto(zona['error'])
                                                                 continue
+
                                                         elif choice == 2:
-                                                            mostrar_texto(ver_recursos(token,id_user_partida),enumerado=True)
-                                                            print('1. VOLVER')
-                                                            choice = param('Eliga una opción: ',int,valores_validos=[1])
-                                                            if choice == 1:
-                                                                limpiar_pantalla()
-                                                                break
+                                                            mostrar_texto(todos_mis_recursos(token, id_user_partida))
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            limpiar_pantalla()
+                                                            continue
 
                                                         elif choice == 3:
                                                             mapa = ver_mapa(token, id_user_partida)
                                                             mostrar_texto(mapa)
-                                                            choice = param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
                                                             limpiar_pantalla()
                                                             continue
 
                                                         elif choice == 4:
                                                             mostrar_texto(cambiar_turno(token,id_user_partida))
-                                                            choice = param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
                                                             limpiar_pantalla()
                                                             break
 

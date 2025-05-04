@@ -246,12 +246,36 @@ def ver_zona(id):
         return jsonify(jugador.ver_zona(zona)),200
     else:
         return jsonify({'error': f'Zona {zona} no encontrada'}),404
-@app.route('/games/<id>/player/ver_recursos',methods=['GET'])
+
+@app.route('/games/<id>/player/todos_mis_recursos',methods=['GET'])
 @jwt_required()
-def ver_recursos(id):
+def todos_mis_recursos(id):
+    """
+    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
+    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
+    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
+    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
+
+    Parameters
+    ----------
+    id : str
+        El identificador único del juego cuyo turno necesita ser cambiado.
+
+    Returns
+    -------
+    tuple
+        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
+    """
     user = get_jwt_identity()
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    return jsonify(jugador.ver_recursos()),200
+    recursos_totales = jugador.ver_recursos()
+
+    mis_recursos = ''
+
+    for recurso in recursos_totales:
+        mis_recursos += f"{recurso}\n"
+
+    return mis_recursos, 200
 
 @app.route('/games/<id>/player/ver_mapa',methods=['GET'])
 @jwt_required()
@@ -301,6 +325,8 @@ def cambiar_turno(id):
     partida = partidas[id]
     partida.cambiar_turno()
     return "Turno cambiado con éxito", 200
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

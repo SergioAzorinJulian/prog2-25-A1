@@ -231,11 +231,13 @@ class Jugador:
         for coordenada,region in self.mapa.regiones.items():
             if region.get_propietario() == self.usuario:
                 self.conquista.append(coordenada)
+
     def ver_recursos(self) -> list:
         recursos_list = []
         for recurso in self.recursos:
             recursos_list.append(str(recurso))
         return recursos_list
+
     def __eq__(self,other):
         if self.usuario == other:
             return True
