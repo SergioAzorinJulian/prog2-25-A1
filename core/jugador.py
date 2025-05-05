@@ -111,7 +111,25 @@ class Jugador:
             return f'Tropa: {tropa} no existe'
             
     def mover_batallon(self,destino : tuple[int,int]):
-        pass
+        if not self.region_actual:
+            return ("Error: No hay región actual asignada", True)
+
+        if destino not in self.mapa.regiones:
+            return ("Error: Región destino no encontrada", True)
+
+        try:
+            for i in self.mapa.regiones[self.region_actual].tropas:  # Iterar sobre las tropas
+                cantidad = i.cantidad
+                nombre = i.nombre.lower()
+                if cantidad > 0:
+                    mensaje, exito = self.mover_tropa(destino, nombre, cantidad)
+                    print(mensaje)  # Para depuración
+                    if not exito:  # Si mover_tropa devuelve False
+                        return ("No se han podido mover las tropas porque esa zona ya tiene dueño", False)
+            return ("Tropas movidas correctamente", True)
+        except Exception as e:
+            return (f"Error al mover batallón: {str(e)}", True)
+
     def combatir(destino : tuple[int,int]):
         pass
     def construir_edificio(self,edificio):
