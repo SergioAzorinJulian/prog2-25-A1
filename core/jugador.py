@@ -3,6 +3,7 @@ from region import Region
 from region_manager import RegionManager
 from recursos import Recurso
 from tropas import *
+from edificios import *
 
 '''
 PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
@@ -23,13 +24,6 @@ PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
 
         CONSTRUIR EDIFICIO -> Construye edificios, escribir aquí edificios y recursos que consumen crearlos -> []
 
-        AÑADIR FAMILIA -> Añade familias, escribir aquí que recurso consume añadir cada familia -> []
-            Sistema de generación de familias:
-                Se parte de una cantidad inicial (6 o las que se definan) y cada 2 o 3 (o X) turnos se hace "recuento" de recursos del reino;
-                es decir, si se tiene comida y agua "de sobra" (superavit) vendra 1 o 2 (o Y) familias nuevas al reino; de igual manera, si para 
-                el turno X no tienes suficiente agua y comida para sustentar al pueblo (déficit) se empezaran a ir las familias del reino; pero 
-                más paulatinamente, porque sino podría llegar un punto crítico en el que no haya familias, y por tanto tampoco quien trabaje ...
-
         VOLVER
 
 Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territorio enemigo -> COMBATIR o ABORTAR
@@ -37,27 +31,37 @@ Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territori
 
 
 class Jugador:
-    def __init__(self, usuario, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
+
+    def __init__(self, usuario, reino, mapa, recursos: list[Recurso] = [Recurso('madera', 100, 0, 100), Recurso('agua', 100, 0, 100),
                                                                  Recurso('piedra', 50, 0, 100), Recurso('hierro', 25, 0, 100),
-                                                                 Recurso('oro', 25, 0, 100), \
+                                                                 Recurso('oro', 50, 0, 100),
                                                                  Recurso('caza', 400, 0, 400),
                                                                  Recurso('recoleccion', 400, 0, 400)],
                  conquista: list[tuple[int, int]] = []):
         self.usuario = usuario
+        self.reino = reino
         self.mapa = mapa
         self.conquista = conquista  # Se debe actualizar en cada interacción
         self.recursos = recursos
-        self.region_actual: tuple[int, int] = None  # La zona que esta consultando el jugador dentro del bucle principal
+        self.region_actual: tuple[int, int] | None = None  # La zona que esta consultando el jugador dentro del bucle principal
 
     def __str__(self):
-        return f'Usuario: {self.usuario}, Mapa: {self.mapa}'
+        return f'Usuario: {self.usuario}'
 
     def mapa_grafico(self, mapa):
         pass
-
+    def establecer_reino(self):
+        """
+        Establece su reino, es decir, su primer territorio en el que maniobrar
+        """
+        for region in self.mapa.reinos:
+            if region.get_propietario() == 'Neutral':
+                region.set_propietario(self.usuario)  
+                region.set_nombre_reino(self.reino)
+            break
     def ver_zona(self, region: tuple[int, int]):  # Actualiza a su vez la región actual
         self.region_actual = region
-        return str(self.mapa.regiones[self.region_actual])
+        return str(self.mapa.regiones[self.region_actual]), True if self.mapa.regiones[self.region_actual].get_propietario() == self.usuario else False
 
     @classmethod
     def mostrar_catalogo(cls):
@@ -75,28 +79,33 @@ class Jugador:
         catalogo = ''
         for i in cls.tropas_objetos.values():
             catalogo += str(i()) + '\n'
-
         return cls.tropas_objetos, catalogo
 
-    def add_tropa(self, tropa, cantidad):
-        tropas_objetos = {
-                key.lower(): value
+    @classmethod
+    def mostrar_catalogo_edificios(cls):
+        if not hasattr(cls,'edificios_objetos'):
+            cls.edificios_objetos = {
+            key.lower(): value
                 for key, value in globals().items()
-                if isinstance(value, type) and (
-                        issubclass(value, TropaAtaque) or
-                        issubclass(value, TropaDefensa) or
-                        issubclass(value, TropaAlcance) or
-                        issubclass(value, TropaEstructura)) and value not in (
-                   TropaAtaque, TropaDefensa, TropaEstructura,
-                   TropaAlcance)}
-        if tropa in tropas_objetos.keys():
+                if isinstance(value,type) and
+                        (issubclass(value, Edificio))
+                        and value is not Edificio
+        }
+        catalogo = ''
+        for i in cls.edificios_objetos.values():
+            catalogo += str(i()) + '\n'
+        return cls.edificios_objetos, catalogo
+    
+    def add_tropa(self, tropa, cantidad):
+        cantidad = int(cantidad) #El valor que se pasa a la API ES STR
+        if tropa in self.__class__.tropas_objetos.keys():
             for recurso in self.recursos:
-                if recurso == tropas_objetos[tropa].recursos:
-                    if recurso.cantidad >= tropas_objetos[tropa].recursos.cantidad * cantidad:
-                        recurso -= tropas_objetos[tropa].recursos * cantidad
+                if recurso == self.__class__.tropas_objetos[tropa].recursos:
+                    if recurso.cantidad >= self.__class__.tropas_objetos[tropa].recursos.cantidad * cantidad:
+                        recurso -= self.__class__.tropas_objetos[tropa].recursos * cantidad
                     else:
-                        return f'Cantidad insuficiente de {tropas_objetos[tropa].recursos.nombre}'
-            nueva_tropa = tropas_objetos[tropa](cantidad=cantidad)
+                        return f'Cantidad insuficiente de {self.__class__.tropas_objetos[tropa].recursos.nombre}'
+            nueva_tropa = self.__class__.tropas_objetos[tropa](cantidad=cantidad)
             for i in self.mapa.regiones[self.region_actual].tropas:
                 if nueva_tropa == i:
                     i += nueva_tropa
@@ -107,52 +116,91 @@ class Jugador:
             return f'Tropa: {tropa} no existe'
 
     def mover_tropa(self, destino: tuple[int, int], tropa, cantidad):
-        # AÑADIR COMPROBACIÓN: destino pertenece a conquista + self.mapa.regiones[self.region_actual].get_conexiones
-        if tropa in self.__class__.tropas_obetos.keys():
-            for i in self.mapa.regiones[self.region_actual].tropas:
-                if i.nombre.lower() == tropa:  # tropa debe ser minúscula
-                    if i.cantidad > cantidad:
-                        nueva_tropa = i - cantidad
-                        for tropa_destino in self.mapa.regiones[destino].tropas:
-                            if nueva_tropa == tropa_destino:
-                                tropa_destino += nueva_tropa
-                                return f'Tropa movida a {destino}'
-                        self.mapa.regiones[destino].tropas.append(nueva_tropa)
-                        return f'Tropa movida a {destino}'
-                    elif i.cantidad == cantidad:
-                        nueva_tropa = i
-                        self.mapa.regiones[self.region_actual].tropas.remove(i)
-                        for tropa_destino in self.mapa.regiones[destino].tropas:
-                            if nueva_tropa == tropa_destino:
-                                tropa_destino += nueva_tropa
-                                return f'Tropa movida a {destino}'
-                        self.mapa.regiones[destino].tropas.append(nueva_tropa)
-                        return f'Tropa movida a {destino}'
+        cantidad = int(cantidad)
+        if destino in self.conquista + self.mapa.regiones[self.region_actual].get_conexiones():
+            if self.mapa.regiones[destino].get_propietario() == self.usuario or self.mapa.regiones[destino].get_propietario() == 'Neutral':
+                if tropa in self.__class__.tropas_objetos.keys():
+                    if tropa in self.mapa.regiones[self.region_actual].tropas:
+                            tropa_mover = self.mapa.regiones[self.region_actual].tropas[self.mapa.regiones[self.region_actual].tropas.index(tropa)]
+                            if  tropa_mover.cantidad > cantidad:
+                                nueva_tropa = tropa_mover - cantidad
+                                tropa_mover -= cantidad
+                                if tropa in self.mapa.regiones[destino].tropas:
+                                    tropa_destino = self.mapa.regiones[destino].tropas[self.mapa.regiones[destino].tropas.index(tropa)]
+                                    tropa_destino += nueva_tropa
+                                    return f'Tropa movida a {destino}',True
+                                self.mapa.regiones[destino].tropas.append(nueva_tropa)
+                                return f'Tropa movida a {destino}',True
+                            elif tropa_mover.cantidad == cantidad:
+                                nueva_tropa = self.mapa.regiones[self.region_actual].tropas[self.mapa.regiones[self.region_actual].tropas.index(tropa)]
+                                self.mapa.regiones[self.region_actual].tropas.remove(tropa)
+                                if tropa in self.mapa.regiones[destino].tropas:
+                                    tropa_destino = self.mapa.regiones[destino].tropas[self.mapa.regiones[destino].tropas.index(tropa)]
+                                    tropa_destino += nueva_tropa
+                                    return f'Tropa movida a {destino}',True
+                                self.mapa.regiones[destino].tropas.append(nueva_tropa)
+                                return f'Tropa movida a {destino}',True
 
-                    else:
-                        return f'No dispones de {cantidad} {i.nombre}'
-            return f'No dispones de {tropa} en la region'
+                            else:
+                                return f'No dispones de {cantidad} {tropa}',True
+                    return f'No dispones de {tropa} en la region',True
+                else:
+                    return f'Tropa: {tropa} no existe',True
+            else:
+                return f'La zona pertenece a {self.mapa.regiones[destino].get_propietario()}\n Combatir?',False #False cuando haya opción de combate
         else:
-            return f'Tropa: {tropa} no existe'
+            return f'No puedes moverte a {destino}, fuera de rango',True
 
     def mover_batallon(self, destino: tuple[int, int]):
         pass
 
-    def combatir(destino: tuple[int, int]):
-        pass
+    def combatir(self,destino: tuple[int, int]): #AÑADIR CONDICIÓN DE COMBATE CONTRA REINO, SI GANA ATK SE ACABÓ LA PARTIDA
+        ejercito_atk = self.mapa.regiones[self.region_actual].tropas
+        ejercito_def = self.mapa.regiones[destino].tropas
+        texto_lista = []
+        while ejercito_atk!=[] and ejercito_def!=[]:    #El bucle se repetirá hasta que uno de los ejercitos esté vacio
+
+            max_tropas = max(len(ejercito_atk), len(ejercito_def)) #Cogemos la longitud del ejercito más grande
+            for i in range(max_tropas):  #Repetimos el bucle hasta que lleguemos a la longitud del ejercito más grande
+                if i < len(ejercito_atk):
+                    texto_lista.append(ejercito_atk[i].atacar(ejercito_atk, ejercito_def))  #La tropa 'i' ataca al ejercito enemigo
+
+                if i < len(ejercito_def):
+                    texto_lista.append(ejercito_def[i].atacar(ejercito_def, ejercito_atk))  #La tropa 'i' ataca al ejercito enemigo
+
+
+        if ejercito_atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
+            texto_lista.append('El ataque fracasó.')
+            return texto_lista  
+        elif ejercito_def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
+            texto_lista.append('Ataque exitoso.')
+            return texto_lista
 
     def construir_edificio(self, edificio):
-        pass
+        if edificio in self.__class__.edificios_objetos.keys():
+            costo = self.__class__.edificios_objetos[edificio].costo
+            if all(self.recursos[self.recursos.index(recurso)] >= recurso for recurso in costo):
+                for recurso in costo:
+                    self.recursos[self.recursos.index(recurso)] -= recurso
+                self.mapa.regiones[self.region_actual].edificios.append(self.__class__.edificios_objetos[edificio]())
+                return f'Edificio: {edificio} construido'
+            else:
+                return 'Recursos insuficientes'
+            
+        else:
+            return f'Edificio: {edificio} no reconocido'
 
-    def add_familia(region: tuple[int, int], familia):
-        pass
-'''
-    def regenerar_recursos():
-        pass
-
-    def actualizar_conquista():
-        pass
-
-    def actualizar_tropas():
-        pass
-'''
+    def actualizar_conquista(self) -> None:
+        for coordenada,region in self.mapa.regiones.items():
+            if region.get_propietario() == self.usuario:
+                self.conquista.append(coordenada)
+    def ver_recursos(self) -> list:
+        recursos_list = []
+        for recurso in self.recursos:
+            recursos_list.append(str(recurso))
+        return recursos_list
+    def __eq__(self,other):
+        if self.usuario == other:
+            return True
+        else:
+            return False

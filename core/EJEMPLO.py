@@ -1,37 +1,12 @@
 import requests
-from combate import Batalla
-from jugador import Jugador
-from mapa import Mapa
-
+import getpass
+import os
+from typing import *
+import time
 URL = 'http://127.0.0.1:5000'
-token = ''
 
-def crear_mapa():
-    """Crea el mapa por defecto y lo devuelve."""
-
-    # Inicializar el mapa con 6 filas y 6 columnas
-    map = Mapa(5, 5)
-
-    # Crear nodos y conexiones
-    nodos = map.crear_nodos()
-    conexiones = map.crear_aristas(nodos)
-
-    # Asignar terrenos a los nodos
-    map.anyadir_terreno(conexiones)
-
-    # Asignar zonas y generar recursos
-    map.asigna_zonas()
-
-    return map
-
+#------------FUNCIONES------------
 def to_tuple():
-    """
-    Obtiene coordenadas del usuario a través de input y las convierte en una tupla.
-    Maneja errores de formato y rango, y se mantiene en un bucle hasta que se ingrese un valor válido.
-
-    Returns:
-        tuple[int, int]: Una tupla con las coordenadas ingresadas por el usuario.
-    """
     while True:
         try:
             entrada = input("Introduce las coordenadas (fila, columna): ")
@@ -47,115 +22,466 @@ def to_tuple():
             # Eliminar espacios en blanco alrededor de cada coordenada y convertir a entero
             fila = int(coordenadas_str[0].strip())
             columna = int(coordenadas_str[1].strip())
-
             return (fila, columna)
+        except (ValueError, TypeError):
+            print('El tipo de dato no es válido.')
+            continue
 
-        except ValueError:
-            print("Error: Las coordenadas deben ser números enteros.")
-            continue  # Volver al inicio del bucle
+                
+def param(
+        nombre: str,
+        tipo: type,
+        lon_min: int = 0,
+        is_password: bool = False,
+        valores_validos: Union[list, tuple, None] = None,
+) -> Any:
+    """
+    Solicita un valor por consola para la variable indicada, validando su tipo y longitud mínima.
+    """
+    valido = False
+    out = None
+    while not valido:
+        prompt = (
+            f'{nombre} (Longitud mínima: {lon_min}): '
+            if lon_min
+            else f'{nombre}'
+        )
+        entrada = getpass.getpass(prompt) if is_password else input(prompt)
+        if len(entrada) < lon_min:
+            print(f'Longitud menor que la requerida: {lon_min}')
+            continue
+        try:
+            out = tipo(entrada)
+        except (ValueError, TypeError):
+            print('El tipo de dato no es válido.')
+            continue
+        if valores_validos and out not in valores_validos:
+            print(f'La entrada {out} no está presente en las opciones válidas {valores_validos}')
+            continue
+        valido = True
+    return out
 
+def limpiar_pantalla() -> None:
+    # Para Windows
+    if os.name == 'nt':
+        os.system('cls')
+    # Para Unix/Linux/macOS
+    else:
+        os.system('clear')
 
-def create(id, value):
-    global token
-    r = requests.post(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
-    print(r.status_code)
-    print(r.text)
+def mostrar_texto(lista : list[str] | str,enumerado : bool = False) -> None:
+    n = 1
+    if isinstance(lista, str):
+        lista = [lista]
+    for texto in lista:
+        if texto is None:
+            continue
+        else:
+            if enumerado:
+                num = f'{n}. '
+                for letra in num:
+                    print(letra, end='',flush=True)
+                n += 1
+            for caracter in texto:
+                print(caracter,end='',flush=True)
+                time.sleep(0.03)
+            print('\n',end='')
 
-
-def read(id):
-    global token
-    r = requests.get(f'{URL}/data/{id}', headers={'Authorization': 'Bearer ' + token})
-
-    print(r.status_code)
-    print(r.text)
-
-
-def update(id, value):
-    global token
-    r = requests.put(f'{URL}/data/{id}?value={value}', headers={'Authorization': 'Bearer ' + token})
-    print(r.status_code)
-    print(r.text)
-
-
-def singup(user, password):
-    r = requests.post(f'{URL}/signup?user={user}&password={password}')
-
-    print(r.status_code)
-    print(r.text)
-
+#------------REQUESTS------------
+# AUTENTICACIÓN
+def signup(user, password):
+    r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
+    return r.text
 
 def login(user, password):
-    global token
-    r = requests.get(f'{URL}/login?user={user}&password={password}')
-    token = r.text
+    r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
-        create(str(user), 'jugador')
-        return True
-    else:
-        return False
-
-
-def ver_zona(usuario,tupla):
-    r = requests.get(f'{URL}/data/ver_zona/{usuario}?value={tupla}')
-    print(r.text)
-def mostrar_catalogo(usuario):
-    r = requests.get(f'{URL}/data/ver_zona/catalogo/{usuario}')
+        return r.text, True
+    return r.text, False
+#USERS
+#   BUZON
+def notificaciones(token):
+    r = requests.get(f'{URL}/users/mail/notificaciones',headers={'Authorization': f'Bearer {token}'})
     return r.text
-def add_tropa(usuario,tropa,cantidad):
-    r = requests.post(f'{URL}/data/ver_zona/add_tropa/{usuario}?tropa={tropa}&cantidad={cantidad}')
+def obtener_buzon(token):
+    r = requests.get(f'{URL}/users/mail',headers={'Authorization': f'Bearer {token}'})
+    mensajes = r.json()
+    return mensajes  
+def marcar_leido(token):
+    r = requests.put(f'{URL}/users/mail',headers={'Authorization': f'Bearer {token}'})
     return r.text
+#USERS
+#   AMIGOS
+def obtener_amigos(token):
+    r = requests.get(f'{URL}/users/friends',headers={'Authorization': f'Bearer {token}'})
+    amigos = r.json()
+    return amigos
+def obtener_solicitudes(token):
+    r = requests.get(f'{URL}/users/friend-requests',headers={'Authorization': f'Bearer {token}'})
+    solicitudes = r.json()
+    return solicitudes
+def enviar_solicitud(token,usuario):
+    r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def aceptar_solicitud(token,nuevo_amigo):
+    r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def rechazar_solicitud(token,usuario):
+    r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+#USERS
+#   GAME REQUESTS
+def invitaciones_privadas(token):
+    r = requests.get(f'{URL}/users/game_requests',headers={'Authorization': f'Bearer {token}'})
+    invitaciones = r.json()
+    return invitaciones
+#   MY GAMES
+def mis_partidas(token):
+    r = requests.get(f'{URL}/users/my_games',headers={'Authorization': f'Bearer {token}'})
+    partidas = r.json()
+    return partidas
+#PARTIDA
+def crear_partida(token,privada,reino, invitado = None, size=3, terrenos=None):
+    parametros_partida = {
+        'privada': privada,
+        'invitado': invitado,
+        'reino': reino,
+        'size' : size,
+        'terrenos': terrenos
+    }
+    r = requests.post(f'{URL}/games',headers={'Authorization': f'Bearer {token}'},json=parametros_partida)
+    return r.text
+def partidas_publicas(token):
+    r = requests.get(f'{URL}/games',headers={'Authorization': f'Bearer {token}'})
+    publicas = r.json()
+    return publicas
+#/game/<id>/
+def unirse_partida(token,id_partida,reino):
+    r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def iniciar_partida(token,id_partida):
+    r = requests.put(f'{URL}/games/{id_partida}/start',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def cancelar_partida(token,id_partida):
+    r = requests.post(f'{URL}/games/{id_partida}/cancel',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def get_estado_partida(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/game_state',headers={'Authorization': f'Bearer {token}'})
+    estado = r.text
+    return estado
+def get_estado_jugador(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player_state',headers={'Authorization': f'Bearer {token}'})
+    estado = r.json()
+    return estado
+#/game/<id>/player
+def ver_zona(token,id_partida,coordenada):
+    diccionario = {'zona': coordenada}
+    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
+    zona = r.json()
+    return zona,r.status_code
+def ver_recursos(token,id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos',headers={'Authorization': f'Bearer {token}'})
+    return r.json()
 def menu():
     while True:
-        print("\n=== MENU ===")
-
-        print("1. REGISTRATE")
-        print("2. INICIAR SESIÓN")
-        print("3. Read Data")
-        print("4. Exit")
-
-        choice = input('Elige una opción (1-4): ')
-
-
-        if choice == '1':
-            user = input("Usuario Nuevo: ")
-            password = input("Contraseña: ")
-            singup(user, password)
-        elif choice == '2':
-            user = input("Usuario: ")
-            password = input("Contraseña: ")
-            if login(user, password):
+        print('=== MENU ===')
+        print('1. REGISTRARSE')
+        print('2. INICIAR SESIÓN')
+        print('3. Exit')
+        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+        if choice == 1:
+            user = param('Usuario: ',str)
+            password = param('Contraseña: ',str,is_password=True)
+            mostrar_texto(signup(user, password))
+            limpiar_pantalla()
+        elif choice == 2:
+            user = param('Usuario: ',str)
+            password = param('Contraseña: ',str,is_password=True)
+            log_in = login(user,password)
+            if log_in[1]:
+                token = log_in[0]
+                limpiar_pantalla()
                 while True:
-                    print('1. VER REGIÓN')
-                    print('2. VOLVER')
-                    choice = input('Elige una opción (1-2):')
-                    if choice == '1':
-                        tupla = input('Tupla')
-                        ver_zona(user,tupla)
+                    mostrar_texto(notificaciones(token))
+                    print('1. JUGAR')
+                    print('2. PERFIL')
+                    print('3. LOG OUT')
+                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                    if choice == 1:
+                        limpiar_pantalla()
                         while True:
-                            print('1. AÑADIR TROPA')
-                            print('2.VOLVER')
-                            choice = input('Elige una opción (1-2):')
-                            if choice == '1':
-                                print(mostrar_catalogo(user))
-                                tropa = input('Que tropa desea añadir???: ').lower()
-                                cantidad = int(input('Que cantidad???: '))
-                                print(add_tropa(user,tropa,cantidad))
-                            elif choice == '2':
+                            print('1. CREAR PARTIDA')
+                            print('2. UNIRSE A PARTIDA')
+                            print('3. VOLVER')
+                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            if choice == 1:
+                                limpiar_pantalla()
+                                while True:
+                                    privada = True if param('Publica o privada?: ',str,valores_validos=['publica','privada','Publica','Privada']).lower() == 'privada' else False
+                                    if privada:
+                                        amigos = obtener_amigos(token)
+                                        if amigos != []:
+                                            mostrar_texto(amigos,enumerado=True)
+                                            valores_validos = [n for n in range(0,len(amigos)+1)]
+                                            amigo = param('Que amigo desea invitar: ',int,valores_validos=valores_validos)
+                                            invitado = amigos[amigo - 1]
+                                        else:
+                                            mostrar_texto('Todavía no tienes amigos')
+                                            limpiar_pantalla()
+                                            break
+                                    else:
+                                        invitado = None
+                                    print('1. PARTIDA CUSTOM')#/game [POST] -> Crear Partida con id random, el mapa y añade al primer usuario
+                                    print('2. PARTIDA DEFAULT')#/game [POST]
+                                    print('3. VOLVER')
+                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                    if choice == 1:
+                                        mostrar_texto('Kingdom Kraft esta trabajando en ello, vuelva más tarde')
+                                        break
+                                    elif choice == 2:
+                                        reino = param('Introduce el nombre de tu reino: ',str)
+                                        mostrar_texto(crear_partida(token,privada,reino,invitado))
+                                        limpiar_pantalla()
+                                        break
+                                    elif choice == 3:
+                                        limpiar_pantalla()
+                                        break
+                            elif choice == 2:
+                                limpiar_pantalla()
+                                while True:
+                                    print('1. UNIRSE A UNA NUEVA PARTIDA') #/game [GET] y #/game/<id>/join [PUT] + /game/<id>/start [PUT]
+                                    print('2. CONTINUAR') #/users/my_games [GET] #/game/<id>/game_state [GET] -> /game/<id>/ver_zona
+                                    print('3. VOLVER')
+                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                    if choice == 1:
+                                        publicas = partidas_publicas(token)
+                                        partidas_str = [partida for partida in publicas.values()]
+                                        mostrar_texto(partidas_str,enumerado=True)
+                                        id_partida = param('Introduzca el id de la partida a la que desea unirse: ',str)
+                                        reino = param('Introduce el nombre de tu reino: ',str)
+                                        mostrar_texto(unirse_partida(token,id_partida,reino))
+                                        mostrar_texto(iniciar_partida(token,id_partida))
+                                        limpiar_pantalla()
+                                    elif choice == 2:
+                                        user_partidas = mis_partidas(token)
+                                        if user_partidas != {}:
+                                            str_partidas = [partida for partida in user_partidas.values()]
+                                            mostrar_texto(str_partidas)
+                                        else:
+                                            mostrar_texto('Todavía no te has unido a ninguna partida')
+                                            limpiar_pantalla()
+                                            continue
+                                        id_user_partida = param('Introduzca el id de la partida: ',str)
+                                        estado_partida = get_estado_partida(token,id_user_partida)
+                                        if estado_partida == 'Empezada':
+                                            while True:
+                                                if get_estado_jugador(token,id_user_partida):
+                                                    mostrar_texto('Bienvenido a Kingdom Craft')
+                                                    limpiar_pantalla()
+                                                    while get_estado_jugador(token,id_user_partida) == True:
+                                                        print('===KINGDOM CRAFT===')
+                                                        print('1. VER ZONA')
+                                                        print('2.VER RECURSOS')
+                                                        print('3. SALIR')
+                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                                        if choice == 1:
+                                                            coordenada = to_tuple()
+                                                            zona,estado = ver_zona(token,id_user_partida,coordenada)
+                                                            if estado == 200:
+                                                                while True:
+                                                                    if zona[1]:
+                                                                        print(zona[0])
+                                                                        print('1. AÑADIR TROPA')
+                                                                        print('2. MOVER TROPA')
+                                                                        print('3. MOVER BATALLÓN')
+                                                                        print('4. CONSTRUIR EDIFICIO')
+                                                                        print('5. VOLVER')
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5])
+                                                                        match choice:
+                                                                            case 1:
+                                                                                pass
+                                                                            case 2:
+                                                                                pass
+                                                                            case 3:
+                                                                                pass
+                                                                            case 4:
+                                                                                pass
+                                                                            case 5:
+                                                                                limpiar_pantalla()
+                                                                                break
+                                                                    
+                                                                    else:
+                                                                        print(zona[0])
+                                                                        print('1. VOLVER')
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                                                        if choice == 1:
+                                                                            limpiar_pantalla()
+                                                                            break
+                                                            elif estado == 404:
+                                                                mostrar_texto(zona['error'])
+                                                                continue
+                                                        elif choice == 2:
+                                                            mostrar_texto(ver_recursos(token,id_user_partida),enumerado=True)
+                                                            print('1. VOLVER')
+                                                            choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                                            if choice == 1:
+                                                                limpiar_pantalla()
+                                                                break
+                                                        else:
+                                                            limpiar_pantalla()
+                                                            break
+                                                else:
+                                                    mostrar_texto('Todavía no es tu turno')
+                                                    print('1. RECARGAR')
+                                                    print('2. VOLVER')
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                    if choice == 1:
+                                                        continue
+                                                    else:
+                                                        limpiar_pantalla()
+                                                        break
+                                        elif estado_partida == 'Esperando':
+                                            mostrar_texto('Esperando a que se una otro jugador')
+                                            limpiar_pantalla()
+                                            continue
+                                        elif estado_partida == 'Finalizada':
+                                            mostrar_texto('Kingdom Craft esta trabajando en ello')
+                                            limpiar_pantalla()
+                                            continue
+                                    else:
+                                        limpiar_pantalla()
+                                        break
+                            elif choice == 3:
+                                limpiar_pantalla()
                                 break
 
-                    elif choice == '2':
+                    elif choice == 2:
+                        limpiar_pantalla()
+                        while True:
+                            print('1. BUZÓN')
+                            print('2. AMIGOS')
+                            print('3. VOLVER')
+                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            if choice == 1:
+                                limpiar_pantalla()
+                                while True:
+                                    buzon = obtener_buzon(token)
+                                    if buzon != []:
+                                        mostrar_texto(buzon)
+                                        print('1. MARCAR COMO LEÍDO')
+                                        print('2. VOLVER')
+                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        if choice == 1:
+                                            mostrar_texto(marcar_leido(token))
+                                            limpiar_pantalla()
+                                        elif choice == 2:
+                                            limpiar_pantalla()
+                                            break
+                                    else:
+                                        mostrar_texto('No tienes ningún mensaje')
+                                        print('1. RECARGAR')
+                                        print('2. VOLVER')
+                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        if choice == 1:
+                                            continue
+                                        else:
+                                            limpiar_pantalla()
+                                            break
+                            elif choice == 2:
+                                limpiar_pantalla()
+                                while True:
+                                    amigos = obtener_amigos(token)
+                                    if amigos != []:
+                                        mostrar_texto(amigos)
+                                    else:
+                                        mostrar_texto('Todavía no tienes amigos')
+                                    print('1. SOLICITUDES DE AMISTAD')
+                                    print('2. ENVIAR SOLICITUD DE AMISTAD')
+                                    print('3. INVITACIONES DE PARTIDA')
+                                    print('4. VOLVER')
+                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4])
+                                    if choice == 1:
+                                        limpiar_pantalla()
+                                        while True:
+                                            solicitudes = obtener_solicitudes(token)
+                                            if solicitudes !=[]:
+                                                mostrar_texto(solicitudes,enumerado=True)
+                                                mostrar_texto(f'{len(solicitudes)+1}. VOLVER')
+                                                valores_validos = [num for num in range(0,len(solicitudes) + 2)]
+                                                choice = param('Eliga una opción: ',int,valores_validos=valores_validos)
+                                                if choice != valores_validos[-1]:
+                                                    solicitud = solicitudes[choice - 1] #Porque las listas empiezan en 0
+                                                    print('1. ACEPTAR SOLICITUD')
+                                                    print('2. RECHAZAR SOLICITUD')
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                    if choice == 1:
+                                                        mostrar_texto(aceptar_solicitud(token,solicitud))
+                                                        limpiar_pantalla()
+                                                    elif choice == 2:
+                                                        mostrar_texto(rechazar_solicitud(token,solicitud))
+                                                        limpiar_pantalla()
+                                                else:
+                                                    limpiar_pantalla()
+                                                    break
+                                            else:
+                                                mostrar_texto('No tienes ninguna solicitud de amistad')
+                                                print('1. RECARGAR')
+                                                print('2. VOLVER')
+                                                choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                if choice == 1:
+                                                    continue
+                                                else:
+                                                    limpiar_pantalla()
+                                                    break
+                                    elif choice == 2:
+                                        usuario = param('Introduzca el usuario: ',str)
+                                        mostrar_texto(enviar_solicitud(token,usuario))
+                                        limpiar_pantalla()
+                                    elif choice == 3: #Invitaciones de partida
+                                        limpiar_pantalla()
+                                        while True:
+                                            invitaciones_dict = invitaciones_privadas(token)
+                                            if invitaciones_dict != {}:
+                                                invitaciones_str = [partida for partida in invitaciones_dict.values()]
+                                                mostrar_texto(invitaciones_str,enumerado=True)
+                                                id_invitacion = param('Introduce el id de la invitación',str)
+                                                print('1. ACEPTAR INVITACIÓN')
+                                                print('2. RECHAZAR INVITACIÓN')
+                                                choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                if choice == 1:
+                                                    reino = param('Introduce el nombre de tu reino: ',str)
+                                                    mostrar_texto(unirse_partida(token,id_invitacion,reino))
+                                                    mostrar_texto(iniciar_partida(token,id_invitacion))
+                                                    break
+                                                elif choice == 2:
+                                                    mostrar_texto(cancelar_partida(token,id_invitacion))
+                                                    break
+                                            else:
+                                                mostrar_texto('No tienes ninguna invitación')
+                                                print('1. RECARGAR')
+                                                print('2. VOLVER')
+                                                choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                if choice == 1:
+                                                    continue
+                                                else:
+                                                    limpiar_pantalla()
+                                                    break
+                                        
+                                    elif choice == 4:
+                                        limpiar_pantalla()
+                                        break
+                            elif choice == 3:
+                                limpiar_pantalla()
+                                break
+                    elif choice == 3:
+                        limpiar_pantalla()
                         break
-                    else:
-                        print('Opción invalida')
-        elif choice == '3':
-            id = user
-            read(id)
-
-        elif choice == '4':
-            print("Saliendo...")
+            else:
+                mostrar_texto(log_in[0])
+                limpiar_pantalla()            
+        elif choice == 3:
+            print('Saliendo...')
             break
-        else:
-            print("Invalid choice. Please try again.")
 
 
 if __name__ == '__main__':

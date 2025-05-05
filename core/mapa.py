@@ -2,7 +2,7 @@ from region_manager import RegionManager
 from region import Region
 
 from random import randint, choice
-from typing import List, Dict
+from typing import List, Dict, Optional
 from copy import deepcopy
 
 
@@ -56,7 +56,7 @@ class Mapa:
         Si se proporciona un tipo de terreno que no existe en el juego.
     """
 
-    def __init__(self, filas: int, columnas: int):
+    def __init__(self, filas: int, columnas: int, tipos_terreno: Optional[list[str]] = None):
 
         """
         Inicializa una instancia de la clase Mapa.
@@ -82,6 +82,11 @@ class Mapa:
             Diccionario con las regiones del mapa.
         self.region_manager : RegionManager
             Instancia de la clase RegionManager encargada de gestionar las regiones y sus recursos.
+        self.reinos : list[Region]
+            Listado con los objetos Region que sean reinos en el mapa (2).
+        self.tipos_terreno : Optional[list[str]]
+            Lista opcional de tipos de terreno válidos. Por defecto None, que inicializa una lista vacía.
+
         """
 
         self._filas = 0 # Inicializamos el numero de filas a 0
@@ -91,6 +96,9 @@ class Mapa:
         self._conexiones: dict[tuple, list[tuple]] = {} # Diccionario con los nodos como clave y una lista con los vecinos del nodo como valor
         self._terrenos: dict[tuple, str] = {} # Diccionario con los nodos como clave y el tipo de terreno como valor
         self.regiones: dict[tuple, Region] = {} # Diccionario con los nodos como clave y el objeto Region como valor
+        self.reinos: list[Region] = [] # Listado de reinos del mapa (2)
+        # Listado de terrenos disponibles en el mapa
+        self._tipos_terreno: list[str] = tipos_terreno if tipos_terreno is not None else []
 
         # Crear instancia de RegionManager con referencia a este mapa
         self.region_manager = RegionManager(self)
@@ -157,6 +165,29 @@ class Mapa:
 
         return deepcopy(self.regiones)
 
+    def get_reinos(self) -> list[Region]:
+        """
+        Devuelve una copia del listado de reinos del mapa.
+
+        Returns
+        -------
+        list[Region]
+            Una copia del listado de reinos del mapa.
+        """
+
+        return deepcopy(self.reinos)
+
+    def get_tipos_terreno(self) -> list[str]:
+        """
+        Devuelve una copia profunda de la lista de tipos de terreno definidos para el mapa.
+
+        Returns:
+            list[str]: Una copia profunda de la lista de tipos de terreno.
+        """
+        return deepcopy(self._tipos_terreno)
+
+
+
     ### FUNCIONES PARA ESTABLECER NUEVOS VALORES A LOS ATRIBUTOS PROTEGIDOS ###
     def set_filas(self, filas: int):
         """
@@ -202,7 +233,38 @@ class Mapa:
         except ValueError as e:
             print(e)
 
+    def set_tipos_terreno(self, nuevos_tipos: list[str]) -> None:
+        """
+        Establece la lista de tipos de terreno para el mapa.
 
+        Args:
+            nuevos_tipos (list[str]): La nueva lista de tipos de terreno.
+
+        Raises:
+            TypeError: Si el argumento proporcionado no es una lista o
+                       si alguno de los elementos de la lista no es un string.
+        """
+
+        # Comprobamos si el nuevos_tipos es una lista
+        if not isinstance(nuevos_tipos, list):
+            raise TypeError("El argumento 'nuevos_tipos' debe ser una lista.")
+
+        # Si es una lista, comprobamos si todos sus elementos son strings
+        # Iteramos sobre cada elemento usando la función enumerate para obtener índice y valor
+        for indice, tipo in enumerate(nuevos_tipos):
+            if not isinstance(tipo, str):
+                # Si encontramos un elemento que no es string, lanzamos un error
+                # indicando cuál es el problemático y su tipo, usando el nombre 'indice'.
+                raise TypeError(
+                    f"El elemento en el índice {indice} de la lista ('{tipo}') no es un string, "
+                    f"es de tipo {type(tipo).__name__}."
+                )
+
+        # Si ambas comprobaciones pasan, asignamos la nueva lista
+        self._tipos_terreno = nuevos_tipos
+
+
+    ### FUNCIONES PRINCIPALES ###
     def crear_nodos(self)-> List[tuple[int, int]]:
 
         """
@@ -287,7 +349,7 @@ class Mapa:
         return nodos_aristas  # Devolvemos el diccionario con los vecinos de cada nodo
 
 
-    def anyadir_terreno(self, nodos_conectados: Dict[tuple[int, int], list[tuple[int, int]]], terrenos:list[str] = None) -> dict[tuple[int, int], dict[str, list[int] | str]]:
+    def anyadir_terreno(self, nodos_conectados: Dict[tuple[int, int], list[tuple[int, int]]]) -> dict[tuple[int, int], dict[str, list[int] | str]]:
 
         """
         Asigna un tipo de terreno a cada nodo del mapa. Se hace una distribucion en bloques del terreno
@@ -297,8 +359,6 @@ class Mapa:
         ----------
         nodos_conectados : dict[tuple[int, int], list[int]]
             Diccionario con los nodos como clave y una lista de sus vecinos como valor.
-        terrenos : list[str], optional
-            Listado de tipos de terreno específicos a asignar. Si no se proporciona, se usarán terrenos genéricos.
 
         Returns
         -------
@@ -322,20 +382,21 @@ class Mapa:
 
 
         # Listado con todos los terrenos disponibles dentro del juego
-        terrenos_disponibles = ['terreno1', 'terreno2', 'terreno3', 'terreno4', 'terreno5', 'terreno6', 'terreno7', 'terreno8','terrenoN']
+        terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'terreno1', 'terreno2', 'terreno3',
+                                'terrenoN']
 
-        if terrenos: # Si el usuario me ha pasado un listado de terrenos especificos
+        if self.get_tipos_terreno(): # Si el usuario me ha pasado un listado de terrenos específicos ...
             try:
-                for terreno in terrenos:  # Iteramos sobre el listado para verificar si todos los terrenos existen en el juego o no
-                    if terreno not in terrenos_disponibles:  # Si se detecta algun terreno que no existe, se lanza una excepcion
+                for terreno in self.get_tipos_terreno():  # Iteramos sobre el listado para verificar si todos los terrenos existen en el juego o no
+                    if terreno not in terrenos_disponibles:  # Si se detecta algún terreno que no existe, se lanza una excepción
                         raise ValueError(f'El terreno {terreno} no existe en el juego')
-            except ValueError as e: # Capturamos la excepcion
+            except ValueError as e: # Capturamos la excepción
                 print(e)
-                return {} # Devolvemos un diccionario vacio para mantener la consistencia de los datos
+                return {} # Devolvemos un diccionario vacío para mantener la consistencia de los datos
 
         nodos_disponibles: List[tuple[int, int]] = deepcopy(list(nodos_conectados.keys())) # Copia del listado de nodos (claves del diccionario)
         # Lo convertimos a lista para poder iterar, eliminar elementos, ...
-        # Listado de nodos que todavia no tienen un tipo de terreno establecido
+        # Listado de nodos que todavía no tienen un tipo de terreno establecido
 
         resultado: dict = {} # Diccionario compuesto por los nodos (clave), sus vecinos (valor) y sus tipos de terreno (valor)
 
@@ -345,24 +406,28 @@ class Mapa:
                 'terreno' : ''
             }
 
-        if not terrenos: # Si no se pasan unos terrenos especificos se usaran unos genericos
+        if not self.get_tipos_terreno(): # Si no se pasan unos terrenos específicos se usarán unos genéricos
             terrenos = ['terreno1', 'terreno2', 'terreno3' ,'terrenoN']
+        else: # Si se pasan unos terrenos específicos se usaran esos
+            terrenos = self.get_tipos_terreno()
 
-        while nodos_disponibles: # Mientras queden nodos sin terreno establecido
-            nodo_actual: tuple[int, int] = choice(nodos_disponibles) # Nodo en el que se esta trabajando actualmente
+
+        while nodos_disponibles: # Mientras queden nodos sin terreno establecido ...
+
+            nodo_actual: tuple[int, int] = choice(nodos_disponibles) # Nodo en el que se está trabajando actualmente
 
             nodos_disponibles.remove(nodo_actual) # Eliminamos el nodo actual del listado de disponibles
 
-            extension_terreno: int = randint(4, 6) # Cantidad de nodos que van a compartir un terreno (colindantes)
+            extension_terreno: int = randint(4, 6) # Cantidad de nodos que van a compartir un mismo terreno (colindantes)
             tipo_terreno: str = choice(terrenos) # Tipo de terreno que se va a asignar a los nodos (aleatoriamente)
 
             nodos_a_procesar: list[tuple[int, int]] = [nodo_actual] # Nodos a los que se les va a asignar el tipo de terreno 'tipo_terreno'
             nodos_procesados: int = 0 # Cantidad de nodos a los que ya se les ha asignado dicho tipo de terreno
 
             while nodos_a_procesar and (nodos_procesados < extension_terreno): # Mientras queden nodos por procesar y la cantidad de
-                                                                               # nodos procesados sea menor a la de 'extension_terreno'
+                                                                               # nodos procesados sea menor a la de 'extension_terreno' ...
 
-                nodo: tuple[int, int] = nodos_a_procesar.pop(0) # Eliminamos el nodo de la lista de nodos a procesar para trabajar con el
+                nodo: tuple[int, int] = nodos_a_procesar.pop(0) # Eliminamos el nodo de la lista de nodos a procesar para trabajar con él
 
                 if resultado[nodo]['terreno'] != '': # Si el nodo ya tiene un tipo de terreno, pasamos al siguiente nodo
                     continue # Volvemos al principio del bucle
@@ -377,8 +442,8 @@ class Mapa:
 
 
                 for vecino in resultado[nodo]['vecinos']: # Nos movemos a los vecinos del nodo actual
-                    if vecino in nodos_disponibles and vecino not in nodos_a_procesar: # Si el vecino del nodo actual esta en la lista de nodos disponibles (sin terreno)
-                                                                                       # y no lo teniamos en el listado de nodos a procesar lo anyadimos
+                    if vecino in nodos_disponibles and vecino not in nodos_a_procesar: # Si el vecino del nodo actual está en la lista de nodos disponibles (sin terreno)
+                                                                                       # y no lo teníamos en el listado de nodos a procesar lo anyadimos al listado
                         nodos_a_procesar.append(vecino)
 
         return resultado
@@ -433,6 +498,9 @@ class Mapa:
                 region.set_conexiones(self._conexiones.get(punto, []))
                 # Anyadimos la region al diccionario del mapa
                 self.regiones[punto] = region
+                # Si la region es un reino, la anyadimos a la lista de reinos
+                if es_reino:
+                    self.reinos.append(region)
 
         # Generar recursos para cada región
         self.region_manager.regiones = self.regiones
@@ -453,9 +521,9 @@ class Mapa:
             for columna in range(self._columnas):
                 punto = (fila, columna)  # Posición actual en el mapa
                 if punto in self._terrenos:
-                    map_str += f"{self._terrenos[punto]} "
+                    map_str += f"{self._terrenos[punto]:<10} "
                 else:
-                    map_str += "None "
+                    map_str += f"{'None':<10}"
             map_str += '\n'  # Nueva línea al final de cada fila
         return map_str
 
