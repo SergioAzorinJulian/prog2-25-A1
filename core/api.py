@@ -3,6 +3,8 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import hashlib
 import random
 from partida import Partida
+import pickle
+
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
@@ -319,6 +321,30 @@ def cambiar_turno(id):
     partida = partidas[id]
     partida.cambiar_turno()
     return "Turno cambiado con éxito", 200
+
+@app.route('/games/<id>/partida.pkl',methods=['POST'])
+@jwt_required()
+def obtener_partida(id):
+    '''
+    Creamos archivo pkl de la partida en la ruta de la partida
+    '''
+    partida = partidas[id]
+    with open('partida.pkl','wb') as f:
+        pickle.dump(partida,f)
+    return f'Partida {id} guardada', 200
+
+
+@app.route('/games/<id>/jugador.pkl',methods=['POST'])
+@jwt_required()
+def obtener_jugador(id):
+    '''
+    Creamos archivo pkl del jugador en la ruta de la partida
+    '''
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    with open('jugador.pkl','wb') as f:
+        pickle.dump(jugador,f)
+    return f'Tu jugador ha sido guardado', 200
 
 
 

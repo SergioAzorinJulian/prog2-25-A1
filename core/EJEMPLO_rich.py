@@ -308,6 +308,24 @@ def cambiar_turno(token, id_partida):
         return None
 
 
+def guardar_partida(token, id_partida):
+    r = requests.post(f'{URL}/games/{id_partida}/partida.pkl', headers={'Authorization': f'Bearer {token}'})
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al guardar: [/error]{r.status_code}")
+        return None
+
+def guardar_jugadores(token, id_partida):
+    r = requests.post(f'{URL}/games/{id_partida}/jugador.pkl', headers={'Authorization': f'Bearer {token}'})
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al guardar: [/error]{r.status_code}")
+        return None
+
+
+
 ### MENU PRINCIPAL ###
 def menu():
 
@@ -512,6 +530,7 @@ def menu():
                                                         table_opciones_partida.add_row('2. Ver mis recursos')
                                                         table_opciones_partida.add_row('3. Ver mapa')
                                                         table_opciones_partida.add_row('4. Finalizar mi turno')
+
 
                                                         console.print(table_opciones_partida)
 

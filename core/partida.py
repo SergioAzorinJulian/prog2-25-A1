@@ -1,7 +1,7 @@
 from jugador import Jugador
 from mapa import Mapa
 import random
-
+import pickle
 class Partida:
     def __init__(self,id,host,jugadores : list = [],estado: str = 'Esperando',privada=False):
         self.id = id
@@ -53,4 +53,7 @@ class Partida:
             str_jugadores += str(jugador)+'\n'
 
         return f'Partida de id: {self.id}\nJugadores:\n{str_jugadores}\nEstado: {self.estado}'
+
+
+
 
