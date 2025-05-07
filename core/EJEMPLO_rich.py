@@ -5,6 +5,7 @@ import getpass
 import os
 from typing import *
 import time
+from copy import deepcopy
 from rich.console import Console
 from rich.theme import Theme
 from rich.table import Table
@@ -12,6 +13,7 @@ from rich.markdown import Markdown
 from rich.align import Align
 from rich.text import Text
 from rich.progress import track
+from rich import box
 from mapa import Mapa
 
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
@@ -19,7 +21,7 @@ TERRENOS_JUEGO = Mapa.terrenos_disponibles
 titulo_md = Markdown("# Bienvenido a Kingdom Kraft")
 parrafo_texto = Text(
     "Un juego de estrategia por turnos donde podrás construir tu reino, gestionar tus recursos y enfrentarte a otros jugadores.",
-    justify="center" 
+    justify="center"
 )
 despedida_md = Markdown("##### ¡Buena suerte!")
 
@@ -358,8 +360,8 @@ def menu():
         if choice == 1:
             user = param('Usuario: ', str)
             password = param('Contraseña: ', str, is_password=True)
-            mostrar_texto(signup(user, password))
             barra_de_progreso(10, 0.1)
+            mostrar_texto(signup(user, password))
             limpiar_pantalla()
         elif choice == 2:
             user = param('Usuario: ', str)
@@ -407,9 +409,21 @@ def menu():
                             if choice == 1:
                                 limpiar_pantalla()
                                 while True:
-                                    privada = True if param('¿Tipo de partida pública o privada?: ', str,
-                                                            valores_validos=['publica', 'privada', 'Publica',
-                                                                             'Privada']).lower() == 'privada' else False
+
+                                    table_alcance_partida = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                    table_alcance_partida.add_column('ALCANCE DE LA PARTIDA', justify='center', style='prompt')
+
+                                    table_alcance_partida.add_row('1. Pública')
+                                    table_alcance_partida.add_row('2. Privada')
+
+                                    console.print(table_alcance_partida)
+
+                                    console.print()
+
+                                    privada = True if param('Elija una opción: ', int, valores_validos=[1, 2]) == 'privada' else False
+                                    limpiar_pantalla()
+
                                     if privada:
                                         amigos = obtener_amigos(token)
                                         if amigos != []:
@@ -441,22 +455,40 @@ def menu():
                                     choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
                                     console.print()
                                     if choice == 1:
-                                        tamanyo = param('Introduce el tamaño del mapa (min.3, max. 50): ', int, valores_validos = [3, 26])
+                                        tamanyo = param('Introduce el tamaño del mapa (min.3, max. 50): ', int, valores_validos=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50])
                                         while True:
                                             terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str)
-                                            terrenos = terrenos.split(',')
+                                            if len(terrenos.split(',')) < 2:
+                                                console.print('Error: Debe introducir al menos 2 tipos de terreno.', style = 'warning')
+                                                continue
 
-                                            if len(terrenos) < 2:
-                                                console.print('Debe de introducir al menos dos tipos de terreno', style = 'warning')
-                                            for terreno in terrenos:
-                                                if terreno.strip().lower() not in TERRENOS_JUEGO:
-                                                    console.print(f'El tipo de terreno "{terreno}" no existe en el juego',
-                                                                  style='error')
+                                            copia_terrenos = deepcopy(TERRENOS_JUEGO)
+                                            for terreno in terrenos.split(','):
+                                                if terreno.strip().lower() in copia_terrenos:
+                                                    copia_terrenos.remove(terreno.strip().lower())
+                                                else:
+                                                    if terreno.strip().lower() in TERRENOS_JUEGO:
+                                                        console.print(
+                                                            f'[error]Error: El tipo de terreno "{terreno}" se ha introducido más de una vez.[/error] \n[info]Ayuda: La multiplicidad máxima de cada terreno es 1.[info]',)
+                                                    else:
+                                                        console.print(f'Error: El tipo de terreno "{terreno}" no existe en el juego.', style = 'error')
+
+                                                    console.print()
+
+                                                    table_terrenos = Table(box = box.ROUNDED, border_style = 'bold', header_style="bold white reverse blue")
+                                                    table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
+                                                    for tereno in TERRENOS_JUEGO:
+                                                        table_terrenos.add_row(tereno.capitalize())
+
+                                                    console.print(table_terrenos)
+                                                    console.print()
+
                                                     break
                                             else:
                                                 break
 
                                         reino = param('Introduce el nombre de tu reino: ', str)
+
                                         barra_de_progreso(10, 0.1)
                                         mostrar_texto(crear_partida(token, privada, reino, invitado, tamanyo, terrenos))
                                         limpiar_pantalla()
@@ -531,7 +563,6 @@ def menu():
                                                         table_opciones_partida.add_row('3. Ver mapa')
                                                         table_opciones_partida.add_row('4. Finalizar mi turno')
 
-
                                                         console.print(table_opciones_partida)
 
                                                         console.print()
@@ -577,12 +608,11 @@ def menu():
 
                                                                     else:
                                                                         console.print(zona[0], style = 'prompt')
-                                                                        console.print('1. VOLVER', style = 'prompt')
-                                                                        choice = param('Eliga una opción: ', int,
-                                                                                       valores_validos=[1])
-                                                                        if choice == 1:
-                                                                            limpiar_pantalla()
-                                                                            break
+                                                                        mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                                        param('Presione "Enter" para continuar ...', str,
+                                                                              valores_validos=[''], estilo='info')
+                                                                        limpiar_pantalla()
+                                                                        break
                                                             elif estado == 404:
                                                                 mostrar_texto(zona['error'])
                                                                 continue

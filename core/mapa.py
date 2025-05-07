@@ -57,8 +57,7 @@ class Mapa:
     """
 
     # Listado con todos los terrenos disponibles dentro del juego
-    terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'terreno1', 'terreno2', 'terreno3',
-                            'terrenoN']
+    terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'colina', 'pantano', 'río', 'llanura']
 
     def __init__(self, filas: int, columnas: int, tipos_terreno: Optional[list[str]] = None):
 
