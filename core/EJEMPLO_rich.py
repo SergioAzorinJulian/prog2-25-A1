@@ -423,7 +423,25 @@ def menu():
                                     choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
                                     console.print()
                                     if choice == 1:
-                                        mostrar_texto('Kingdom Kraft esta trabajando en ello, vuelva más tarde')
+                                        tamanyo = param('Introduce el tamaño del mapa (min.3, max. 50): ', int, valores_validos = [3, 26])
+                                        while True:
+                                            terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str)
+                                            terrenos = terrenos.split(',')
+
+                                            if len(terrenos) < 2:
+                                                console.print('Debe de introducir al menos dos tipos de terreno', style = 'warning')
+                                            for terreno in terrenos:
+                                                if terreno.strip().lower() not in TERRENOS_JUEGO:
+                                                    console.print(f'El tipo de terreno "{terreno}" no existe en el juego',
+                                                                  style='error')
+                                                    break
+                                            else:
+                                                break
+
+                                        reino = param('Introduce el nombre de tu reino: ', str)
+                                        barra_de_progreso(10, 0.1)
+                                        mostrar_texto(crear_partida(token, privada, reino, invitado, tamanyo, terrenos))
+                                        limpiar_pantalla()
                                         break
                                     elif choice == 2:
                                         reino = param('Introduce el nombre de tu reino: ', str)
@@ -450,7 +468,7 @@ def menu():
 
                                     console.print()
 
-                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+                                    choice = param('Elija una opción: ', int, valores_validos=[0, 1, 2])
                                     console.print()
                                     if choice == 1:
                                         # Todo: hacer una tabla
@@ -766,7 +784,7 @@ def menu():
                             elif choice == 0:
                                 limpiar_pantalla()
                                 break
-                    elif choice == 3:
+                    elif choice == 0:
                         limpiar_pantalla()
                         break
             else:
