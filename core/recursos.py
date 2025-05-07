@@ -1,4 +1,3 @@
-import random
 class Recurso:
     """
     Con la clase recurso se crean los diferentes recursos
@@ -60,17 +59,6 @@ class Recurso:
         self.valor_max = valor_max
         self.creados[self.nombre] = self.to_dict()
 
-    def __str__(self) -> str:
-        """metodo para mostrar el recurso"""
-        if self.regeneracion > 0:
-            return f"{self.nombre}: {self.cantidad} unidades; regeneracion: {self.regeneracion}"
-        else:
-            return f"{self.nombre}: {self.cantidad} unidades"
-     
-    def __repr__(self) -> str:
-        """metodo para mostrar el recurso"""
-        return f"Recurso(nombre = {self.nombre}, cantidad = {self.cantidad}, regeneracion = {self.regeneracion})"
-
     def to_dict(self) -> dict:
         """introduce la instancia en un diccionario"""
         return {
@@ -88,7 +76,18 @@ class Recurso:
         valor_maximo = datos["valor_max"]
 
         return cls(nombre, cantidad, regeneracion, valor_maximo)
-    
+
+    def __str__(self) -> str:
+        """Metodo para mostrar información del recurso"""
+        if self.regeneracion > 0:
+            return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
+        else:
+            return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades"
+
+    def __repr__(self) -> str:
+        """Metodo para mostrar información del recurso y su valor maximo"""
+        return f"{self.nombre.capitalize():<11}: {self.cantidad:<4}/{self.valor_max:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
+
     def __sub__(self,other : int):
         nueva_cantidad = self.cantidad
         if isinstance(other, Recurso): # Es una Tropa
@@ -125,10 +124,12 @@ class Recurso:
         if isinstance(other, Recurso):
             return self.nombre == other.nombre
         return False
+
     def __ge__(self, other):
         if isinstance(other, Recurso):
             return self.cantidad >= other.cantidad
         return False
+
     def regenerar(self, porcentaje):
         """cantidad de regeneracion del recurso -> Se regenera cada turno"""
         percent = porcentaje / 100

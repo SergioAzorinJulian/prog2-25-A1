@@ -56,6 +56,10 @@ class Mapa:
         Si se proporciona un tipo de terreno que no existe en el juego.
     """
 
+    # Listado con todos los terrenos disponibles dentro del juego
+    terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'terreno1', 'terreno2', 'terreno3',
+                            'terrenoN']
+
     def __init__(self, filas: int, columnas: int, tipos_terreno: Optional[list[str]] = None):
 
         """
@@ -381,14 +385,11 @@ class Mapa:
         """
 
 
-        # Listado con todos los terrenos disponibles dentro del juego
-        terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'terreno1', 'terreno2', 'terreno3',
-                                'terrenoN']
 
         if self.get_tipos_terreno(): # Si el usuario me ha pasado un listado de terrenos específicos ...
             try:
                 for terreno in self.get_tipos_terreno():  # Iteramos sobre el listado para verificar si todos los terrenos existen en el juego o no
-                    if terreno not in terrenos_disponibles:  # Si se detecta algún terreno que no existe, se lanza una excepción
+                    if terreno not in type(self).terrenos_disponibles:  # Si se detecta algún terreno que no existe, se lanza una excepción
                         raise ValueError(f'El terreno {terreno} no existe en el juego')
             except ValueError as e: # Capturamos la excepción
                 print(e)
@@ -407,8 +408,8 @@ class Mapa:
             }
 
         if not self.get_tipos_terreno(): # Si no se pasan unos terrenos específicos se usarán unos genéricos
-            terrenos = ['terreno1', 'terreno2', 'terreno3' ,'terrenoN']
-        else: # Si se pasan unos terrenos específicos se usaran esos
+            terrenos = ['bosque', 'montaña', 'pradera', 'desierto']
+        else: # Si se pasan unos terrenos específicos se usarán esos
             terrenos = self.get_tipos_terreno()
 
 

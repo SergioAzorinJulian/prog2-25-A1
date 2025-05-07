@@ -169,19 +169,52 @@ def get_estado_partida(token,id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/game_state',headers={'Authorization': f'Bearer {token}'})
     estado = r.text
     return estado
-def get_estado_jugador(token,id_partida):
-    r = requests.get(f'{URL}/games/{id_partida}/player_state',headers={'Authorization': f'Bearer {token}'})
-    estado = r.json()
-    return estado
+
+def get_estado_jugador(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
+    try:
+        respuesta_json = r.json()
+        # Usamos .get() por seguridad, devuelve None si la clave no existe
+        return respuesta_json.get("es_turno")
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"ERROR: Fallo al decodificar JSON en get_estado_jugador. Respuesta recibida: {r.text}")
+        return None
+    except AttributeError: # En caso de que r.json() devolviera algo inesperado o la clave faltara
+         print(f"ERROR: La respuesta JSON no era un diccionario o no tenía la clave 'es_turno'. Respuesta: {r.text}")
+         return None
+
+
 #/game/<id>/player
-def ver_zona(token,id_partida,coordenada):
+def ver_zona(token,id_partida, coordenada):
     diccionario = {'zona': coordenada}
     r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
     zona = r.json()
     return zona,r.status_code
-def ver_recursos(token,id_partida):
+
+def ver_recursos(token, id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos',headers={'Authorization': f'Bearer {token}'})
     return r.json()
+
+def ver_mapa(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa',headers={'Authorization': f'Bearer {token}'})
+    if r.status_code == 200:
+        return r.text
+    else:
+        print(f"Error al obtener el mapa: {r.status_code}")
+        print("Respuesta recibida: ", r.text)
+        return None
+
+def cambiar_turno(token, id_partida):
+    r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno',headers={'Authorization': f'Bearer {token}'})
+    if r.status_code == 200:
+        return r.text
+    else:
+        print(f"Error al obtener el mapa: {r.status_code}")
+        print("Respuesta recibida: ", r.text)
+        return None
+
+
+### MENU PRINCIPAL ###
 def menu():
     while True:
         print('=== MENU ===')
@@ -189,6 +222,7 @@ def menu():
         print('2. INICIAR SESIÓN')
         print('3. Exit')
         choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+        print()
         if choice == 1:
             user = param('Usuario: ',str)
             password = param('Contraseña: ',str,is_password=True)
@@ -207,13 +241,15 @@ def menu():
                     print('2. PERFIL')
                     print('3. LOG OUT')
                     choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                    print()
                     if choice == 1:
                         limpiar_pantalla()
                         while True:
+                            print('0. VOLVER')
                             print('1. CREAR PARTIDA')
                             print('2. UNIRSE A PARTIDA')
-                            print('3. VOLVER')
-                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2])
+                            print()
                             if choice == 1:
                                 limpiar_pantalla()
                                 while True:
@@ -231,10 +267,12 @@ def menu():
                                             break
                                     else:
                                         invitado = None
+
+                                    print('0. VOLVER')
                                     print('1. PARTIDA CUSTOM')#/game [POST] -> Crear Partida con id random, el mapa y añade al primer usuario
                                     print('2. PARTIDA DEFAULT')#/game [POST]
-                                    print('3. VOLVER')
-                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                    choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2])
+                                    print()
                                     if choice == 1:
                                         mostrar_texto('Kingdom Kraft esta trabajando en ello, vuelva más tarde')
                                         break
@@ -243,16 +281,17 @@ def menu():
                                         mostrar_texto(crear_partida(token,privada,reino,invitado))
                                         limpiar_pantalla()
                                         break
-                                    elif choice == 3:
+                                    elif choice == 0:
                                         limpiar_pantalla()
                                         break
                             elif choice == 2:
                                 limpiar_pantalla()
                                 while True:
+                                    print('0. VOLVER')
                                     print('1. UNIRSE A UNA NUEVA PARTIDA') #/game [GET] y #/game/<id>/join [PUT] + /game/<id>/start [PUT]
                                     print('2. CONTINUAR') #/users/my_games [GET] #/game/<id>/game_state [GET] -> /game/<id>/ver_zona
-                                    print('3. VOLVER')
-                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                    choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2])
+                                    print()
                                     if choice == 1:
                                         publicas = partidas_publicas(token)
                                         partidas_str = [partida for partida in publicas.values()]
@@ -280,24 +319,30 @@ def menu():
                                                     limpiar_pantalla()
                                                     while get_estado_jugador(token,id_user_partida) == True:
                                                         print('===KINGDOM CRAFT===')
+                                                        print('0. SALIR')
                                                         print('1. VER ZONA')
-                                                        print('2.VER RECURSOS')
-                                                        print('3. SALIR')
-                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                                        print('2. VER MIS RECURSOS')
+                                                        print('3. VER MAPA')
+                                                        print('4. FINALIZAR MI TURNO')
+                                                        choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2, 3, 4])
+                                                        print()
                                                         if choice == 1:
                                                             coordenada = to_tuple()
-                                                            zona,estado = ver_zona(token,id_user_partida,coordenada)
+                                                            zona, estado = ver_zona(token,id_user_partida,coordenada)
                                                             if estado == 200:
                                                                 while True:
                                                                     if zona[1]:
                                                                         print(zona[0])
+                                                                        print('0. VOLVER')
                                                                         print('1. AÑADIR TROPA')
                                                                         print('2. MOVER TROPA')
                                                                         print('3. MOVER BATALLÓN')
                                                                         print('4. CONSTRUIR EDIFICIO')
-                                                                        print('5. VOLVER')
-                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5])
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2, 3, 4])
                                                                         match choice:
+                                                                            case 0:
+                                                                                limpiar_pantalla()
+                                                                                break
                                                                             case 1:
                                                                                 pass
                                                                             case 2:
@@ -306,10 +351,7 @@ def menu():
                                                                                 pass
                                                                             case 4:
                                                                                 pass
-                                                                            case 5:
-                                                                                limpiar_pantalla()
-                                                                                break
-                                                                    
+
                                                                     else:
                                                                         print(zona[0])
                                                                         print('1. VOLVER')
@@ -320,21 +362,34 @@ def menu():
                                                             elif estado == 404:
                                                                 mostrar_texto(zona['error'])
                                                                 continue
+
                                                         elif choice == 2:
-                                                            mostrar_texto(ver_recursos(token,id_user_partida),enumerado=True)
-                                                            print('1. VOLVER')
-                                                            choice = param('Eliga una opción: ',int,valores_validos=[1])
-                                                            if choice == 1:
-                                                                limpiar_pantalla()
-                                                                break
+                                                            mostrar_texto(ver_recursos(token, id_user_partida))
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            limpiar_pantalla()
+                                                            continue
+
+                                                        elif choice == 3:
+                                                            mapa = ver_mapa(token, id_user_partida)
+                                                            mostrar_texto(mapa)
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            limpiar_pantalla()
+                                                            continue
+
+                                                        elif choice == 4:
+                                                            mostrar_texto(cambiar_turno(token,id_user_partida))
+                                                            param('Presione "Enter" para continuar ...', str, valores_validos=[''])
+                                                            limpiar_pantalla()
+                                                            break
+
                                                         else:
                                                             limpiar_pantalla()
                                                             break
                                                 else:
                                                     mostrar_texto('Todavía no es tu turno')
+                                                    print('0. VOLVER')
                                                     print('1. RECARGAR')
-                                                    print('2. VOLVER')
-                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                    choice = param('Eliga una opción: ',int,valores_validos=[0, 1])
                                                     if choice == 1:
                                                         continue
                                                     else:
@@ -351,37 +406,37 @@ def menu():
                                     else:
                                         limpiar_pantalla()
                                         break
-                            elif choice == 3:
+                            elif choice == 0:
                                 limpiar_pantalla()
                                 break
 
                     elif choice == 2:
                         limpiar_pantalla()
                         while True:
+                            print('0. VOLVER')
                             print('1. BUZÓN')
                             print('2. AMIGOS')
-                            print('3. VOLVER')
-                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2])
                             if choice == 1:
                                 limpiar_pantalla()
                                 while True:
                                     buzon = obtener_buzon(token)
                                     if buzon != []:
                                         mostrar_texto(buzon)
+                                        print('0. VOLVER')
                                         print('1. MARCAR COMO LEÍDO')
-                                        print('2. VOLVER')
-                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        choice = param('Eliga una opción: ',int,valores_validos=[0, 1])
                                         if choice == 1:
                                             mostrar_texto(marcar_leido(token))
                                             limpiar_pantalla()
-                                        elif choice == 2:
+                                        else:
                                             limpiar_pantalla()
                                             break
                                     else:
                                         mostrar_texto('No tienes ningún mensaje')
+                                        print('0. VOLVER')
                                         print('1. RECARGAR')
-                                        print('2. VOLVER')
-                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                        choice = param('Eliga una opción: ',int,valores_validos=[0, 1])
                                         if choice == 1:
                                             continue
                                         else:
@@ -394,12 +449,13 @@ def menu():
                                     if amigos != []:
                                         mostrar_texto(amigos)
                                     else:
-                                        mostrar_texto('Todavía no tienes amigos')
+                                        mostrar_texto('Todavía no tienes amigos agregados')
+
+                                    print('0. VOLVER')
                                     print('1. SOLICITUDES DE AMISTAD')
                                     print('2. ENVIAR SOLICITUD DE AMISTAD')
                                     print('3. INVITACIONES DE PARTIDA')
-                                    print('4. VOLVER')
-                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4])
+                                    choice = param('Eliga una opción: ',int,valores_validos=[0, 1, 2, 3])
                                     if choice == 1:
                                         limpiar_pantalla()
                                         while True:
@@ -425,9 +481,10 @@ def menu():
                                                     break
                                             else:
                                                 mostrar_texto('No tienes ninguna solicitud de amistad')
+                                                print('0. VOLVER')
                                                 print('1. RECARGAR')
-                                                print('2. VOLVER')
-                                                choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                choice = param('Eliga una opción: ',int,valores_validos=[0, 1])
+                                                print()
                                                 if choice == 1:
                                                     continue
                                                 else:
@@ -467,10 +524,10 @@ def menu():
                                                     limpiar_pantalla()
                                                     break
                                         
-                                    elif choice == 4:
+                                    elif choice == 0:
                                         limpiar_pantalla()
                                         break
-                            elif choice == 3:
+                            elif choice == 0:
                                 limpiar_pantalla()
                                 break
                     elif choice == 3:
