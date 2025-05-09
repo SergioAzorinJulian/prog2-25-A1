@@ -204,3 +204,14 @@ class Jugador:
             return True
         else:
             return False
+
+    def producir_recursos(self):
+        region = self.mapa.regiones[self.region_actual]
+        for edificio in region.edificios:
+            if isinstance(edificio, (Mina, Granja, Pozo)) and edificio.nivel > 0:  # Comprobación de que el edificio existe y sea productor
+                produccion = edificio.producir()
+                for recurso_nombre, cantidad in produccion.items():
+                    for recurso in self.recursos:
+                        if recurso.nombre == recurso_nombre:
+                            recurso.cantidad += cantidad
+                            print(f"Se ha producido {cantidad} de {recurso_nombre}.")
