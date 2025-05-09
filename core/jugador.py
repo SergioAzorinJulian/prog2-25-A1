@@ -130,6 +130,31 @@ class Jugador:
         except Exception as e:
             return (f"Error al mover batallón: {str(e)}", True)
 
+    def subir_nivel(self, recursos: dict, familias_disponibles: int): #Mejorar un edificio si hay familias y recursos disponibles
+        try:
+            if self.nivel == 0:
+                print("El edificio está en nivel 0 y no puede mejorar.")
+                return False
+
+            if familias_disponibles < self.familias_asignadas:
+                print("No hay suficientes familias disponibles para asignar.")
+                return False
+
+            for recurso, cantidad in self.costo_mejora.items():
+                if recursos.get(recurso, 0) < cantidad:
+                    print(f"No hay suficientes recursos para mejorar: falta {recurso}.")
+                    return False
+
+            for recurso, cantidad in self.costo_mejora.items():
+                recursos[recurso] -= cantidad
+
+            self.nivel += 1
+            print("Edificio mejorado con éxito.")
+            return True
+        except (TypeError, AttributeError):
+            print("Error interno al intentar mejorar el edificio.")
+            return False
+
     def combatir(destino : tuple[int,int]):
         pass
     def construir_edificio(self,edificio):
