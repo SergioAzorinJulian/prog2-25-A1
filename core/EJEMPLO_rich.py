@@ -421,7 +421,7 @@ def menu():
 
                                     console.print()
 
-                                    privada = True if param('Elija una opción: ', int, valores_validos=[1, 2]) == 'privada' else False
+                                    privada = True if param('Elija una opción: ', int, valores_validos=[1, 2]) == 2 else False
                                     limpiar_pantalla()
 
                                     if privada:
