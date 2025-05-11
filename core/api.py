@@ -3,6 +3,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import hashlib
 import random
 from partida import Partida
+from jugador import Jugador
 import pickle
 
 app = Flask(__name__)
@@ -228,8 +229,11 @@ def cancelar_partida(id):
 @app.route('/games/<id>/game_state',methods=['GET'])
 @jwt_required()
 def estado_partida(id):
-    estado = partidas[id].estado_partida()
-    return estado,200
+    try:
+        estado = partidas[id].estado_partida()
+        return estado, 200
+    except KeyError:
+        return 'Partida no encontrada', 404
 @app.route('/games/<id>/player_state',methods=['GET'])
 @jwt_required()
 def estado_jugador(id):
@@ -409,7 +413,111 @@ def obtener_buzones():
 
     return 'Buzones obtenidos', 200
 
+@app.route('/games/<id>/player/ver_mapa',methods=['GET'])
+@jwt_required()
+def ver_mapa(id):
+    """
+    Recupera la representación gráfica del mapa para un jugador
+    en una partida específica. Este endpoint está protegido y requiere
+    un token JWT válido para acceder. Identifica al usuario autenticado,
+    recupera su instancia de jugador correspondiente dentro de la partida
+    y obtiene la representación gráfica del mapa del jugador.
 
+    Parameters
+    ----------
+    id : str
+        ID de la partida en la que está jugando el jugador.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la representación gráfica del mapa del jugador
+        y el código de estado HTTP.
+    """
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    mapa_grafico = jugador.mapa_grafico()
+    return mapa_grafico, 200
+
+@app.route('/games/<id>/player/cambiar_turno',methods=['PUT'])
+@jwt_required()
+def cambiar_turno(id):
+    """
+    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
+    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
+    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
+    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
+
+    Parameters
+    ----------
+    id : str
+        El identificador único del juego cuyo turno necesita ser cambiado.
+
+    Returns
+    -------
+    tuple
+        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
+    """
+    partida = partidas[id]
+    partida.cambiar_turno()
+    return "Turno cambiado con éxito", 200
+@app.route('/games/<id>/player/catalogos',methods=['GET'])
+@jwt_required()
+def catalogos(id):
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    catalogos_dict = {}
+    valores_validos_tropas, catalogo_tropas = jugador.mostrar_catalogo()
+    valores_validos_edificios, catalogo_edificios = jugador.mostrar_catalogo_edificios()
+    catalogos_dict['tropas'] = {
+        'valores_validos' : valores_validos_tropas,
+        'catalogo' : catalogo_tropas
+    }
+    catalogos_dict['edificios'] = {
+        'valores_validos' : valores_validos_edificios,
+        'catalogo' : catalogo_edificios
+    }
+    return jsonify(catalogos_dict),200
+@app.route('/games/<id>/player/add_tropa',methods=['POST'])
+@jwt_required()
+def add_tropa(id):
+    user = get_jwt_identity()
+    tropa_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.add_tropa(tropa_dict['tropa'],tropa_dict['cantidad'])
+    return salida, 200
+@app.route('/games/<id>/player/mover_tropa',methods=['PUT'])
+@jwt_required()
+def mover_tropa(id):
+    user = get_jwt_identity()
+    tropa_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
+    return jsonify(salida), 200
+@app.route('/games/<id>/player/mover_batallon',methods=['PUT'])
+@jwt_required()
+def mover_batallon(id):
+    user = get_jwt_identity()
+    destino_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.mover_batallon(tuple(destino_dict['destino']))
+    return jsonify(salida), 200
+@app.route('/games/<id>/player/edificio',methods=['POST'])
+@jwt_required()
+def construir_edificio(id):
+    user = get_jwt_identity()
+    edificio = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.construir_edificio(edificio)
+    return salida,200
+@app.route('/games/<id>/player/edificio',methods=['PUT'])
+@jwt_required()
+def subir_nivel_edificio(id):
+    user = get_jwt_identity()
+    edificio = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.subir_nivel_edificio(edificio)
+    return salida,200
 
 
 
