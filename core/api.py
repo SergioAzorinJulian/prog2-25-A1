@@ -5,6 +5,7 @@ import random
 from partida import Partida
 import pickle
 
+from jugador import Jugador
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
@@ -228,8 +229,12 @@ def cancelar_partida(id):
 @app.route('/games/<id>/game_state',methods=['GET'])
 @jwt_required()
 def estado_partida(id):
-    estado = partidas[id].estado_partida()
-    return estado,200
+    try:
+        estado = partidas[id].estado_partida()
+        return estado,200
+    except KeyError:
+        return 'Partida no encontrada', 404   
+    
 @app.route('/games/<id>/player_state',methods=['GET'])
 @jwt_required()
 def estado_jugador(id):
@@ -413,6 +418,62 @@ def obtener_buzones():
 
 
 
+@app.route('/games/<id>/player/catalogos',methods=['GET'])
+@jwt_required()
+def catalogos(id):
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    catalogos_dict = {}
+    valores_validos_tropas, catalogo_tropas = jugador.mostrar_catalogo()
+    valores_validos_edificios, catalogo_edificios = jugador.mostrar_catalogo_edificios()
+    catalogos_dict['tropas'] = {
+        'valores_validos' : valores_validos_tropas,
+        'catalogo' : catalogo_tropas
+    }
+    catalogos_dict['edificios'] = {
+        'valores_validos' : valores_validos_edificios,
+        'catalogo' : catalogo_edificios
+    }
+    return jsonify(catalogos_dict),200 
+@app.route('/games/<id>/player/add_tropa',methods=['POST'])
+@jwt_required()
+def add_tropa(id):
+    user = get_jwt_identity()
+    tropa_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.add_tropa(tropa_dict['tropa'],tropa_dict['cantidad'])
+    return salida, 200
+@app.route('/games/<id>/player/mover_tropa',methods=['PUT'])
+@jwt_required()
+def mover_tropa(id):
+    user = get_jwt_identity()
+    tropa_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
+    return jsonify(salida), 200
+@app.route('/games/<id>/player/mover_batallon',methods=['PUT'])
+@jwt_required()
+def mover_batallon(id):
+    user = get_jwt_identity()
+    destino_dict = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.mover_batallon(tuple(destino_dict['destino']))
+    return jsonify(salida), 200
+@app.route('/games/<id>/player/edificio',methods=['POST'])
+@jwt_required()
+def construir_edificio(id):
+    user = get_jwt_identity()
+    edificio = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.construir_edificio(edificio)
+    return salida,200
+@app.route('/games/<id>/player/edificio',methods=['PUT'])
+@jwt_required()
+def subir_nivel_edificio(id):
+    user = get_jwt_identity()
+    edificio = request.get_json()
+    jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    salida = jugador.subir_nivel_edificio(edificio)
+    return salida,200
 if __name__ == '__main__':
     app.run(debug=True)
-    

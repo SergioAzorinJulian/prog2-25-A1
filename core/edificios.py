@@ -21,12 +21,14 @@ class Edificio:
         self.efectividad = efectividad
 
     def subir_nivel(self,recursos_jugador : list) -> str:
-        if recursos_jugador[recursos_jugador.index(self.__class__.costo)] >= self.__class__.costo * self.nivel:
-            recursos_jugador[recursos_jugador.index(self.__class__.costo)] -= self.__class__.costo * self.nivel
+        if all(recursos_jugador[recursos_jugador.index(recurso)] >= recurso for recurso in self.__class__.costo):
+            for recurso in self.__class__.costo:
+                recursos_jugador[recursos_jugador.index(recurso)] -= recurso
             self.nivel += 1
             self.efectividad += 0.2
+            return f'Edificio subido de nivel, nivel: {self.nivel}'
         else:
-            return f'Recurso {self.__class__.costo} insuficiente'
+            return f'Recursos insuficientes'
     def producir(self,recursos_region : list[Recurso], recursos_jugador : list[Recurso]) -> None:
         if self.__class__.produce in recursos_region:
             recurso_region = recursos_region[recursos_region.index(self.__class__.produce)]
@@ -37,6 +39,17 @@ class Edificio:
             return None
     def __str__(self) -> str:
         return f'{self.nombre}: Nivel={self.nivel}, Efectividad={self.efectividad}, Costo={self.__class__.costo}, Produce={self.__class__.produce}'
+    def __eq__(self, other):
+        if isinstance(other,Edificio):
+            if self.nombre.lower() == other.nombre:
+                return True
+            else:
+                return False
+        else:
+            if self.nombre.lower() == other:
+                return True
+            else:
+                return False
 
 
 class Mina(Edificio):
