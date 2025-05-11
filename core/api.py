@@ -239,12 +239,7 @@ def estado_partida(id):
 @jwt_required()
 def estado_jugador(id):
     user = get_jwt_identity()
-    try:
-        es_su_turno = partidas[id].estado_jugador(user)
-        return jsonify({"es_turno": es_su_turno}), 200
-    except Exception as e:
-        print(f"ERROR en estado_jugador: {e}")
-        return jsonify({"error": "Error interno al obtener estado del jugador", "details": str(e)}), 500
+    return jsonify(partidas[id].estado_jugador(user)),200
 
 
 #/games/<id>/player/
@@ -283,55 +278,6 @@ def ver_recursos(id):
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
 
     return jsonify(jugador.ver_recursos()),200
-
-@app.route('/games/<id>/player/ver_mapa',methods=['GET'])
-@jwt_required()
-def ver_mapa(id):
-    """
-    Recupera la representación gráfica del mapa para un jugador
-    en una partida específica. Este endpoint está protegido y requiere
-    un token JWT válido para acceder. Identifica al usuario autenticado,
-    recupera su instancia de jugador correspondiente dentro de la partida
-    y obtiene la representación gráfica del mapa del jugador.
-
-    Parameters
-    ----------
-    id : str
-        ID de la partida en la que está jugando el jugador.
-
-    Returns
-    -------
-    tuple
-        Una tupla que contiene la representación gráfica del mapa del jugador
-        y el código de estado HTTP.
-    """
-    user = get_jwt_identity()
-    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    mapa_grafico = jugador.mapa_grafico()
-    return mapa_grafico, 200
-
-@app.route('/games/<id>/player/cambiar_turno',methods=['PUT'])
-@jwt_required()
-def cambiar_turno(id):
-    """
-    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
-    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
-    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
-    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
-
-    Parameters
-    ----------
-    id : str
-        El identificador único del juego cuyo turno necesita ser cambiado.
-
-    Returns
-    -------
-    tuple
-        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
-    """
-    partida = partidas[id]
-    partida.cambiar_turno()
-    return "Turno cambiado con éxito", 200
 
 @app.route('/games/partidas.pkl',methods=['POST'])
 @jwt_required()
