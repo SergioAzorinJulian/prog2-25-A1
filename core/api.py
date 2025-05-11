@@ -31,6 +31,7 @@ def kingdom_craft():
 #AUTENTICACIÓN
 @app.route('/auth/signup', methods=['POST'])
 def signup():
+
     user = request.args.get('user', '')
     if user in users:
         return f'Usuario {user} ya existe', 409
@@ -46,6 +47,9 @@ def signup():
             'invitaciones_partida':[]
         }
         buzon[user] = []
+
+
+
         return f'Usuario {user} registrado', 200
 
 @app.route('/auth/login', methods=['GET'])
@@ -114,7 +118,9 @@ def rechazar_solicitud(id):
 @jwt_required()
 def notificaciones():
     user = get_jwt_identity()
+
     notificaciones = 0
+
     for mensaje in buzon[user]:
         if mensaje['leido'] == False:
             notificaciones += 1
@@ -322,29 +328,88 @@ def cambiar_turno(id):
     partida.cambiar_turno()
     return "Turno cambiado con éxito", 200
 
-@app.route('/games/<id>/partida.pkl',methods=['POST'])
+@app.route('/games/partidas.pkl',methods=['POST'])
 @jwt_required()
-def obtener_partida(id):
-    '''
-    Creamos archivo pkl de la partida en la ruta de la partida
-    '''
-    partida = partidas[id]
-    with open('partida.pkl','wb') as f:
-        pickle.dump(partida,f)
-    return f'Partida {id} guardada', 200
+def guardar_partidas():
+    """
+    Metemos en archivo pkl las partidas
+    """
+    with open('partidas.pkl','wb') as f:
+        pickle.dump(partidas,f)
+    return f'Partidas guardadas', 200
 
 
-@app.route('/games/<id>/jugador.pkl',methods=['POST'])
+@app.route('/users/jugadores.pkl',methods=['POST'])
+def guardar_jugadores():
+    """
+    Metemos en archivo pkl los jugadores
+    """
+    with open('jugadores.pkl','wb') as f:
+        pickle.dump(users,f)
+    return f'Jugadores guardados', 200
+
+@app.route('/users/mail/buzones.pkl',methods=['POST'])
+def guardar_buzones():
+    """
+    Metemos en archivo pkl los buzones (notificaciones)
+    """
+
+    with open('buzones.pkl','wb') as f:
+        pickle.dump(buzon,f)
+    return f'Buzones guardados', 200
+
+
+@app.route('/games/partidas.pkl',methods=['GET'])
 @jwt_required()
-def obtener_jugador(id):
-    '''
-    Creamos archivo pkl del jugador en la ruta de la partida
-    '''
-    user = get_jwt_identity()
-    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    with open('jugador.pkl','wb') as f:
-        pickle.dump(jugador,f)
-    return f'Tu jugador ha sido guardado', 200
+def obtener_partidas():
+    """
+        Cargamos las partidas
+    """
+    with open('partidas.pkl','rb') as f:
+        partidas_nuevo=pickle.load(f)
+
+    for keys in partidas_nuevo:
+        users[keys]=partidas_nuevo[keys]
+
+    return 'Partidas obtenidas', 200
+
+@app.route('/users/jugadores.pkl',methods=['GET'])
+def obtener_jugadores():
+    """
+        Cargamos los jugadores
+
+        """
+    try:
+        with open('jugadores.pkl','rb') as f:
+            users_nuevo=pickle.load(f)
+        for keys in users_nuevo:
+            users[keys] = users_nuevo[keys]
+    except EOFError:
+        with open('jugadores.pkl','wb') as f:
+            pickle.dump(partidas,f)
+
+
+    return 'Jugadores obtenidos', 200
+
+
+@app.route('/users/mail/buzones.pkl',methods=['GET'])
+def obtener_buzones():
+    """
+        Cargamos los buzones (notificaciones)
+        """
+    try:
+        with open('buzones.pkl','rb') as f:
+            buzon_nuevo=pickle.load(f)
+        for keys in buzon_nuevo:
+            buzon[keys] = buzon_nuevo[keys]
+    except EOFError:
+        with open('buzones.pkl','wb') as f:
+            pickle.dump(buzon,f)
+
+
+    return 'Buzones obtenidos', 200
+
+
 
 
 
