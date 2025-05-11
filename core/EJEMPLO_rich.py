@@ -577,7 +577,7 @@ def menu():
                                                                     if zona[1]:
                                                                         table_opciones_dentro_zona = Table(show_edge=False, header_style="bold white reverse blue")
 
-                                                                        table_opciones_dentro_zona.add_column(f'ZONA {zona['Posición']}', justify='center', style='prompt')
+                                                                        table_opciones_dentro_zona.add_column(f'OPCIONES DENTRO DE LA ZONA', justify='center', style='prompt')
 
                                                                         table_opciones_dentro_zona.add_row('0. Volver', style='dim')
                                                                         table_opciones_dentro_zona.add_row('1. Añadir tropa')
