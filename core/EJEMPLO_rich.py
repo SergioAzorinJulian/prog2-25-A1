@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import api
 import requests
 import getpass
 import os
@@ -15,7 +15,7 @@ from rich.text import Text
 from rich.progress import track
 from rich import box
 from mapa import Mapa
-
+import pickle
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 titulo_md = Markdown("# Bienvenido a Kingdom Kraft")
@@ -147,11 +147,20 @@ def barra_de_progreso(ritmo, tiempo):
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
+
+    obtener_jugadores()
+
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
+
+    subir_jugadores()
+
+    subir_buzones()
+
     return r.text
 
 
 def login(user, password):
+    obtener_jugadores()
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
         return r.text, True
@@ -161,18 +170,23 @@ def login(user, password):
 # USERS
 #   BUZON
 def notificaciones(token):
+    obtener_buzones()
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
+
     return r.text
 
 
 def obtener_buzon(token):
+
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
     return mensajes
 
 
 def marcar_leido(token):
+
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
+
     return r.text
 
 
@@ -310,26 +324,71 @@ def cambiar_turno(token, id_partida):
         return None
 
 
-def guardar_partida(token, id_partida):
-    r = requests.post(f'{URL}/games/{id_partida}/partida.pkl', headers={'Authorization': f'Bearer {token}'})
+def obtener_partidas(token):
+    r = requests.get(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
     if r.status_code==200:
         return r.text
     else:
-        console.print(f"[error]Error al guardar: [/error]{r.status_code}")
+        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
         return None
 
-def guardar_jugadores(token, id_partida):
-    r = requests.post(f'{URL}/games/{id_partida}/jugador.pkl', headers={'Authorization': f'Bearer {token}'})
+def obtener_jugadores():
+    r = requests.get(f'{URL}/users/jugadores.pkl')
     if r.status_code==200:
         return r.text
     else:
-        console.print(f"[error]Error al guardar: [/error]{r.status_code}")
+        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
         return None
+
+def obtener_buzones():
+    r = requests.get(f'{URL}/users/mail/buzones.pkl')
+    if r.status_code == 200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
+        return None
+
+def subir_partidas(token):
+    r = requests.post(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
+        return None
+
+def subir_jugadores():
+    r = requests.post(f'{URL}/users/jugadores.pkl')
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
+        return None
+
+def subir_buzones():
+    r = requests.post(f'{URL}/users/mail/buzones.pkl')
+    if r.status_code == 200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
+        return None
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 ### MENU PRINCIPAL ###
 def menu():
+
 
     console.print(Align.center(titulo_md), style='bold bright_yellow', )
     console.print()
