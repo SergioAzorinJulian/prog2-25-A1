@@ -3,6 +3,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import hashlib
 import random
 from partida import Partida
+from jugador import Jugador
 import pickle
 
 from jugador import Jugador
@@ -231,10 +232,9 @@ def cancelar_partida(id):
 def estado_partida(id):
     try:
         estado = partidas[id].estado_partida()
-        return estado,200
+        return estado, 200
     except KeyError:
-        return 'Partida no encontrada', 404   
-    
+        return 'Partida no encontrada', 404
 @app.route('/games/<id>/player_state',methods=['GET'])
 @jwt_required()
 def estado_jugador(id):
@@ -414,10 +414,54 @@ def obtener_buzones():
 
     return 'Buzones obtenidos', 200
 
+@app.route('/games/<id>/player/ver_mapa',methods=['GET'])
+@jwt_required()
+def ver_mapa(id):
+    """
+    Recupera la representación gráfica del mapa para un jugador
+    en una partida específica. Este endpoint está protegido y requiere
+    un token JWT válido para acceder. Identifica al usuario autenticado,
+    recupera su instancia de jugador correspondiente dentro de la partida
+    y obtiene la representación gráfica del mapa del jugador.
 
+    Parameters
+    ----------
+    id : str
+        ID de la partida en la que está jugando el jugador.
 
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la representación gráfica del mapa del jugador
+        y el código de estado HTTP.
+    """
+    user = get_jwt_identity()
+    jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
+    mapa_grafico = jugador.mapa_grafico()
+    return mapa_grafico, 200
 
+@app.route('/games/<id>/player/cambiar_turno',methods=['PUT'])
+@jwt_required()
+def cambiar_turno(id):
+    """
+    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
+    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
+    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
+    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
 
+    Parameters
+    ----------
+    id : str
+        El identificador único del juego cuyo turno necesita ser cambiado.
+
+    Returns
+    -------
+    tuple
+        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
+    """
+    partida = partidas[id]
+    partida.cambiar_turno()
+    return "Turno cambiado con éxito", 200
 @app.route('/games/<id>/player/catalogos',methods=['GET'])
 @jwt_required()
 def catalogos(id):
@@ -434,7 +478,7 @@ def catalogos(id):
         'valores_validos' : valores_validos_edificios,
         'catalogo' : catalogo_edificios
     }
-    return jsonify(catalogos_dict),200 
+    return jsonify(catalogos_dict),200
 @app.route('/games/<id>/player/add_tropa',methods=['POST'])
 @jwt_required()
 def add_tropa(id):
@@ -475,5 +519,8 @@ def subir_nivel_edificio(id):
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.subir_nivel_edificio(edificio)
     return salida,200
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
