@@ -1,4 +1,5 @@
 import random
+import math
 class Recurso:
     """
     Con la clase recurso se crean los diferentes recursos
@@ -115,7 +116,7 @@ class Recurso:
         return self
     
     def __mul__(self,other : int):
-        return self.__class__(self.nombre,self.cantidad * other,self.regeneracion,self.valor_max)
+        return self.__class__(self.nombre,math.ceil(self.cantidad * other),self.regeneracion,self.valor_max)
     
     def __imul__(self, other : int):
         self.cantidad *= other

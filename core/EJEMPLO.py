@@ -3,9 +3,31 @@ import getpass
 import os
 from typing import *
 import time
+from mapa import Mapa
+from copy import deepcopy
 URL = 'http://127.0.0.1:5000'
-
+TERRENOS_JUEGO = Mapa.terrenos_disponibles
 #------------FUNCIONES------------
+def partida_custom():
+    size = param('Introduce un tamaño del mapa: ',int, valores_validos=[i for i in range(3,51)])
+    while True:
+        terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str)
+        if len(terrenos.split(',')) < 2:
+            print('Error: Debe introducir al menos 2 tipos de terreno.', style = 'warning')
+            continue
+
+        copia_terrenos = deepcopy(TERRENOS_JUEGO)
+        for terreno in terrenos.split(','):
+            if terreno.strip().lower() in copia_terrenos:
+                copia_terrenos.remove(terreno.strip().lower())
+            else:
+                if terreno.strip().lower() in TERRENOS_JUEGO:
+                    print(f'Error: El tipo de terreno "{terreno}" se ha introducido más de una vez.',)
+                else:
+                    print(f'Error: El tipo de terreno "{terreno}" no existe en el juego.')
+                limpiar_pantalla()
+                break
+        return size,terrenos
 def to_tuple():
     while True:
         try:
@@ -168,7 +190,7 @@ def cancelar_partida(token,id_partida):
 def get_estado_partida(token,id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/game_state',headers={'Authorization': f'Bearer {token}'})
     estado = r.text
-    return estado
+    return estado,r.status_code
 def get_estado_jugador(token,id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/player_state',headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
@@ -182,6 +204,34 @@ def ver_zona(token,id_partida,coordenada):
 def ver_recursos(token,id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos',headers={'Authorization': f'Bearer {token}'})
     return r.json()
+def ver_mapa(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def cambiar_turno(token, id_partida):
+    r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno',headers={'Authorization': f'Bearer {token}'})
+    return r.text
+def catalogos(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/player/catalogos',headers={'Authorization': f'Bearer {token}'})
+    return r.json()
+def add_tropa(token, id_partida, tropa, cantidad):
+    diccionario = {'tropa':tropa,'cantidad':cantidad}
+    r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
+    return r.text
+def mover_tropa(token, id_partida, tropa, cantidad, destino):
+    diccionario = {'tropa':tropa,'cantidad':cantidad, 'destino': destino}
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
+    return r.json()
+def mover_batallon(token, id_partida,destino):
+    diccionario = {'destino': destino}
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon',headers={'Authorization': f'Bearer {token}'},json=(diccionario))
+    return r.json()
+def construir_edificio(token,id_partida,edificio):
+    r = requests.post(f'{URL}/games/{id_partida}/player/edificio',headers={'Authorization': f'Bearer {token}'},json=(edificio))
+    return r.text
+def subir_nivel_edificio(token,id_partida,edificio):
+    r = requests.put(f'{URL}/games/{id_partida}/player/edificio',headers={'Authorization': f'Bearer {token}'},json=(edificio))
+    return r.text
+
 def menu():
     while True:
         print('=== MENU ===')
@@ -236,7 +286,10 @@ def menu():
                                     print('3. VOLVER')
                                     choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
                                     if choice == 1:
-                                        mostrar_texto('Kingdom Kraft esta trabajando en ello, vuelva más tarde')
+                                        size, terrenos = partida_custom()
+                                        reino = param('Introduce el nombre de tu reino: ',str)
+                                        mostrar_texto(crear_partida(token, privada, reino, invitado, size, terrenos))
+                                        limpiar_pantalla()
                                         break
                                     elif choice == 2:
                                         reino = param('Introduce el nombre de tu reino: ',str)
@@ -272,44 +325,74 @@ def menu():
                                             limpiar_pantalla()
                                             continue
                                         id_user_partida = param('Introduzca el id de la partida: ',str)
-                                        estado_partida = get_estado_partida(token,id_user_partida)
-                                        if estado_partida == 'Empezada':
-                                            while True:
-                                                if get_estado_jugador(token,id_user_partida):
-                                                    mostrar_texto('Bienvenido a Kingdom Craft')
-                                                    limpiar_pantalla()
-                                                    while get_estado_jugador(token,id_user_partida) == True:
+                                        while True:
+                                            estado_partida, r_estado = get_estado_partida(token,id_user_partida)
+                                            if r_estado == 200:
+                                                if estado_partida == 'Empezada':                                    
+                                                    estado_jugador = get_estado_jugador(token,id_user_partida)
+                                                    if estado_jugador:
+                                                        mostrar_texto('Bienvenido a Kingdom Craft')
+                                                        if 'catalogos_dict' not in locals().keys(): #Creamos el catalogo si no existe
+                                                            catalogos_dict = catalogos(token,id_user_partida)
+                                                        limpiar_pantalla()
                                                         print('===KINGDOM CRAFT===')
                                                         print('1. VER ZONA')
                                                         print('2.VER RECURSOS')
-                                                        print('3. SALIR')
-                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                                                        print('3. VER MAPA')
+                                                        print('4. CAMBIAR TURNO')
+                                                        print('5. SALIR')
+                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5])
                                                         if choice == 1:
-                                                            coordenada = to_tuple()
-                                                            zona,estado = ver_zona(token,id_user_partida,coordenada)
-                                                            if estado == 200:
-                                                                while True:
+                                                            coordenada = to_tuple()                                                            
+                                                            while True: 
+                                                                zona,estado = ver_zona(token,id_user_partida,coordenada)
+                                                                if estado == 200:
                                                                     if zona[1]:
                                                                         print(zona[0])
                                                                         print('1. AÑADIR TROPA')
                                                                         print('2. MOVER TROPA')
                                                                         print('3. MOVER BATALLÓN')
                                                                         print('4. CONSTRUIR EDIFICIO')
-                                                                        print('5. VOLVER')
-                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5])
+                                                                        print('5. SUBIR DE NIVEL EDIFICIO')
+                                                                        print('6. VOLVER')
+                                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4,5,6])
                                                                         match choice:
                                                                             case 1:
-                                                                                pass
+                                                                                mostrar_texto(catalogos_dict['tropas']['catalogo'])
+                                                                                tropa = param('Introduzca el nombre de la tropa: ',str, valores_validos=catalogos_dict['tropas']['valores_validos'])
+                                                                                cantidad = param('Introduzca la cantidad: ',int)
+                                                                                mostrar_texto(add_tropa(token,id_user_partida,tropa,cantidad))
+                                                                                limpiar_pantalla()
+                                                                                
                                                                             case 2:
-                                                                                pass
+                                                                                tropa = param('Introduzca el nombre de la tropa: ',str, valores_validos=catalogos_dict['tropas']['valores_validos'])
+                                                                                cantidad = param('Introduzca la cantidad: ',int)
+                                                                                destino = to_tuple()
+                                                                                salida = mover_tropa(token,id_user_partida,tropa,cantidad,destino)
+                                                                                if isinstance(salida,tuple): #No se a podido mover la tropa, saltar opcion de combate
+                                                                                    print('Kingdom Craft se encargará pronto')
+                                                                                else:
+                                                                                    mostrar_texto(salida)
+                                                                                    limpiar_pantalla()                                                                                                                       
                                                                             case 3:
-                                                                                pass
+                                                                                destino = to_tuple()
+                                                                                salida = mover_batallon(token,id_user_partida,destino)
+                                                                                if isinstance(salida,tuple):
+                                                                                    print('Kingdom Craft se encargará pronto')
+                                                                                else:
+                                                                                    mostrar_texto(salida)
+                                                                                    limpiar_pantalla()
                                                                             case 4:
-                                                                                pass
+                                                                                mostrar_texto(catalogos_dict['edificios']['catalogo'])
+                                                                                edificio = param('Introduzca el nombre del edificio: ',str, valores_validos=catalogos_dict['edificios']['valores_validos'])
+                                                                                mostrar_texto(construir_edificio(token,id_user_partida,edificio))
                                                                             case 5:
+                                                                                edificio = param('Introduzca el nombre del edificio: ',str, valores_validos=catalogos_dict['edificios']['valores_validos'])
+                                                                                mostrar_texto(subir_nivel_edificio(token,id_user_partida,edificio))
+                                                                            case 6:
                                                                                 limpiar_pantalla()
                                                                                 break
-                                                                    
+                                                                
                                                                     else:
                                                                         print(zona[0])
                                                                         print('1. VOLVER')
@@ -317,37 +400,50 @@ def menu():
                                                                         if choice == 1:
                                                                             limpiar_pantalla()
                                                                             break
-                                                            elif estado == 404:
-                                                                mostrar_texto(zona['error'])
-                                                                continue
+                                                                elif estado == 404:
+                                                                    mostrar_texto(zona['error'])
+                                                                    break
                                                         elif choice == 2:
                                                             mostrar_texto(ver_recursos(token,id_user_partida),enumerado=True)
                                                             print('1. VOLVER')
                                                             choice = param('Eliga una opción: ',int,valores_validos=[1])
                                                             if choice == 1:
                                                                 limpiar_pantalla()
-                                                                break
+                                                                continue
+                                                        elif choice == 3:
+                                                            print(ver_mapa(token,id_user_partida))
+                                                            print('1. VOLVER')
+                                                            choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                                            if choice == 1:
+                                                                limpiar_pantalla()
+                                                                continue
+                                                        elif choice == 4:
+                                                            mostrar_texto(cambiar_turno(token,id_user_partida))
+                                                            continue
                                                         else:
                                                             limpiar_pantalla()
                                                             break
-                                                else:
-                                                    mostrar_texto('Todavía no es tu turno')
-                                                    print('1. RECARGAR')
-                                                    print('2. VOLVER')
-                                                    choice = param('Eliga una opción: ',int,valores_validos=[1,2])
-                                                    if choice == 1:
-                                                        continue
                                                     else:
-                                                        limpiar_pantalla()
-                                                        break
-                                        elif estado_partida == 'Esperando':
-                                            mostrar_texto('Esperando a que se una otro jugador')
-                                            limpiar_pantalla()
-                                            continue
-                                        elif estado_partida == 'Finalizada':
-                                            mostrar_texto('Kingdom Craft esta trabajando en ello')
-                                            limpiar_pantalla()
-                                            continue
+                                                        mostrar_texto('Todavía no es tu turno')
+                                                        print('1. RECARGAR')
+                                                        print('2. VOLVER')
+                                                        choice = param('Eliga una opción: ',int,valores_validos=[1,2])
+                                                        if choice == 1:
+                                                            continue
+                                                        else:
+                                                            limpiar_pantalla()
+                                                            break
+                                                elif estado_partida == 'Esperando':
+                                                    mostrar_texto('Esperando a que se una otro jugador')
+                                                    limpiar_pantalla()
+                                                    break
+                                                elif estado_partida == 'Finalizada':
+                                                    mostrar_texto('Kingdom Craft esta trabajando en ello')
+                                                    limpiar_pantalla()
+                                                    continue
+                                            elif r_estado == 404:
+                                                mostrar_texto(estado_partida)
+                                                break
                                     else:
                                         limpiar_pantalla()
                                         break

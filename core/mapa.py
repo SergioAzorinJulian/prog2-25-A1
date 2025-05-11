@@ -55,6 +55,8 @@ class Mapa:
     ValueError
         Si se proporciona un tipo de terreno que no existe en el juego.
     """
+     # Listado con todos los terrenos disponibles dentro del juego
+    terrenos_disponibles = ['bosque', 'montaña', 'pradera', 'desierto', 'colina', 'pantano', 'río', 'llanura']
 
     def __init__(self, filas: int, columnas: int, tipos_terreno: Optional[list[str]] = None):
 
@@ -407,7 +409,7 @@ class Mapa:
             }
 
         if not self.get_tipos_terreno(): # Si no se pasan unos terrenos específicos se usarán unos genéricos
-            terrenos = ['terreno1', 'terreno2', 'terreno3' ,'terrenoN']
+            terrenos = ['bosque', 'montaña', 'pradera', 'desierto']
         else: # Si se pasan unos terrenos específicos se usaran esos
             terrenos = self.get_tipos_terreno()
 

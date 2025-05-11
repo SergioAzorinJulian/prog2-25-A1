@@ -161,7 +161,7 @@ class Region:
                 f"Edificios: {self.edificios} | \n"
                 f"Tropas: \n{tropas_str}")
 
-        return mensaje if not self.get_es_reino() else mensaje + f" | Nombre: {self.get_nombre_reino()}"
+        return mensaje if not self.get_es_reino() else mensaje + f"Nombre: {self.get_nombre_reino()} |"
 
     def __repr__(self) -> str:
         """Devuelve una representacion de una region de manera mas "tecnica"."""
