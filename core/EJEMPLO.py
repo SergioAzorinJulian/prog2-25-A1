@@ -301,7 +301,14 @@ def subir_nivel_edificio(token, id_partida, edificio):
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
                      json=(edificio))
     return r.text
-
+def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    diccionario = {
+        'atacantes': atacantes_pos,
+        'defensores': defensores_pos
+    }
+    r = requests.put(f'{URL}/games/{id_partida}/player/combatir', headers={'Authorization': f'Bearer {token}'},
+                     json=(diccionario))
+    return r.json()
 
 def menu():
     while True:
@@ -468,9 +475,20 @@ def menu():
                                                                                                      tropa, cantidad,
                                                                                                      destino)
                                                                                 if isinstance(salida,
-                                                                                              tuple):  # No se a podido mover la tropa, saltar opcion de combate
-                                                                                    print(
-                                                                                        'Kingdom Craft se encargará pronto')
+                                                                                              list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                                                    mostrar_texto(salida[0])
+                                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                                    print('2. ABORTAR')
+                                                                                    choice = param('Eliga una opción: ',int, valores_validos=[1,2])
+                                                                                    if choice == 1:
+                                                                                        salida = combatir(token,id_user_partida, coordenada, destino)
+                                                                                        mostrar_texto(salida['texto'])
+                                                                                        limpiar_pantalla()
+                                                                                        if salida['estado'] == 'Finalizada':
+                                                                                            break
+                                                                                    else:
+                                                                                        limpiar_pantalla()
+                                                                                        continue
                                                                                 else:
                                                                                     mostrar_texto(salida)
                                                                                     limpiar_pantalla()
@@ -479,9 +497,20 @@ def menu():
                                                                                 salida = mover_batallon(token,
                                                                                                         id_user_partida,
                                                                                                         destino)
-                                                                                if isinstance(salida, tuple):
-                                                                                    print(
-                                                                                        'Kingdom Craft se encargará pronto')
+                                                                                if isinstance(salida, list):
+                                                                                    mostrar_texto(salida[0])
+                                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                                    print('2. ABORTAR')
+                                                                                    choice = param('Eliga una opción: ',int, valores_validos=[1,2])
+                                                                                    if choice == 1:
+                                                                                        salida = combatir(token,id_user_partida, coordenada, destino)
+                                                                                        mostrar_texto(salida['texto'])
+                                                                                        limpiar_pantalla()
+                                                                                        if salida['estado'] == 'Finalizada':
+                                                                                            break
+                                                                                    else:
+                                                                                        limpiar_pantalla()
+                                                                                        continue
                                                                                 else:
                                                                                     mostrar_texto(salida)
                                                                                     limpiar_pantalla()
@@ -558,12 +587,22 @@ def menu():
                                                             break
                                                 elif estado_partida == 'Esperando':
                                                     mostrar_texto('Esperando a que se una otro jugador')
-                                                    limpiar_pantalla()
-                                                    break
+                                                    print('1. RECARGAR')
+                                                    print('2. SALIR')
+                                                    choice = param('Elige una opción',int,valores_validos=[1,2])
+                                                    if choice == 1:
+                                                        limpiar_pantalla()
+                                                        continue
+                                                    else:
+                                                        limpiar_pantalla()
+                                                        break
                                                 elif estado_partida == 'Finalizada':
-                                                    mostrar_texto('Kingdom Craft esta trabajando en ello')
-                                                    limpiar_pantalla()
-                                                    continue
+                                                    mostrar_texto('La partida fué finalizada')                                                    
+                                                    print('1. SALIR')
+                                                    choice = param('Elige una opción: ',int,valores_validos=[1])
+                                                    if choice == 1:
+                                                        limpiar_pantalla()
+                                                        break
                                             elif r_estado == 404:
                                                 mostrar_texto(estado_partida)
                                                 break

@@ -221,7 +221,7 @@ def cancelar_partida(id):
         partidas[id].cancelar_partida()
         users[user]['invitaciones_partida'].remove(id)
         host = partidas[id].host
-        buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación'})
+        buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación','leido':False})
         users[host]['partidas'].remove(id)
         del partidas[id]
         return f'Partida {id} cancelada con éxito',200
@@ -407,6 +407,8 @@ def cambiar_turno(id):
     """
     partida = partidas[id]
     partida.cambiar_turno()
+    le_toca_a = partida.turno
+    buzon[le_toca_a].append({'mensaje': f'Es tu turno! Partida: {id}','leido':False})
     return "Turno cambiado con éxito", 200
 @app.route('/games/<id>/player/catalogos',methods=['GET'])
 @jwt_required()
@@ -465,7 +467,16 @@ def subir_nivel_edificio(id):
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.subir_nivel_edificio(edificio)
     return salida,200
-
+@app.route('/games/<id>/player/combatir',methods=['PUT'])
+@jwt_required()
+def combatir(id):
+    parametros = request.get_json()
+    salida = partidas[id].combatir(tuple(parametros['atacantes']),tuple(parametros['defensores']))
+    salida_dict = {
+        'texto': salida[0],
+        'estado': salida[1]
+    }
+    return jsonify(salida_dict),200
 
 
 if __name__ == '__main__':
