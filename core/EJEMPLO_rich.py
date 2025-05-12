@@ -15,7 +15,7 @@ from rich.text import Text
 from rich.progress import track
 from rich import box
 from mapa import Mapa
-import pickle
+import pickle_files
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 titulo_md = Markdown("# Bienvenido a Kingdom Kraft")

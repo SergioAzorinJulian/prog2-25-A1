@@ -285,8 +285,8 @@ def guardar_partidas():
     """
     Metemos en archivo pkl las partidas
     """
-    with open('partidas.pkl','wb') as f:
-        pickle.dump(partidas,f)
+    with open('pickle_files/partidas.pkl', 'wb') as f:
+        pickle.dump(partidas, f)
     return f'Partidas guardadas', 200
 
 
@@ -295,8 +295,8 @@ def guardar_jugadores():
     """
     Metemos en archivo pkl los jugadores
     """
-    with open('jugadores.pkl','wb') as f:
-        pickle.dump(users,f)
+    with open('pickle_files/jugadores.pkl', 'wb') as f:
+        pickle.dump(users, f)
     return f'Jugadores guardados', 200
 
 @app.route('/users/mail/buzones.pkl',methods=['POST'])
@@ -305,8 +305,8 @@ def guardar_buzones():
     Metemos en archivo pkl los buzones (notificaciones)
     """
 
-    with open('buzones.pkl','wb') as f:
-        pickle.dump(buzon,f)
+    with open('pickle_files/buzones.pkl', 'wb') as f:
+        pickle.dump(buzon, f)
     return f'Buzones guardados', 200
 
 
@@ -316,11 +316,15 @@ def obtener_partidas():
     """
         Cargamos las partidas
     """
-    with open('partidas.pkl','rb') as f:
-        partidas_nuevo=pickle.load(f)
+    try:
+        with open('pickle_files/partidas.pkl', 'rb') as f:
+            partidas_nuevo=pickle.load(f)
 
-    for keys in partidas_nuevo:
-        users[keys]=partidas_nuevo[keys]
+        for keys in partidas_nuevo:
+            users[keys]=partidas_nuevo[keys]
+    except EOFError:
+        with open('pickle_files/partidas.pkl', 'wb') as f:
+            pickle.dump(partidas, f)
 
     return 'Partidas obtenidas', 200
 
@@ -331,13 +335,13 @@ def obtener_jugadores():
 
         """
     try:
-        with open('jugadores.pkl','rb') as f:
+        with open('pickle_files/jugadores.pkl', 'rb') as f:
             users_nuevo=pickle.load(f)
         for keys in users_nuevo:
             users[keys] = users_nuevo[keys]
     except EOFError:
-        with open('jugadores.pkl','wb') as f:
-            pickle.dump(partidas,f)
+        with open('pickle_files/jugadores.pkl', 'wb') as f:
+            pickle.dump(users, f)
 
 
     return 'Jugadores obtenidos', 200
@@ -349,13 +353,13 @@ def obtener_buzones():
         Cargamos los buzones (notificaciones)
         """
     try:
-        with open('buzones.pkl','rb') as f:
+        with open('pickle_files/buzones.pkl', 'rb') as f:
             buzon_nuevo=pickle.load(f)
         for keys in buzon_nuevo:
             buzon[keys] = buzon_nuevo[keys]
     except EOFError:
-        with open('buzones.pkl','wb') as f:
-            pickle.dump(buzon,f)
+        with open('pickle_files/buzones.pkl', 'wb') as f:
+            pickle.dump(buzon, f)
 
 
     return 'Buzones obtenidos', 200
