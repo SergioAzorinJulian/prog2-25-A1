@@ -221,7 +221,7 @@ def cancelar_partida(id):
         partidas[id].cancelar_partida()
         users[user]['invitaciones_partida'].remove(id)
         host = partidas[id].host
-        buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación'})
+        buzon[host].append({'mensaje':f'{user} ha cancelado tu invitación','leido':False})
         users[host]['partidas'].remove(id)
         del partidas[id]
         return f'Partida {id} cancelada con éxito',200
@@ -285,8 +285,8 @@ def guardar_partidas():
     """
     Metemos en archivo pkl las partidas
     """
-    with open('partidas.pkl','wb') as f:
-        pickle.dump(partidas,f)
+    with open('pickle_files/partidas.pkl', 'wb') as f:
+        pickle.dump(partidas, f)
     return f'Partidas guardadas', 200
 
 
@@ -295,8 +295,8 @@ def guardar_jugadores():
     """
     Metemos en archivo pkl los jugadores
     """
-    with open('jugadores.pkl','wb') as f:
-        pickle.dump(users,f)
+    with open('pickle_files/jugadores.pkl', 'wb') as f:
+        pickle.dump(users, f)
     return f'Jugadores guardados', 200
 
 @app.route('/users/mail/buzones.pkl',methods=['POST'])
@@ -305,8 +305,8 @@ def guardar_buzones():
     Metemos en archivo pkl los buzones (notificaciones)
     """
 
-    with open('buzones.pkl','wb') as f:
-        pickle.dump(buzon,f)
+    with open('pickle_files/buzones.pkl', 'wb') as f:
+        pickle.dump(buzon, f)
     return f'Buzones guardados', 200
 
 
@@ -316,11 +316,15 @@ def obtener_partidas():
     """
         Cargamos las partidas
     """
-    with open('partidas.pkl','rb') as f:
-        partidas_nuevo=pickle.load(f)
+    try:
+        with open('pickle_files/partidas.pkl', 'rb') as f:
+            partidas_nuevo=pickle.load(f)
 
-    for keys in partidas_nuevo:
-        users[keys]=partidas_nuevo[keys]
+        for keys in partidas_nuevo:
+            users[keys]=partidas_nuevo[keys]
+    except EOFError:
+        with open('pickle_files/partidas.pkl', 'wb') as f:
+            pickle.dump(partidas, f)
 
     return 'Partidas obtenidas', 200
 
@@ -331,13 +335,13 @@ def obtener_jugadores():
 
         """
     try:
-        with open('jugadores.pkl','rb') as f:
+        with open('pickle_files/jugadores.pkl', 'rb') as f:
             users_nuevo=pickle.load(f)
         for keys in users_nuevo:
             users[keys] = users_nuevo[keys]
     except EOFError:
-        with open('jugadores.pkl','wb') as f:
-            pickle.dump(partidas,f)
+        with open('pickle_files/jugadores.pkl', 'wb') as f:
+            pickle.dump(users, f)
 
 
     return 'Jugadores obtenidos', 200
@@ -349,13 +353,13 @@ def obtener_buzones():
         Cargamos los buzones (notificaciones)
         """
     try:
-        with open('buzones.pkl','rb') as f:
+        with open('pickle_files/buzones.pkl', 'rb') as f:
             buzon_nuevo=pickle.load(f)
         for keys in buzon_nuevo:
             buzon[keys] = buzon_nuevo[keys]
     except EOFError:
-        with open('buzones.pkl','wb') as f:
-            pickle.dump(buzon,f)
+        with open('pickle_files/buzones.pkl', 'wb') as f:
+            pickle.dump(buzon, f)
 
 
     return 'Buzones obtenidos', 200
@@ -407,6 +411,8 @@ def cambiar_turno(id):
     """
     partida = partidas[id]
     partida.cambiar_turno()
+    le_toca_a = partida.turno
+    buzon[le_toca_a].append({'mensaje': f'Es tu turno! Partida: {id}','leido':False})
     return "Turno cambiado con éxito", 200
 @app.route('/games/<id>/player/catalogos',methods=['GET'])
 @jwt_required()
@@ -465,7 +471,16 @@ def subir_nivel_edificio(id):
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.subir_nivel_edificio(edificio)
     return salida,200
-
+@app.route('/games/<id>/player/combatir',methods=['PUT'])
+@jwt_required()
+def combatir(id):
+    parametros = request.get_json()
+    salida = partidas[id].combatir(tuple(parametros['atacantes']),tuple(parametros['defensores']))
+    salida_dict = {
+        'texto': salida[0],
+        'estado': salida[1]
+    }
+    return jsonify(salida_dict),200
 
 
 if __name__ == '__main__':

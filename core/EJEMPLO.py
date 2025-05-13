@@ -120,13 +120,21 @@ def mostrar_texto(lista: list[str] | str, enumerado: bool = False) -> None:
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
+    subir_jugadores()
+    subir_buzones()
     return r.text
 
 
 def login(user, password):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
+        subir_jugadores()
+        subir_buzones()
         return r.text, True
     return r.text, False
 
@@ -134,54 +142,82 @@ def login(user, password):
 # USERS
 #   BUZON
 def notificaciones(token):
+    obtener_buzones()
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
+    subir_buzones()
     return r.text
 
 
 def obtener_buzon(token):
+    obtener_buzones()
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
+    subir_buzones()
     return mensajes
 
 
 def marcar_leido(token):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
+    subir_buzones()
+    subir_jugadores()
     return r.text
 
 
 # USERS
 #   AMIGOS
 def obtener_amigos(token):
+    obtener_jugadores()
     r = requests.get(f'{URL}/users/friends', headers={'Authorization': f'Bearer {token}'})
     amigos = r.json()
+    subir_jugadores()
     return amigos
 
 
 def obtener_solicitudes(token):
+    obtener_buzones()
+    obtener_jugadores()
     r = requests.get(f'{URL}/users/friend-requests', headers={'Authorization': f'Bearer {token}'})
     solicitudes = r.json()
+    subir_buzones()
+    subir_jugadores()
     return solicitudes
 
 
 def enviar_solicitud(token, usuario):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}',
                       headers={'Authorization': f'Bearer {token}'})
+    subir_jugadores()
+    subir_buzones()
     return r.text
 
 
 def aceptar_solicitud(token, nuevo_amigo):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
+    subir_jugadores()
+    subir_buzones()
     return r.text
 
 
 def rechazar_solicitud(token, usuario):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
+    subir_jugadores()
+    subir_buzones()
     return r.text
 
 
 # USERS
 #   GAME REQUESTS
 def invitaciones_privadas(token):
+    obtener_jugadores()
+    obtener_buzones()
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
     return invitaciones
@@ -189,6 +225,7 @@ def invitaciones_privadas(token):
 
 #   MY GAMES
 def mis_partidas(token):
+    obtener_partidas(token)
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
     return partidas
@@ -196,6 +233,7 @@ def mis_partidas(token):
 
 # PARTIDA
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
+    obtener_partidas(token)
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -204,38 +242,51 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
         'terrenos': terrenos
     }
     r = requests.post(f'{URL}/games', headers={'Authorization': f'Bearer {token}'}, json=parametros_partida)
+    subir_partidas(token)
     return r.text
 
 
 def partidas_publicas(token):
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
+    subir_partidas(token)
     return publicas
 
 
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
+    obtener_partidas(token)
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
+    subir_partidas(token)
     return r.text
 
 
 def iniciar_partida(token, id_partida):
+    obtener_partidas(token)
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
+    subir_partidas(token)
     return r.text
 
 
 def cancelar_partida(token, id_partida):
+    obtener_partidas(token)
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
+    subir_partidas(token)
     return r.text
 
 
 def get_estado_partida(token, id_partida):
+    obtener_jugadores()
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
     return estado, r.status_code
 
 
 def get_estado_jugador(token, id_partida):
+    obtener_jugadores()
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
     return estado
@@ -243,6 +294,7 @@ def get_estado_jugador(token, id_partida):
 
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
+    obtener_partidas(token)
     diccionario = {'zona': coordenada}
     r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona', headers={'Authorization': f'Bearer {token}'},
                       json=(diccionario))
@@ -251,56 +303,137 @@ def ver_zona(token, id_partida, coordenada):
 
 
 def ver_recursos(token, id_partida):
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
 
 
 def ver_mapa(token, id_partida):
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 
 def cambiar_turno(token, id_partida):
+    obtener_jugadores()
+    obtener_buzones()
+    obtener_partidas(token)
     r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno', headers={'Authorization': f'Bearer {token}'})
+    subir_partidas(token)
+    subir_jugadores()
+    subir_buzones()
     return r.text
 
 
 def catalogos(token, id_partida):
+    obtener_partidas(token)
     r = requests.get(f'{URL}/games/{id_partida}/player/catalogos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
 
 
 def add_tropa(token, id_partida, tropa, cantidad):
+    obtener_partidas(token)
     diccionario = {'tropa': tropa, 'cantidad': cantidad}
     r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa', headers={'Authorization': f'Bearer {token}'},
                       json=(diccionario))
+    subir_partidas(token)
     return r.text
 
 
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
+    obtener_partidas(token)
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'},
                      json=(diccionario))
+    subir_partidas(token)
     return r.json()
 
 
 def mover_batallon(token, id_partida, destino):
+    obtener_partidas(token)
     diccionario = {'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'},
                      json=(diccionario))
+    subir_partidas(token)
     return r.json()
 
 
 def construir_edificio(token, id_partida, edificio):
+    obtener_partidas(token)
     r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
                       json=(edificio))
+    subir_partidas(token)
     return r.text
 
 
 def subir_nivel_edificio(token, id_partida, edificio):
+    obtener_partidas(token)
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
                      json=(edificio))
+    subir_partidas(token)
     return r.text
+def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    obtener_partidas(token)
+    diccionario = {
+        'atacantes': atacantes_pos,
+        'defensores': defensores_pos
+    }
+    r = requests.put(f'{URL}/games/{id_partida}/player/combatir', headers={'Authorization': f'Bearer {token}'},
+                     json=(diccionario))
+    subir_partidas(token)
+    return r.json()
+
+
+
+def obtener_partidas(token):
+    r = requests.get(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
+    if r.status_code==200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
+        return None
+
+def obtener_jugadores():
+    r = requests.get(f'{URL}/users/jugadores.pkl')
+    if r.status_code==200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
+        return None
+
+def obtener_buzones():
+    r = requests.get(f'{URL}/users/mail/buzones.pkl')
+    if r.status_code == 200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
+        return None
+
+def subir_partidas(token):
+    r = requests.post(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
+    if r.status_code==200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
+        return None
+
+def subir_jugadores():
+    r = requests.post(f'{URL}/users/jugadores.pkl')
+    if r.status_code==200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
+        return None
+
+def subir_buzones():
+    r = requests.post(f'{URL}/users/mail/buzones.pkl')
+    if r.status_code == 200:
+        return r.text
+    else:
+        print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
+        return None
+
+
 
 
 def menu():
@@ -468,9 +601,20 @@ def menu():
                                                                                                      tropa, cantidad,
                                                                                                      destino)
                                                                                 if isinstance(salida,
-                                                                                              tuple):  # No se a podido mover la tropa, saltar opcion de combate
-                                                                                    print(
-                                                                                        'Kingdom Craft se encargará pronto')
+                                                                                              list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                                                    mostrar_texto(salida[0])
+                                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                                    print('2. ABORTAR')
+                                                                                    choice = param('Eliga una opción: ',int, valores_validos=[1,2])
+                                                                                    if choice == 1:
+                                                                                        salida = combatir(token,id_user_partida, coordenada, destino)
+                                                                                        mostrar_texto(salida['texto'])
+                                                                                        limpiar_pantalla()
+                                                                                        if salida['estado'] == 'Finalizada':
+                                                                                            break
+                                                                                    else:
+                                                                                        limpiar_pantalla()
+                                                                                        continue
                                                                                 else:
                                                                                     mostrar_texto(salida)
                                                                                     limpiar_pantalla()
@@ -479,9 +623,20 @@ def menu():
                                                                                 salida = mover_batallon(token,
                                                                                                         id_user_partida,
                                                                                                         destino)
-                                                                                if isinstance(salida, tuple):
-                                                                                    print(
-                                                                                        'Kingdom Craft se encargará pronto')
+                                                                                if isinstance(salida, list):
+                                                                                    mostrar_texto(salida[0])
+                                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                                    print('2. ABORTAR')
+                                                                                    choice = param('Eliga una opción: ',int, valores_validos=[1,2])
+                                                                                    if choice == 1:
+                                                                                        salida = combatir(token,id_user_partida, coordenada, destino)
+                                                                                        mostrar_texto(salida['texto'])
+                                                                                        limpiar_pantalla()
+                                                                                        if salida['estado'] == 'Finalizada':
+                                                                                            break
+                                                                                    else:
+                                                                                        limpiar_pantalla()
+                                                                                        continue
                                                                                 else:
                                                                                     mostrar_texto(salida)
                                                                                     limpiar_pantalla()
@@ -558,12 +713,22 @@ def menu():
                                                             break
                                                 elif estado_partida == 'Esperando':
                                                     mostrar_texto('Esperando a que se una otro jugador')
-                                                    limpiar_pantalla()
-                                                    break
+                                                    print('1. RECARGAR')
+                                                    print('2. SALIR')
+                                                    choice = param('Elige una opción',int,valores_validos=[1,2])
+                                                    if choice == 1:
+                                                        limpiar_pantalla()
+                                                        continue
+                                                    else:
+                                                        limpiar_pantalla()
+                                                        break
                                                 elif estado_partida == 'Finalizada':
-                                                    mostrar_texto('Kingdom Craft esta trabajando en ello')
-                                                    limpiar_pantalla()
-                                                    continue
+                                                    mostrar_texto('La partida fué finalizada')                                                    
+                                                    print('1. SALIR')
+                                                    choice = param('Elige una opción: ',int,valores_validos=[1])
+                                                    if choice == 1:
+                                                        limpiar_pantalla()
+                                                        break
                                             elif r_estado == 404:
                                                 mostrar_texto(estado_partida)
                                                 break

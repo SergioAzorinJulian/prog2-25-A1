@@ -182,7 +182,7 @@ class Jugador:
                         return f'No dispones de {cantidad} {tropa}'
             return f'No dispones de {tropa} en la region'                
         else:
-            return f'La zona pertenece a {self.mapa.regiones[destino].get_propietario()}\n Combatir?',False #False cuando haya opción de combate
+            return f'La zona pertenece a {self.mapa.regiones[destino].get_propietario()}\nCombatir?',False #False cuando haya opción de combate
 
     def mover_batallon(self, destino: tuple[int, int]):
         if destino not in self.conquista + self.mapa.regiones[self.region_actual].get_conexiones():
@@ -194,7 +194,7 @@ class Jugador:
                 self.mover_tropa(destino, nombre, cantidad)
             return "Tropas movidas correctamente"
         else:
-            return f'La zona pertenece a {self.mapa.regiones[destino].get_propietario()}\n Combatir?',False
+            return f'La zona pertenece a {self.mapa.regiones[destino].get_propietario()}\nCombatir?',False
 
 
     def construir_edificio(self, edificio):

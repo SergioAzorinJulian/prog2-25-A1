@@ -1,7 +1,7 @@
 from jugador import Jugador
 from mapa import Mapa
 import random
-import pickle
+import pickle_files
 class Partida:
     def __init__(self,id,host,jugadores : list[Jugador] = [],estado: str = 'Esperando',privada=False):
         self.id = id
@@ -65,18 +65,18 @@ class Partida:
                 if i < len(ejercito_def):
                     texto_lista.append(ejercito_def[i].atacar(ejercito_def, ejercito_atk))  #La tropa 'i' ataca al ejercito enemigo
 
-
         if ejercito_atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
             texto_lista.append('El ataque fracasó.')
             return texto_lista,self.estado  
         elif ejercito_def==[]:  #Si el ejercito de defensa se ha quedado sin tropas...
             texto_lista.append(f'Ataque exitoso. \nMoviendo tropas a {defensores_pos}...')
+            self.mapa.regiones[defensores_pos].set_propietario(self.turno)
             self.jugadores[self.jugadores.index(self.turno)].mover_batallon(defensores_pos)
             if self.mapa.regiones[defensores_pos].get_es_reino():
                 self.estado = 'Finalizada'
                 self.ganador = self.turno #El que estaba jugando
                 texto_lista.append('Felicidades! Ganastes en madafaking Kingdom Craft')
-            return texto_lista,self.estado #devolvemos el estado para ver si hay que acabar el bucle de juego
+            return texto_lista,self.estado #devolvemos el estado para ver si hay que acabar el bucle de juego   
     def producir_edificios(self,jugador : Jugador) -> None:
         for region in self.mapa.regiones.values():
             if region.get_propietario() == jugador.usuario:
