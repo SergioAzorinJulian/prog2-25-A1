@@ -56,13 +56,18 @@ def signup():
 
 @app.route('/auth/login', methods=['GET'])
 def login():
+    print(partidas)
     user = request.args.get('user', '')
+
     password = request.args.get('password', '')
     hashed = hashlib.sha256(password.encode()).hexdigest()
 
     if user in users and users[user]['hashed'] == hashed:
+        print(partidas)
         return create_access_token(identity=user), 200
+
     else:
+        print(partidas)
         return f'Usuario o contraseña incorrectos', 401
 
 #USUARIOS
@@ -322,6 +327,7 @@ def obtener_partidas():
             users[keys]=partidas_nuevo[keys]
     except EOFError:
         with open('pickle_files/partidas.pkl', 'wb') as f:
+            print('hola')
             pickle.dump(partidas, f)
 
     return 'Partidas obtenidas', 200

@@ -132,8 +132,7 @@ def login(user, password):
     obtener_buzones()
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
-        subir_jugadores()
-        subir_buzones()
+
         return r.text, True
     return r.text, False
 
@@ -508,7 +507,7 @@ def menu():
                             elif choice == 2:
                                 limpiar_pantalla()
                                 while True:
-                                    obtener_partidas()
+
                                     print(
                                         '1. UNIRSE A UNA NUEVA PARTIDA')  # /game [GET] y #/game/<id>/join [PUT] + /game/<id>/start [PUT]
                                     print(
