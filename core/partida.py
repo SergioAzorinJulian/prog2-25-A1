@@ -1,7 +1,7 @@
 from jugador import Jugador
 from mapa import Mapa
 import random
-import pickle_files
+
 class Partida:
     def __init__(self,id,host,jugadores : list[Jugador] = [],estado: str = 'Esperando',privada=False):
         self.id = id
