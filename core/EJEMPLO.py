@@ -5,8 +5,8 @@ from typing import *
 import time
 from mapa import Mapa
 from copy import deepcopy
-
-URL = 'http://127.0.0.1:5000'
+URL='http://127.0.0.1:5000'
+#URL = 'https://sergioazorinjulian.pythonanywhere.com/'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 
@@ -120,11 +120,10 @@ def mostrar_texto(lista: list[str] | str, enumerado: bool = False) -> None:
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos()
+
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
-    subir_jugadores()
-    subir_buzones()
+    subir_datos()
     return r.text
 
 
@@ -142,98 +141,90 @@ def login(user, password):
 # USERS
 #   BUZON
 def notificaciones(token):
-    obtener_buzones()
+    obtener_datos()
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
+    subir_datos()
     return r.text
 
 
 def obtener_buzon(token):
-    obtener_buzones()
+    obtener_datos()
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
-    subir_buzones()
+    subir_datos()
     return mensajes
 
 
 def marcar_leido(token):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos()
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
+    subir_datos()
     return r.text
 
 
 # USERS
 #   AMIGOS
 def obtener_amigos(token):
-    obtener_jugadores()
+    obtener_datos()
     r = requests.get(f'{URL}/users/friends', headers={'Authorization': f'Bearer {token}'})
     amigos = r.json()
-    subir_jugadores()
+    subir_datos()
     return amigos
 
 
 def obtener_solicitudes(token):
-    obtener_buzones()
-    obtener_jugadores()
+    obtener_datos()
     r = requests.get(f'{URL}/users/friend-requests', headers={'Authorization': f'Bearer {token}'})
     solicitudes = r.json()
-    subir_buzones()
-    subir_jugadores()
+    subir_datos()
     return solicitudes
 
 
 def enviar_solicitud(token, usuario):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos()
     r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}',
                       headers={'Authorization': f'Bearer {token}'})
-    subir_jugadores()
-    subir_buzones()
+    subir_datos()
     return r.text
 
 
 def aceptar_solicitud(token, nuevo_amigo):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos(token)
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
-    subir_jugadores()
-    subir_buzones()
+    subir_datos(token)
     return r.text
 
 
 def rechazar_solicitud(token, usuario):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos()
+
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
-    subir_jugadores()
-    subir_buzones()
+    subir_datos()
     return r.text
 
 
 # USERS
 #   GAME REQUESTS
 def invitaciones_privadas(token):
-    obtener_jugadores()
-    obtener_buzones()
+    obtener_datos()
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
+    subir_datos()
     return invitaciones
 
 
 #   MY GAMES
 def mis_partidas(token):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
+    subir_datos()
     return partidas
 
 
 # PARTIDA
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
-    obtener_partidas(token)
+    obtener_datos()
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -242,151 +233,151 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
         'terrenos': terrenos
     }
     r = requests.post(f'{URL}/games', headers={'Authorization': f'Bearer {token}'}, json=parametros_partida)
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def partidas_publicas(token):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
-    subir_partidas(token)
+    subir_datos()
     return publicas
 
 
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def iniciar_partida(token, id_partida):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def cancelar_partida(token, id_partida):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def get_estado_partida(token, id_partida):
-    obtener_jugadores()
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
+    subir_datos()
     return estado, r.status_code
 
 
 def get_estado_jugador(token, id_partida):
-    obtener_jugadores()
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
+    subir_datos()
     return estado
 
 
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
-    obtener_partidas(token)
+    obtener_datos()
     diccionario = {'zona': coordenada}
     r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona', headers={'Authorization': f'Bearer {token}'},
                       json=(diccionario))
     zona = r.json()
+    subir_datos()
     return zona, r.status_code
 
 
 def ver_recursos(token, id_partida):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos', headers={'Authorization': f'Bearer {token}'})
+    subir_datos()
     return r.json()
 
 
 def ver_mapa(token, id_partida):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
+    subir_datos()
     return r.text
 
 
 def cambiar_turno(token, id_partida):
-    obtener_jugadores()
-    obtener_buzones()
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas(token)
-    subir_jugadores()
-    subir_buzones()
+    subir_datos()
     return r.text
 
 
 def catalogos(token, id_partida):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.get(f'{URL}/games/{id_partida}/player/catalogos', headers={'Authorization': f'Bearer {token}'})
+    subir_datos()
     return r.json()
 
 
 def add_tropa(token, id_partida, tropa, cantidad):
-    obtener_partidas(token)
+    obtener_datos()
     diccionario = {'tropa': tropa, 'cantidad': cantidad}
     r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa', headers={'Authorization': f'Bearer {token}'},
                       json=(diccionario))
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
-    obtener_partidas(token)
+    obtener_datos()
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'},
                      json=(diccionario))
-    subir_partidas(token)
+    subir_datos()
     return r.json()
 
 
 def mover_batallon(token, id_partida, destino):
-    obtener_partidas(token)
+    obtener_datos()
     diccionario = {'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'},
                      json=(diccionario))
-    subir_partidas(token)
+    subir_datos()
     return r.json()
 
 
 def construir_edificio(token, id_partida, edificio):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
                       json=(edificio))
-    subir_partidas(token)
+    subir_datos()
     return r.text
 
 
 def subir_nivel_edificio(token, id_partida, edificio):
-    obtener_partidas(token)
+    obtener_datos()
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
                      json=(edificio))
-    subir_partidas(token)
+    subir_datos()
     return r.text
 def combatir(token, id_partida, atacantes_pos, defensores_pos):
-    obtener_partidas(token)
+    obtener_datos()
     diccionario = {
         'atacantes': atacantes_pos,
         'defensores': defensores_pos
     }
     r = requests.put(f'{URL}/games/{id_partida}/player/combatir', headers={'Authorization': f'Bearer {token}'},
                      json=(diccionario))
-    subir_partidas(token)
+    subir_partidas()
     return r.json()
 
 
 
-def obtener_partidas(token):
-    r = requests.get(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
+def obtener_partidas():
+    r = requests.get(f'{URL}/games/partidas.pkl')
     if r.status_code==200:
         return r.text
     else:
@@ -409,8 +400,8 @@ def obtener_buzones():
         print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
         return None
 
-def subir_partidas(token):
-    r = requests.post(f'{URL}/games/partidas.pkl', headers={'Authorization': f'Bearer {token}'})
+def subir_partidas():
+    r = requests.post(f'{URL}/games/partidas.pkl')
     if r.status_code==200:
         return r.text
     else:
@@ -430,11 +421,18 @@ def subir_buzones():
     if r.status_code == 200:
         return r.text
     else:
-        print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
+
         return None
 
+def obtener_datos():
+    obtener_partidas()
+    obtener_buzones()
+    obtener_jugadores()
 
-
+def subir_datos():
+    subir_partidas()
+    subir_buzones()
+    subir_jugadores()
 
 def menu():
     while True:
@@ -510,6 +508,7 @@ def menu():
                             elif choice == 2:
                                 limpiar_pantalla()
                                 while True:
+                                    obtener_partidas()
                                     print(
                                         '1. UNIRSE A UNA NUEVA PARTIDA')  # /game [GET] y #/game/<id>/join [PUT] + /game/<id>/start [PUT]
                                     print(

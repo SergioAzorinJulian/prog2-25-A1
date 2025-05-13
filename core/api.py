@@ -280,7 +280,6 @@ def ver_recursos(id):
     return jsonify(jugador.ver_recursos()),200
 
 @app.route('/games/partidas.pkl',methods=['POST'])
-@jwt_required()
 def guardar_partidas():
     """
     Metemos en archivo pkl las partidas
@@ -311,7 +310,6 @@ def guardar_buzones():
 
 
 @app.route('/games/partidas.pkl',methods=['GET'])
-@jwt_required()
 def obtener_partidas():
     """
         Cargamos las partidas
