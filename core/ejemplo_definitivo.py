@@ -354,5 +354,310 @@ def subir_buzones():
         console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
         return None
 
+def obtener_partidas():
+    r = requests.get(f'{URL}/games/partidas.pkl')
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
+        return None
+
+def subir_partidas():
+    r = requests.post(f'{URL}/games/partidas.pkl')
+    if r.status_code==200:
+        return r.text
+    else:
+        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
+        return None
+def obtener_datos():
+    obtener_partidas()
+    obtener_buzones()
+    obtener_jugadores()
+
+def subir_datos():
+    subir_partidas()
+    subir_buzones()
+    subir_jugadores()
+
 # MENU PRINCIPAL
+
+def menu():
+
+
+    console.print(Align.center(titulo_md), style='bold bright_yellow', )
+    console.print()
+    console.print(Align.center(parrafo_texto), style='green italic', )
+    console.print()
+    console.print(Align.center(despedida_md), style='bold bright_yellow', )
+
+    param('Presione "Enter" para continuar ...', str,
+          valores_validos=[''], estilo='info')
+
+    barra_de_progreso(10, 0.1)
+    limpiar_pantalla()
+
+    while True:
+        table_inicio = Table(show_edge = False, header_style="bold white reverse blue")
+
+        table_inicio.add_column('MENÚ', justify = 'center', style = 'prompt')
+
+        table_inicio.add_row('0. Exit', style = 'dim')
+        table_inicio.add_row('1. Registrarse')
+        table_inicio.add_row('2. Iniciar sesión')
+
+        console.print(table_inicio)
+
+        console.print()
+        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+        console.print()
+        if choice == 1:
+            user = param('Usuario: ', str)
+            password = param('Contraseña: ', str, is_password=True)
+            barra_de_progreso(10, 0.1)
+            mostrar_texto(signup(user, password))
+            limpiar_pantalla()
+        elif choice == 2:
+            user = param('Usuario: ', str)
+            password = param('Contraseña: ', str, is_password=True)
+            log_in = login(user, password)
+            barra_de_progreso(10, 0.2)
+            if log_in[1]:
+                token = log_in[0]
+                limpiar_pantalla()
+                while True:
+                    mostrar_texto(notificaciones(token))
+
+                    table_lobby = Table(show_edge=False, header_style="bold white reverse blue")
+
+                    table_lobby.add_column('LOBBY', justify='center', style='prompt')
+
+                    table_lobby.add_row('0. Log out', style='dim')
+                    table_lobby.add_row('1. Jugar')
+                    table_lobby.add_row('2. Perfil')
+
+                    console.print(table_lobby)
+
+                    console.print()
+
+                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+                    console.print()
+                    if choice == 1:
+                        limpiar_pantalla()
+                        while True:
+
+                            table_para_jugar = Table(show_edge=False, header_style="bold white reverse blue")
+
+                            table_para_jugar.add_column('MENÚ', justify='center', style='prompt')
+
+                            table_para_jugar.add_row('0. Volver', style='dim')
+                            table_para_jugar.add_row('1. Crear partida')
+                            table_para_jugar.add_row('2. Unirse a partida')
+
+                            console.print(table_para_jugar)
+
+                            console.print()
+
+                            choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+                            console.print()
+                            if choice == 1:
+                                limpiar_pantalla()
+                                while True:
+
+                                    table_alcance_partida = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                    table_alcance_partida.add_column('ALCANCE DE LA PARTIDA', justify='center', style='prompt')
+
+                                    table_alcance_partida.add_row('1. Pública')
+                                    table_alcance_partida.add_row('2. Privada')
+
+                                    console.print(table_alcance_partida)
+
+                                    console.print()
+
+                                    privada = True if param('Elija una opción: ', int, valores_validos=[1, 2]) == 2 else False
+                                    limpiar_pantalla()
+
+                                    if privada:
+                                        amigos = obtener_amigos(token)
+                                        if amigos != []:
+                                            # Todo: hacer una tabla
+                                            mostrar_texto(amigos, enumerado=True)
+                                            valores_validos = [n for n in range(0, len(amigos) + 1)]
+                                            amigo = param('Que amigo desea invitar: ', int,
+                                                          valores_validos=valores_validos)
+                                            invitado = amigos[amigo - 1]
+                                        else:
+                                            mostrar_texto('Todavía no tienes amigos')
+                                            limpiar_pantalla()
+                                            break
+                                    else:
+                                        invitado = None
+
+                                    table_tipo_partida = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                    table_tipo_partida.add_column('TIPOS DE PARTIDA', justify='center', style='prompt')
+
+                                    table_tipo_partida.add_row('0. Volver', style='dim')
+                                    table_tipo_partida.add_row('1. Partida personalizada')
+                                    table_tipo_partida.add_row('2. Partida predefinida')
+
+                                    console.print(table_tipo_partida)
+
+                                    console.print()
+
+                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+                                    console.print()
+                                    if choice == 1:
+                                        tamanyo = param('Introduce el tamaño del mapa (min.3, max. 50): ', int, valores_validos=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50])
+                                        while True:
+                                            terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str)
+                                            if len(terrenos.split(',')) < 2:
+                                                console.print('Error: Debe introducir al menos 2 tipos de terreno.', style = 'warning')
+                                                continue
+
+                                            copia_terrenos = deepcopy(TERRENOS_JUEGO)
+                                            for terreno in terrenos.split(','):
+                                                if terreno.strip().lower() in copia_terrenos:
+                                                    copia_terrenos.remove(terreno.strip().lower())
+                                                else:
+                                                    if terreno.strip().lower() in TERRENOS_JUEGO:
+                                                        console.print(
+                                                            f'[error]Error: El tipo de terreno "{terreno}" se ha introducido más de una vez.[/error] \n[info]Ayuda: La multiplicidad máxima de cada terreno es 1.[info]',)
+                                                    else:
+                                                        console.print(f'Error: El tipo de terreno "{terreno}" no existe en el juego.', style = 'error')
+
+                                                    console.print()
+
+                                                    table_terrenos = Table(box = box.ROUNDED, border_style = 'bold', header_style="bold white reverse blue")
+                                                    table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
+                                                    for tereno in TERRENOS_JUEGO:
+                                                        table_terrenos.add_row(tereno.capitalize())
+
+                                                    console.print(table_terrenos)
+                                                    console.print()
+
+                                                    break
+                                            else:
+                                                break
+
+                                        reino = param('Introduce el nombre de tu reino: ', str)
+
+                                        barra_de_progreso(10, 0.1)
+                                        mostrar_texto(crear_partida(token, privada, reino, invitado, tamanyo, terrenos))
+                                        limpiar_pantalla()
+                                        break
+                                    elif choice == 2:
+                                        reino = param('Introduce el nombre de tu reino: ', str)
+                                        barra_de_progreso(10, 0.1)
+                                        mostrar_texto(crear_partida(token, privada, reino, invitado))
+                                        limpiar_pantalla()
+                                        break
+                                    elif choice == 0:
+                                        limpiar_pantalla()
+                                        break
+                            elif choice == 2:
+                                limpiar_pantalla()
+                                while True:
+
+                                    table_que_jugar = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                    table_que_jugar.add_column('DÓNDE QUIERE JUGAR', justify='center', style='prompt')
+
+                                    table_que_jugar.add_row('0. Volver', style='dim')
+                                    table_que_jugar.add_row('1. Unirse a una nueva partida')
+                                    table_que_jugar.add_row('2. Empezar/Continuar una partida a la que ya se ha unido')
+
+                                    console.print(table_que_jugar)
+
+                                    console.print()
+
+                                    choice = param('Elija una opción: ', int, valores_validos=[0, 1, 2])
+                                    console.print()
+                                    if choice == 1:
+                                        # Todo: hacer una tabla
+                                        publicas = partidas_publicas(token)
+                                        partidas_str = [partida for partida in publicas.values()]
+                                        mostrar_texto(partidas_str, enumerado=True)
+                                        id_partida = param('Introduzca el id de la partida a la que desea unirse: ',
+                                                           str)
+                                        reino = param('Introduce el nombre de tu reino: ', str)
+                                        barra_de_progreso(10, 0.2)
+                                        mostrar_texto(unirse_partida(token, id_partida, reino))
+                                        mostrar_texto(iniciar_partida(token, id_partida))
+                                        limpiar_pantalla()
+                                    elif choice == 2:
+                                        # Todo: hacer una tabla
+                                        user_partidas = mis_partidas(token)
+                                        if user_partidas != {}:
+                                            str_partidas = [partida for partida in user_partidas.values()]
+                                            mostrar_texto(str_partidas)
+                                        else:
+                                            mostrar_texto('Todavía no te has unido a ninguna partida')
+                                            limpiar_pantalla()
+                                            continue
+                                        id_user_partida = param('Introduzca el id de la partida: ', str)
+                                        barra_de_progreso(10, 0.1)
+                                        estado_partida = get_estado_partida(token, id_user_partida)
+                                        if estado_partida == 'Empezada':
+                                            while True:
+                                                if get_estado_jugador(token, id_user_partida):
+                                                    # Todo: usar markdown
+                                                    mostrar_texto('Bienvenido a Kingdom Craft')
+                                                    limpiar_pantalla()
+                                                    while get_estado_jugador(token, id_user_partida) == True:
+
+                                                        table_opciones_partida = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                                        table_opciones_partida.add_column('OPCIONES DURANTE LA PARTIDA', justify='center', style='prompt')
+
+                                                        table_opciones_partida.add_row('0. Exit', style='dim')
+                                                        table_opciones_partida.add_row('1. Ver zona')
+                                                        table_opciones_partida.add_row('2. Ver mis recursos')
+                                                        table_opciones_partida.add_row('3. Ver mapa')
+                                                        table_opciones_partida.add_row('4. Finalizar mi turno')
+
+                                                        console.print(table_opciones_partida)
+
+                                                        console.print()
+
+                                                        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4])
+                                                        console.print()
+                                                        if choice == 1:
+                                                            coordenada = to_tuple()
+                                                            zona, estado = ver_zona(token, id_user_partida, coordenada)
+                                                            if estado == 200:
+                                                                while True:
+                                                                    if zona[1]:
+                                                                        table_opciones_dentro_zona = Table(show_edge=False, header_style="bold white reverse blue")
+
+                                                                        table_opciones_dentro_zona.add_column(f'OPCIONES DENTRO DE LA ZONA', justify='center', style='prompt')
+
+                                                                        table_opciones_dentro_zona.add_row('0. Volver', style='dim')
+                                                                        table_opciones_dentro_zona.add_row('1. Añadir tropa')
+                                                                        table_opciones_dentro_zona.add_row('2. Mover batallón')
+                                                                        table_opciones_dentro_zona.add_row('3. Construir edificio')
+                                                                        table_opciones_dentro_zona.add_row('4. Finalizar mi turno')
+
+                                                                        console.print(table_opciones_dentro_zona)
+
+                                                                        console.print()
+
+                                                                        console.print(zona[0], style = 'prompt')
+
+                                                                        choice = param('Eliga una opción: ', int,
+                                                                                       valores_validos=[0, 1, 2, 3])
+                                                                        match choice:
+                                                                            case 0:
+
+                                                                                limpiar_pantalla()
+
+                                                                                break
+                                                                            case 1:
+                                                                                pass
+                                                                            case 2:
+                                                                                pass
+                                                                            case 3:
+                                                                                pass
+                                                                            case 4:
+                                                                                pass
 
