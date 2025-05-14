@@ -324,7 +324,7 @@ def obtener_partidas():
             partidas_nuevo=pickle.load(f)
 
         for keys in partidas_nuevo:
-            users[keys]=partidas_nuevo[keys]
+            partidas[keys]=partidas_nuevo[keys]
     except EOFError:
         with open('pickle_files/partidas.pkl', 'wb') as f:
             print('hola')

@@ -435,6 +435,7 @@ def subir_datos():
 
 def menu():
     while True:
+        obtener_partidas()
         print('=== MENU ===')
         print('1. REGISTRARSE')
         print('2. INICIAR SESIÓN')
