@@ -16,6 +16,7 @@ from rich.progress import track
 from rich import box
 from mapa import Mapa
 import pickle_files
+
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 titulo_md = Markdown("# Bienvenido a Kingdom Kraft")
@@ -144,6 +145,89 @@ def barra_de_progreso(ritmo, tiempo):
     for _ in track(range(ritmo), description="Procesando..."):
         time.sleep(tiempo)
 
+
+def crear_tabla(info: dict, dim = True, forma = None) -> None:
+    """
+    Crea y muestra una tabla usando Rich.
+
+    Esta función toma un diccionario de información y genera una tabla con estilos
+    utilizando el módulo Rich. Cada clave del diccionario se convierte en una columna
+    de la tabla, y los valores contienen el estilo de la columna en el primer elemento
+    y los datos de las filas en el segundo.
+
+    Parameters
+    ----------
+    info : dict
+        Diccionario donde:
+        - Las claves son los nombres de las columnas
+        - Los valores son listas de dos elementos donde:
+          * El primer elemento es el estilo de la columna (str)
+          * El segundo elemento es una lista con los datos de las filas
+        Ejemplo: {"Nombre": ["prompt", ["Ana", "Luis", "Marta"]]}
+    dim : bool, optional
+        Controla si la primera fila de la tabla debe tener un estilo dim.
+        Si es True, la primera fila tendrá el estilo "dim".
+        Por defecto es True.
+    forma : Box, optional
+        Tipo de borde de la tabla (por ejemplo, box.ROUNDED).
+        Si es None, no se aplica ningún estilo de borde específico.
+        Por defecto es None.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    La función utiliza el operador de desempaquetado (*) para pasar los elementos
+    de una lista como argumentos separados a la función add_row.
+
+    Examples
+    --------
+    info = {
+        "Nombre": ["prompt", ["Ana", "Luis", "Marta"]],
+        "Edad": ["success", ["23", "31", "27"]],
+        "Ciudad": ["warning", ["Madrid", "Sevilla", "Valencia"]]
+        }
+    tabla = crear_tabla(info, dim=True)
+    console.print(tabla)
+    """
+
+    table = Table(show_edge=False, header_style="bold white reverse blue", box = forma) if forma else Table(show_edge=False, header_style="bold white reverse blue")
+
+    # Obtener los nombres de las columnas del diccionario
+    columnas = list(info.keys())
+
+    # Agregar cada columna a la tabla con su estilo correspondiente
+    for columna in columnas:
+        # El primer elemento de cada valor es el estilo de la columna
+        table.add_column(columna, justify="center", style= info[columna][0])
+
+    # Determinamos el número de filas que habrán basándonos en la longitud de
+    # la lista de datos de la primera columna (asumimos que todas las columnas tienen el mismo número de filas)
+    num_filas = len(info[columnas[0]][1])
+
+    if num_filas > 0: # Solo procesamos las filas si hay al menos una ...
+        # Agregamos filas a la tabla
+        for i in range(num_filas):
+
+            # Creamos una lista con los valores de cada columna en la posición i
+            # La comprensión de lista hace lo siguiente:
+            # 1. Para cada nombre de columna en la lista 'columnas'
+            # 2. Accede a info[columna][1] (la lista de datos para esa columna)
+            # 3. Obtiene el elemento en la posición i de esa lista
+            # 4. Convierte ese valor a string para poder imprimirlo en la tabla
+            fila = [str(info[columna][1][i]) for columna in columnas]
+
+            # Si dim es True y estamos en la primera fila, usamos el estilo 'dim'
+            if dim and i == 0:
+                # El operador * desempaqueta la lista fila como argumentos separados
+                table.add_row(*fila, style="dim")
+            else:
+                table.add_row(*fila)
+
+
+    console.print(table)
 
 # ------------REQUESTS------------
 # AUTENTICACIÓN
