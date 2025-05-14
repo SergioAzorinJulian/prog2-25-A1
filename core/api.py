@@ -5,8 +5,18 @@ import random
 from partida import Partida
 from jugador import Jugador
 import pickle
-
-from jugador import Jugador
+import os
+"""
+    
+    
+    
+    
+    ######CODIGO QUE SE ENCUENTRA EN LA NUBE (PYTHONANYWHERE)#########
+    
+    
+    
+    
+    """
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
@@ -16,6 +26,15 @@ jwt = JWTManager(app)
 users={}
 buzon={}
 partidas={}
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PICKLE_DIR = os.path.join(BASE_DIR, 'pickle_files')
+os.makedirs(PICKLE_DIR, exist_ok=True)
+
+def pickle_path(filename: str) -> str:
+    return os.path.join(PICKLE_DIR, filename)
+
 
 ### FUNCIONES ###
 def id_partida() -> str:
@@ -71,7 +90,7 @@ def login():
 @jwt_required()
 def amigos():
     amigos = users[get_jwt_identity()]['amigos']
-    return jsonify(amigos),200    
+    return jsonify(amigos),200
 
 @app.route('/users/friend-requests', methods=['POST'])
 @jwt_required()
@@ -94,7 +113,7 @@ def enviar_solicitud():
 def solicitudes():
     solicitudes = users[get_jwt_identity()]['solicitudes_recibidas']
     return jsonify(solicitudes),200
-   
+
 @app.route('/users/friend-requests/<id>/accept', methods=['POST'])
 @jwt_required()
 def aceptar_solicitud(id):
@@ -284,19 +303,19 @@ def guardar_partidas():
     """
     Metemos en archivo pkl las partidas
     """
-    with open('partidas.pkl', 'wb') as f:
-        pickle.dump(partidas, f)
-    return f'Partidas guardadas', 200
 
+    with open(pickle_path('partidas.pkl'), 'wb') as f:
+        pickle.dump(partidas, f)
+    return 'Partidas guardadas', 200
 
 @app.route('/users/jugadores.pkl',methods=['POST'])
 def guardar_jugadores():
     """
     Metemos en archivo pkl los jugadores
     """
-    with open('jugadores.pkl', 'wb') as f:
+    with open(pickle_path('jugadores.pkl'), 'wb') as f:
         pickle.dump(users, f)
-    return f'Jugadores guardados', 200
+    return 'Jugadores guardados', 200
 
 @app.route('/users/mail/buzones.pkl',methods=['POST'])
 def guardar_buzones():
@@ -304,9 +323,9 @@ def guardar_buzones():
     Metemos en archivo pkl los buzones (notificaciones)
     """
 
-    with open('buzones.pkl', 'wb') as f:
+    with open(pickle_path('buzones.pkl'), 'wb') as f:
         pickle.dump(buzon, f)
-    return f'Buzones guardados', 200
+    return 'Buzones guardados', 200
 
 
 @app.route('/games/partidas.pkl',methods=['GET'])
@@ -315,15 +334,12 @@ def obtener_partidas():
         Cargamos las partidas
     """
     try:
-        with open('partidas.pkl', 'rb') as f:
-            partidas_nuevo=pickle.load(f)
-
-        for keys in partidas_nuevo:
-            users[keys]=partidas_nuevo[keys]
-    except EOFError:
-        with open('partidas.pkl', 'wb') as f:
+        with open(pickle_path('partidas.pkl'), 'rb') as f:
+            partidas_nuevo = pickle.load(f)
+        partidas.update(partidas_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('partidas.pkl'), 'wb') as f:
             pickle.dump(partidas, f)
-
     return 'Partidas obtenidas', 200
 
 @app.route('/users/jugadores.pkl',methods=['GET'])
@@ -333,16 +349,18 @@ def obtener_jugadores():
 
         """
     try:
-        with open('jugadores.pkl', 'rb') as f:
-            users_nuevo=pickle.load(f)
-        for keys in users_nuevo:
-            users[keys] = users_nuevo[keys]
-    except EOFError:
-        with open('jugadores.pkl', 'wb') as f:
+        with open(pickle_path('jugadores.pkl'), 'rb') as f:
+            users_nuevo = pickle.load(f)
+        users.update(users_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('jugadores.pkl'), 'wb') as f:
             pickle.dump(users, f)
-
-
     return 'Jugadores obtenidos', 200
+
+
+
+
+
 
 
 @app.route('/users/mail/buzones.pkl',methods=['GET'])
@@ -351,16 +369,16 @@ def obtener_buzones():
         Cargamos los buzones (notificaciones)
         """
     try:
-        with open('buzones.pkl', 'rb') as f:
-            buzon_nuevo=pickle.load(f)
-        for keys in buzon_nuevo:
-            buzon[keys] = buzon_nuevo[keys]
-    except EOFError:
-        with open('buzones.pkl', 'wb') as f:
+        with open(pickle_path('buzones.pkl'), 'rb') as f:
+            buzones_nuevo = pickle.load(f)
+        buzon.update(buzones_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('buzones.pkl'), 'wb') as f:
             pickle.dump(buzon, f)
-
-
     return 'Buzones obtenidos', 200
+
+
+
 
 @app.route('/games/<id>/player/ver_mapa',methods=['GET'])
 @jwt_required()
@@ -481,5 +499,6 @@ def combatir(id):
     return jsonify(salida_dict),200
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+#if __name__ == '__main__':
+ #   app.run(debug=True)
+
