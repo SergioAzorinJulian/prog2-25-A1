@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-import hashlib
-import random
 from partida import Partida
 from jugador import Jugador
+import hashlib
+import random
+from mysql_base import add_user_ranking, ver_ranking
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "Yt7#qW9z!Kp3$VmL"
@@ -22,6 +23,7 @@ def id_partida() -> str:
             return n
         else:
             continue
+      
 #API
 @app.route('/')
 def kingdom_craft():
@@ -44,7 +46,9 @@ def signup():
             'invitaciones_partida':[]
         }
         buzon[user] = []
-        return f'Usuario {user} registrado', 200
+        #Creamos un usuario en MYSQL:
+        text_sql=add_user_ranking(user)
+        return f'Usuario {user} registrado\n{text_sql}', 200
 
 @app.route('/auth/login', methods=['GET'])
 def login():
@@ -58,6 +62,12 @@ def login():
         return f'Usuario o contraseña incorrectos', 401
 
 #USUARIOS
+#   RANKING
+@app.route('/users/ranking', methods=['GET'])
+@jwt_required()
+def ranking_global():
+    ranking : list = ver_ranking()
+    return jsonify(ranking), 200
 #   AMIGOS
 @app.route('/users/friends', methods=['GET'])
 @jwt_required()
@@ -354,5 +364,16 @@ def subir_nivel_edificio(id):
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.subir_nivel_edificio(edificio)
     return salida,200
+@app.route('/games/<id>/player/combatir',methods=['PUT'])
+@jwt_required()
+def combatir(id):
+    user = get_jwt_identity()
+    parametros = request.get_json()
+    salida = partidas[id].combatir(user,tuple(parametros['atacantes']),tuple(parametros['defensores']))
+    salida_dict = {
+        'texto': salida[0],
+        'estado': salida[1]
+    }
+    return jsonify(salida_dict),200
 if __name__ == '__main__':
     app.run(debug=True)

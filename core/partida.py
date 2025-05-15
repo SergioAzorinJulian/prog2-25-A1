@@ -1,5 +1,6 @@
 from jugador import Jugador
 from mapa import Mapa
+from mysql_base import add_elo
 import random
 
 class Partida:
@@ -51,7 +52,7 @@ class Partida:
         else:
             self.turno = self.jugadores[0].usuario
 
-    def combatir(self,atacantes_pos : tuple[int, int], defensores_pos: tuple[int, int]):
+    def combatir(self,atacante : str,atacantes_pos : tuple[int, int], defensores_pos: tuple[int, int]):
         ejercito_atk = self.mapa.regiones[atacantes_pos].tropas
         ejercito_def = self.mapa.regiones[defensores_pos].tropas
         texto_lista = []
@@ -76,6 +77,8 @@ class Partida:
                 self.estado = 'Finalizada'
                 self.ganador = self.turno #El que estaba jugando
                 texto_lista.append('Felicidades! Ganastes en madafaking Kingdom Craft')
+                text_sql = add_elo(atacante,25)
+                texto_lista.append(text_sql)
             return texto_lista,self.estado #devolvemos el estado para ver si hay que acabar el bucle de juego
     def producir_edificios(self,jugador : Jugador) -> None:
         for region in self.mapa.regiones.values():
