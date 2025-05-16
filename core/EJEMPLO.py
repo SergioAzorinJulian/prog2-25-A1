@@ -5,7 +5,7 @@ from typing import *
 import time
 from mapa import Mapa
 from copy import deepcopy
-URL = 'http://127.0.0.1:5000'
+URL = 'MaritoTSF.pythonanywhere.com'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 #------------FUNCIONES------------
 def partida_custom():
@@ -120,6 +120,12 @@ def login(user, password):
     if r.status_code == 200:
         return r.text, True
     return r.text, False
+#USERS
+#   SQL
+def ver_ranking(token):
+    r = requests.get(f'{URL}/users/ranking',headers={'Authorization': f'Bearer {token}'})
+    ranking = r.json()
+    return ranking
 #USERS
 #   BUZON
 def notificaciones(token):
@@ -270,8 +276,9 @@ def menu():
                         while True:
                             print('1. CREAR PARTIDA')
                             print('2. UNIRSE A PARTIDA')
-                            print('3. VOLVER')
-                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3])
+                            print('3. RANKING')
+                            print('4. VOLVER')
+                            choice = param('Eliga una opción: ',int,valores_validos=[1,2,3,4])
                             if choice == 1:
                                 limpiar_pantalla()
                                 while True:
@@ -481,6 +488,11 @@ def menu():
                                         limpiar_pantalla()
                                         break
                             elif choice == 3:
+                                mostrar_texto(ver_ranking(token))
+                                print('1. VOLVER')
+                                choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                continue
+                            elif choice == 4:
                                 limpiar_pantalla()
                                 break
 

@@ -2,6 +2,14 @@ import mysql.connector
 from mysql.connector import Error
 
 #MYSQL
+'''
+TABLA RANKING:
+CREATE TABLE ranking (
+    id VARCHAR(13) PRIMARY KEY,
+    rango INT DEFAULT 0
+);
+
+'''
 config = {
     'host': 'MaritoTSF.mysql.pythonanywhere-services.com',
     'user': 'MaritoTSF',
@@ -37,7 +45,7 @@ def ver_ranking():
     conexion = connect_to_db()
     if conexion:
         cursor = conexion.cursor()
-        cursor.execute("SELECT * FROM ranking")
+        cursor.execute("SELECT * FROM ranking ORDER BY rango DESC")
         ranking = [row for row in cursor.fetchall()] #fetchall varios
         cursor.close()
         conexion.close()
