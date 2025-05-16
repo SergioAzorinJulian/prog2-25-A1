@@ -5,7 +5,7 @@ from typing import *
 import time
 from mapa import Mapa
 from copy import deepcopy
-URL = 'MaritoTSF.pythonanywhere.com'
+URL = 'https://MaritoTSF.pythonanywhere.com'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 #------------FUNCIONES------------
 def partida_custom():
@@ -491,6 +491,7 @@ def menu():
                                 mostrar_texto(ver_ranking(token))
                                 print('1. VOLVER')
                                 choice = param('Eliga una opción: ',int,valores_validos=[1])
+                                limpiar_pantalla()
                                 continue
                             elif choice == 4:
                                 limpiar_pantalla()

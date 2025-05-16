@@ -46,7 +46,7 @@ def ver_ranking():
     if conexion:
         cursor = conexion.cursor()
         cursor.execute("SELECT * FROM ranking ORDER BY rango DESC")
-        ranking = [row for row in cursor.fetchall()] #fetchall varios
+        ranking = [f'{row[0]}: {row[1]}' for row in cursor.fetchall()] #fetchall varios Ej: [(Mario,0),(Pepe,25)...]
         cursor.close()
         conexion.close()
         return ranking
