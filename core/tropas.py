@@ -269,4 +269,72 @@ class Cannon(TropaEstructura):
             else:
                 return f'{self.nombre} sobrecalentado'
 
+class Magician(TropaAlcance):
+    dmg_base=50
+    vida_base=100
+    recursos=Recurso('caza',50,0)
+    healing_base=20
+    def __init__(self,cantidad=0, recursos=50, nombre='Mago'):
+        super().__init__(recursos, nombre, cantidad)
+    def curar(self,aliado:list[Tropa]):
+        if aliado!=[]:
+            n = random.randint(0,len(aliado)-1)
+            aliado[n].vida+=self.healing_base*aliado[n].cantidad
+            return f'{self.nombre} cura a {aliado[n].nombre} : {self.healing_base*aliado[n].cantidad} \n'
+
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        if enemigo != []:
+            n = random.randint(0, len(enemigo) - 1)
+            dmg=self.dmg
+            nombre=enemigo[n].nombre
+            enemigo[n].recibir_dmg(dmg,aliado)
+            txt_healing=Magician.curar(self,aliado)
+            return (f'{self.nombre} ataca a {nombre} : {dmg} \n{txt_healing}')
+
+class Ogre(TropaDefensa):
+    dmg_base=30
+    vida_base=400
+    recursos=Recurso('caza',50,0)
+    def __init__(self,cantidad=0, recursos=50, nombre='Ogro'):
+        super().__init__(recursos, nombre, cantidad)
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        if enemigo != []:
+            n = random.randint(0, len(enemigo) - 1)
+            dmg=self.dmg
+            nombre=enemigo[n].nombre
+            enemigo[n].recibir_dmg(dmg,aliado)
+            return (f'{self.nombre} ataca a {nombre} : {dmg} \n')
+
+class Catapult(TropaEstructura):
+    dmg_base=275
+    vida_base=200
+    recursos=Recurso('madera',200,0)
+    def __init__(self,cantidad=0, recursos=200, nombre='Catapulta'):
+        super().__init__(recursos, nombre, cantidad)
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        if enemigo != []:
+            n = random.randint(0, len(enemigo) - 1)
+            dmg=self.dmg
+            nombre=enemigo[n].nombre
+            enemigo[n].recibir_dmg(dmg,aliado)
+            return (f'{self.nombre} ataca a {nombre} : {dmg} \n')
+
+class Battle_Bear(TropaAtaque):
+    dmg_base=20
+    vida_base=100
+    recursos=Recurso('caza',30,0)
+    def __init__(self,cantidad=0, recursos=30, nombre='Oso de batalla'):
+        super().__init__(recursos, nombre, cantidad)
+
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        if enemigo != []:
+            n = 0
+            for i in enemigo:
+                i.recibir_dmg(self.dmg, enemigo)
+                n += 1
+            return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
+
+
+
+
 
