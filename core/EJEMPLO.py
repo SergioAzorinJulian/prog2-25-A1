@@ -188,9 +188,9 @@ def enviar_solicitud(token, usuario):
 
 
 def aceptar_solicitud(token, nuevo_amigo):
-    obtener_datos(token)
+    obtener_datos()
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
-    subir_datos(token)
+    subir_datos()
     return r.text
 
 
