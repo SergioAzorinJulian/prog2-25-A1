@@ -1,9 +1,14 @@
-#Carlos Peñalver Mora
 
 
 #Clase para definir familias en general
 class Familia:
+
     def __init__(self, id_familia: int, miembros: int = 5, rango: int = 1):
+        '''
+        Inicializa una nueva instancia de la clase Familia con un ID, número de miembros y rango.
+        Se establece como viva y sin tarea asignada inicialmente.
+        '''
+
         self.id = id_familia
         self.miembros = miembros
         self.tarea_asignada = None
@@ -11,12 +16,21 @@ class Familia:
         self.rango = rango
 
     def asignar_tarea(self, tarea: str):
+        '''
+        Asigna una tarea a la familia si está viva.
+        Si no lo está, se imprime un mensaje informativo.
+        '''
         if self.viva:
             self.tarea_asignada = tarea
         else:
             print('Esta familia no está viva y no puede ser asignada a tareas.')
 
     def sufrir_bajas(self, cantidad: int):
+        '''
+        Reduce la cantidad de miembros según el número de bajas indicadas.
+        Si los miembros llegan a 0 o menos, se marca la familia como muerta
+        y se elimina cualquier tarea asignada.
+        '''
         self.miembros -= cantidad
         if self.miembros <= 0:
             self.miembros = 0
@@ -24,10 +38,12 @@ class Familia:
             self.tarea_asignada = None
 
     def aumentar_miembros(self, cantidad: int):
+        ''' Aumenta la cantidad de miembros de una familia'''
         if self.viva:
             self.miembros += cantidad
 
     def aumentar_rango(self):
+        ''' Aumenta el rango de la familia'''
         if self.viva:
             self.rango += 1
 
@@ -44,12 +60,18 @@ class GestorFamilias:
         self.contador_id = 0
 
     def crear_familia(self, miembros: int = 5, rango: int = 1):
+        '''
+        Crea una familia con una cantidad de miembros y rango determinado
+        '''
         nueva_familia = Familia(id_familia=self.contador_id, miembros=miembros, rango=rango)
         self.familias.append(nueva_familia)
         self.contador_id += 1
         return nueva_familia
 
     def mostrar_familias(self):
+        '''
+        Muestra el registro de familias existentes
+        '''
         print("Registro de familias:")
         for familia in self.familias:
             print(familia)
