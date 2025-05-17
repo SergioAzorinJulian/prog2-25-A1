@@ -78,7 +78,7 @@ class Tropa:
         else: # Es un entero
             nueva_cantidad += other
 
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+        return self.__class__(nueva_cantidad, self.recursos, self.nombre)
     
     def __sub__(self, other):
         """Devuelve una nueva instancia de Tropa con la cantidad restada."""
@@ -88,7 +88,7 @@ class Tropa:
         else: # Es un entero
             nueva_cantidad -= other
 
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+        return self.__class__(nueva_cantidad, self.recursos, self.nombre)
     
     def __eq__(self, other):
         if isinstance(other, Tropa):
