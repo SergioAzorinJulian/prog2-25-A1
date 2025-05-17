@@ -13,7 +13,7 @@ def partida_custom():
     while True:
         terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str)
         if len(terrenos.split(',')) < 2:
-            print('Error: Debe introducir al menos 2 tipos de terreno.', style = 'warning')
+            print('Error: Debe introducir al menos 2 tipos de terreno.')
             continue
 
         copia_terrenos = deepcopy(TERRENOS_JUEGO)
@@ -480,7 +480,7 @@ def menu():
                                                 elif estado_partida == 'Finalizada':
                                                     mostrar_texto('Kingdom Craft esta trabajando en ello')
                                                     limpiar_pantalla()
-                                                    continue
+                                                    break
                                             elif r_estado == 404:
                                                 mostrar_texto(estado_partida)
                                                 break

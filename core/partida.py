@@ -4,10 +4,10 @@ from mysql_base import add_elo
 import random
 
 class Partida:
-    def __init__(self,id,host,jugadores : list[Jugador] = [],estado: str = 'Esperando',privada=False):
+    def __init__(self, id, host, jugadores: list[Jugador] = None, estado: str = 'Esperando', privada=False):
         self.id = id
         self.host = host
-        self.jugadores = jugadores
+        self.jugadores = jugadores if jugadores is not None else []
         self.estado = estado
         self.privada = privada
         self.mapa = None
