@@ -197,7 +197,20 @@ class Soldado(TropaAtaque):
     def __init__(self, cantidad=0, recursos=50, nombre='Soldado'):
         super().__init__(recursos, nombre, cantidad)
 
+class Oso(TropaAtaque):
+    dmg_base=20
+    vida_base=100
+    recursos=Recurso('caza',30,0)
+    def __init__(self,cantidad=0, recursos=30, nombre='Oso'):
+        super().__init__(recursos, nombre, cantidad)
 
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]): #No le habeis puesto el crítico, ponerselo
+        if enemigo != []:
+            n = 0
+            for i in enemigo[:]:
+                i.recibir_dmg(self.dmg, enemigo)
+                n += 1
+            return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
@@ -215,7 +228,12 @@ class Gigante(TropaDefensa):
                         txt = ''
                     txt += f'{self.nombre} ataca a {i.nombre} \n' + i.recibir_dmg(self.dmg, enemigo)
             return txt
-
+class Ogro(TropaDefensa):
+    dmg_base=30
+    vida_base=400
+    recursos=Recurso('caza',50,0)
+    def __init__(self,cantidad=0, recursos=50, nombre='Ogro'):
+        super().__init__(recursos, nombre, cantidad)
 
 # TROPAS DE ALCANCE
 class Arquero(TropaAlcance):
@@ -231,13 +249,37 @@ class Arquero(TropaAlcance):
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
         if enemigo != []:
             n = 0
-            for i in enemigo:
+            for i in enemigo[:]:
                 if random.random() < 0.8:  # < 80% de probabilidad
                     i.recibir_dmg(self.dmg, enemigo)
                     n += 1
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
 
+class Magician(TropaAlcance):
+    dmg_base=50
+    vida_base=100
+    recursos=Recurso('caza',50,0)
+    healing_base=20
+    def __init__(self,cantidad=0, recursos=50, nombre='Mago'):
+        super().__init__(recursos, nombre, cantidad)
+        self.heal = self.__class__.healing_base * self.cantidad
+       
+    def curar(self,aliado:list[Tropa]):
+        if aliado!=[]:
+            n = random.randint(0,len(aliado)-1)
+            aliado[n].vida+=self.heal*aliado[n].cantidad
+            return f'{self.nombre} cura a {aliado[n].nombre} : {self.heal*aliado[n].cantidad} \n'
 
+    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        if enemigo != []:
+            n = random.randint(0, len(enemigo) - 1)
+            dmg=self.dmg
+            nombre=enemigo[n].nombre
+            text_cantidad = enemigo[n].recibir_dmg(dmg,aliado) #Este texto devuelve si murieron tropas del enemigo
+            txt_healing=self.curar(self,aliado)
+            return (f'{self.nombre} ataca a {nombre} : {dmg}\n{text_cantidad}\n{txt_healing}')
+    #AQUÍ FALTA AÑADIR EL METODO DE ACTUALIZAR CANTIDAD, YA QUE EL DEL PADRE TROPA, NO ACTUALIZA LA CANTIDAD DE CURACIÓN
+        
 # TROPAS DE ESTRUCTURA
 class Cannon(TropaEstructura):
     '''
@@ -246,7 +288,7 @@ class Cannon(TropaEstructura):
     dmg_base = 300
     vida_base = 500
     recursos = Recurso('madera', 100, 0)
-    def __init__(self, cantidad=0, recursos=100, nombre='Cañon'):
+    def __init__(self, cantidad=0, recursos=100, nombre='Cannon'):
         super().__init__(recursos, nombre, cantidad)
         self.activo = True
 
@@ -268,71 +310,21 @@ class Cannon(TropaEstructura):
                 return f'{self.nombre} dispara : {dmg_total}'
             else:
                 return f'{self.nombre} sobrecalentado'
-
-class Magician(TropaAlcance):
-    dmg_base=50
-    vida_base=100
-    recursos=Recurso('caza',50,0)
-    healing_base=20
-    def __init__(self,cantidad=0, recursos=50, nombre='Mago'):
-        super().__init__(recursos, nombre, cantidad)
-    def curar(self,aliado:list[Tropa]):
-        if aliado!=[]:
-            n = random.randint(0,len(aliado)-1)
-            aliado[n].vida+=self.healing_base*aliado[n].cantidad
-            return f'{self.nombre} cura a {aliado[n].nombre} : {self.healing_base*aliado[n].cantidad} \n'
-
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
-        if enemigo != []:
-            n = random.randint(0, len(enemigo) - 1)
-            dmg=self.dmg
-            nombre=enemigo[n].nombre
-            enemigo[n].recibir_dmg(dmg,aliado)
-            txt_healing=Magician.curar(self,aliado)
-            return (f'{self.nombre} ataca a {nombre} : {dmg} \n{txt_healing}')
-
-class Ogre(TropaDefensa):
-    dmg_base=30
-    vida_base=400
-    recursos=Recurso('caza',50,0)
-    def __init__(self,cantidad=0, recursos=50, nombre='Ogro'):
-        super().__init__(recursos, nombre, cantidad)
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
-        if enemigo != []:
-            n = random.randint(0, len(enemigo) - 1)
-            dmg=self.dmg
-            nombre=enemigo[n].nombre
-            enemigo[n].recibir_dmg(dmg,aliado)
-            return (f'{self.nombre} ataca a {nombre} : {dmg} \n')
-
-class Catapult(TropaEstructura):
+            
+class Catapulta(TropaEstructura):
     dmg_base=275
     vida_base=200
     recursos=Recurso('madera',200,0)
     def __init__(self,cantidad=0, recursos=200, nombre='Catapulta'):
         super().__init__(recursos, nombre, cantidad)
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
-        if enemigo != []:
-            n = random.randint(0, len(enemigo) - 1)
-            dmg=self.dmg
-            nombre=enemigo[n].nombre
-            enemigo[n].recibir_dmg(dmg,aliado)
-            return (f'{self.nombre} ataca a {nombre} : {dmg} \n')
 
-class Battle_Bear(TropaAtaque):
-    dmg_base=20
-    vida_base=100
-    recursos=Recurso('caza',30,0)
-    def __init__(self,cantidad=0, recursos=30, nombre='Oso de batalla'):
-        super().__init__(recursos, nombre, cantidad)
 
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
-        if enemigo != []:
-            n = 0
-            for i in enemigo:
-                i.recibir_dmg(self.dmg, enemigo)
-                n += 1
-            return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
+
+
+
+
+
+
 
 
 
