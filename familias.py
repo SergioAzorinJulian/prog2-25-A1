@@ -70,7 +70,7 @@ class GestorFamilias:
 
     def mostrar_familias(self):
         '''
-        Muestra el registro de familias existentes
+        Muestra el registro de familias .
         '''
         print("Registro de familias:")
         for familia in self.familias:
