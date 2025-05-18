@@ -465,25 +465,19 @@ def subir_datos():
 def jugar(token):
     limpiar_pantalla()
     while True:
-        table_para_jugar = Table(show_edge=False, header_style="bold white reverse blue")
-        table_para_jugar.add_column('MENÚ', justify='center', style='prompt')
-        table_para_jugar.add_row('0. Volver', style='dim')
-        table_para_jugar.add_row('1. Crear partida')
-        table_para_jugar.add_row('2. Unirse a partida')
-        console.print(table_para_jugar)
+        menu = {"Menu": ["prompt",["0.Volver","1.Crear partida","2.Unirse a partida"]]}
+        tabla = crear_tabla(menu, dim=True)
+        console.print(tabla)
         console.print()
-
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
         console.print()
 
         if choice == 1:
             limpiar_pantalla()
             while True:
-                table_alcance_partida = Table(show_edge=False, header_style="bold white reverse blue")
-                table_alcance_partida.add_column('ALCANCE DE LA PARTIDA', justify='center', style='prompt')
-                table_alcance_partida.add_row('1. Pública')
-                table_alcance_partida.add_row('2. Privada')
-                console.print(table_alcance_partida)
+                op1 = {"Crear partida": ["success",["1. Pública","2. Privada"]]}
+                tabla = crear_tabla(op1, dim = True)
+                console.print(tabla)
                 console.print()
 
                 privada = True if param('Elija una opción: ', int, valores_validos=[1, 2]) == 2 else False
@@ -502,13 +496,9 @@ def jugar(token):
                         break
                 else:
                     invitado = None
-
-                table_tipo_partida = Table(show_edge=False, header_style="bold white reverse blue")
-                table_tipo_partida.add_column('TIPOS DE PARTIDA', justify='center', style='prompt')
-                table_tipo_partida.add_row('0. Volver', style='dim')
-                table_tipo_partida.add_row('1. Partida personalizada')
-                table_tipo_partida.add_row('2. Partida predefinida')
-                console.print(table_tipo_partida)
+                tipo = {"Tipo de partida":["prompt",["0. Volver", "1. Partida personalizada", "2. Partida predefinida"]]}
+                tabla = crear_tabla(tipo, dim = True)
+                console.print(tabla)
                 console.print()
 
                 choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
@@ -533,12 +523,9 @@ def jugar(token):
         elif choice == 2:
             limpiar_pantalla()
             while True:
-                table_que_jugar = Table(show_edge=False, header_style="bold white reverse blue")
-                table_que_jugar.add_column('DÓNDE QUIERE JUGAR', justify='center', style='prompt')
-                table_que_jugar.add_row('0. Volver', style='dim')
-                table_que_jugar.add_row('1. Unirse a una nueva partida')
-                table_que_jugar.add_row('2. Empezar/Continuar una partida a la que ya se ha unido')
-                console.print(table_que_jugar)
+                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continiar una partida a la que ya se ha unido"]]}
+                tabla = crear_tabla(op2, dim = True)
+                console.print(tabla)
                 console.print()
 
                 choice = param('Elija una opción: ', int, valores_validos=[0, 1, 2])
@@ -572,14 +559,9 @@ def jugar(token):
                                 catalogos_dict = catalogos(token, id_user_partida)
                             limpiar_pantalla()
                             while get_estado_jugador(token, id_user_partida) == True:
-                                table_opciones_partida = Table(show_edge=False, header_style="bold white reverse blue")
-                                table_opciones_partida.add_column('OPCIONES DURANTE LA PARTIDA', justify='center', style='prompt')
-                                table_opciones_partida.add_row('0. Exit', style='dim')
-                                table_opciones_partida.add_row('1. Ver zona')
-                                table_opciones_partida.add_row('2. Ver mis recursos')
-                                table_opciones_partida.add_row('3. Ver mapa')
-                                table_opciones_partida.add_row('4. Finalizar mi turno')
-                                console.print(table_opciones_partida)
+                                op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
+                                tabla = crear_tabla(op, dim = True)
+                                console.print(tabla)
                                 console.print()
 
                                 choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4])
@@ -591,15 +573,9 @@ def jugar(token):
                                         zona, estado = ver_zona(token, id_user_partida, coordenada)
                                         if estado == 200:
                                             if zona[1]:
-                                                table_opciones_dentro_zona = Table(show_edge=False, header_style="bold white reverse blue")
-                                                table_opciones_dentro_zona.add_column(f'OPCIONES DENTRO DE LA ZONA', justify='center', style='prompt')
-                                                table_opciones_dentro_zona.add_row('0. Volver', style='dim')
-                                                table_opciones_dentro_zona.add_row('1. Añadir tropa')
-                                                table_opciones_dentro_zona.add_row('2. Mover tropa')
-                                                table_opciones_dentro_zona.add_row('3. Mover batallón')
-                                                table_opciones_dentro_zona.add_row('4. Construir edificio')
-                                                table_opciones_dentro_zona.add_row('5. Subir de nivel edificio')
-                                                console.print(table_opciones_dentro_zona)
+                                                dict = {"Opciones dentro de la zona": ["success", ["0. Volver", "1. Añadir tropa", "2. Mover tropa", "3. Mover batallón", "4. Contruir edificio", "5. Subir de nivel edificio"]]}
+                                                tabla = crear_tabla(dict, dim = True)
+                                                console.print(tabla)
                                                 console.print()
 
                                                 console.print(zona[0], style='prompt')
@@ -717,16 +693,10 @@ def jugar(token):
 def mostrar_perfil(token):
     limpiar_pantalla()
     while True:
+        perfil = {"Menú": ["prompt",["0. Volver", "1. Buzón", "2. Amigos"]]}
+        tabla = crear_tabla(perfil, dim = True)
 
-        table_perfil = Table(show_edge=False, header_style="bold white reverse blue")
-
-        table_perfil.add_column('MENÚ', justify='center', style='prompt')
-
-        table_perfil.add_row('0. Volver', style='dim')
-        table_perfil.add_row('1. Buzón')
-        table_perfil.add_row('2. Amigos')
-
-        console.print(table_perfil)
+        console.print(tabla)
 
         console.print()
 
@@ -737,15 +707,11 @@ def mostrar_perfil(token):
                 buzon = obtener_buzon(token)
                 if buzon != []:
                     mostrar_texto(buzon)
+                    buzon = {"Menú": ["prompt", ["0. Volver", "1. Marcar como leído todos los mensajes"]]}
+                    tabla = crear_tabla(buzon, dim=True)
 
-                    table_buzon = Table(show_edge=False, header_style="bold white reverse blue")
 
-                    table_buzon.add_column('MENÚ', justify='center', style='prompt')
-
-                    table_buzon.add_row('0. Volver', style='dim')
-                    table_buzon.add_row('1. Marcar como leído todos los mensajes')
-
-                    console.print(table_buzon)
+                    console.print(tabla)
 
                     console.print()
 
@@ -775,17 +741,9 @@ def mostrar_perfil(token):
                     mostrar_texto(amigos)
                 else:
                     mostrar_texto('Todavía no tienes amigos agregados', estilo='info')
-
-                table_inicio = Table(show_edge=False, header_style="bold white reverse blue")
-
-                table_inicio.add_column('MENÚ', justify='center', style='prompt')
-
-                table_inicio.add_row('0. Volver', style='dim')
-                table_inicio.add_row('1. Solicitudes de amistad')
-                table_inicio.add_row('2. Enviar solicitud de amistad')
-                table_inicio.add_row('3. Invitaciones de partida')
-
-                console.print(table_inicio)
+                amigos = {"Menú": ["prompt",["0. Vover", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
+                tabla = crear_tabla(amigos, dim = True)
+                console.print(tabla)
 
                 console.print()
 
@@ -838,16 +796,11 @@ def mostrar_perfil(token):
                             invitaciones_str = [partida for partida in invitaciones_dict.values()]
                             mostrar_texto(invitaciones_str, enumerado=True)
                             id_invitacion = param('Introduce el id de la invitación', str)
+                            invitacion = {"Menú": ["prompt", ["1. Aceptar invitación", "2. Rechazar invitación"]]}
+                            tabla = crear_tabla(invitacion, dim=True)
 
-                            table_invitaciones = Table(show_edge=False,
-                                                       header_style="bold white reverse blue")
 
-                            table_invitaciones.add_column('MENÚ', justify='center', style='prompt')
-
-                            table_invitaciones.add_row('1. Aceptar invitación')
-                            table_invitaciones.add_row('2. Rechazar invitación')
-
-                            console.print(table_invitaciones)
+                            console.print(tabla)
 
                             console.print()
 
@@ -897,19 +850,13 @@ def menu():
     limpiar_pantalla()
 
     while True:
-        table_inicio = Table(show_edge = False, header_style="bold white reverse blue")
+        principal = {"Menú": ["prompt", ["0. Exit", "1. Registrarse", "2. Iniciar sesión"]]}
+        tabla = crear_tabla(principal, dim = True)
+        console.print(tabla)
 
-        table_inicio.add_column('MENÚ', justify = 'center', style = 'prompt')
 
-        table_inicio.add_row('0. Exit', style = 'dim')
-        table_inicio.add_row('1. Registrarse')
-        table_inicio.add_row('2. Iniciar sesión')
-
-        console.print(table_inicio)
-
-        console.print()
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
-        console.print()
+
         if choice == 1:
             user = param('Usuario: ', str)
             password = param('Contraseña: ', str, is_password=True)
@@ -926,18 +873,9 @@ def menu():
                 limpiar_pantalla()
                 while True:
                     mostrar_texto(notificaciones(token))
-
-                    table_lobby = Table(show_edge=False, header_style="bold white reverse blue")
-
-                    table_lobby.add_column('LOBBY', justify='center', style='prompt')
-
-                    table_lobby.add_row('0. Log out', style='dim')
-                    table_lobby.add_row('1. Jugar')
-                    table_lobby.add_row('2. Perfil')
-
-                    console.print(table_lobby)
-
-                    console.print()
+                    lobby = {"Lobby": ["prompt", ["0. Log out", "1. Jugar", "2. Perfil"]]}
+                    tabla = crear_tabla(lobby, dim=True)
+                    console.print(tabla)
 
                     choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
                     console.print()
