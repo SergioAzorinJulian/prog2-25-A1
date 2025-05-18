@@ -251,6 +251,7 @@ def login(user, password):
         return r.text, True
     return r.text, False
 
+
 # USERS - BUZON
 def notificaciones(token):
     obtener_buzones()
