@@ -7,6 +7,7 @@ from mapa import Mapa
 from copy import deepcopy
 URL = 'https://MaritoTSF.pythonanywhere.com'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
+
 #------------FUNCIONES------------
 def partida_custom():
     size = param('Introduce un tamaño del mapa: ',int, valores_validos=[i for i in range(3,51)])

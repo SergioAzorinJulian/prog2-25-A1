@@ -37,8 +37,10 @@ class Edificio:
             recursos_jugador[recursos_jugador.index(self.__class__.produce)] += recurso_nuevo
         else:
             return None
+
     def __str__(self) -> str:
         return f'{self.nombre}: Nivel={self.nivel}, Efectividad={self.efectividad}, Costo={self.__class__.costo}, Produce={self.__class__.produce}'
+
     def __eq__(self, other):
         if isinstance(other,Edificio):
             if self.nombre.lower() == other.nombre:
