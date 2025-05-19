@@ -69,23 +69,6 @@ class Tropa:
     def __isub__(self, other):
         self.cantidad -= other
         return self
-    
-
-    def __eq__(self, other):
-        if isinstance(other, Tropa):
-            return self.nombre == other.nombre
-        return False
-
-    def __sub__(self, other):
-        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
-        nueva_cantidad = self.cantidad
-        if isinstance(other, Tropa): # Es una Tropa
-            nueva_cantidad -= other.cantidad
-        else: # Es un entero
-            nueva_cantidad -= other
-
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
-
 
     def __add__(self, other):
         """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
@@ -95,7 +78,17 @@ class Tropa:
         else: # Es un entero
             nueva_cantidad += other
 
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+        return self.__class__(nueva_cantidad, self.recursos, self.nombre)
+    
+    def __sub__(self, other):
+        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        nueva_cantidad = self.cantidad
+        if isinstance(other, Tropa): # Es una Tropa
+            nueva_cantidad -= other.cantidad
+        else: # Es un entero
+            nueva_cantidad -= other
+
+        return self.__class__(nueva_cantidad, self.recursos, self.nombre)
     
     def __eq__(self, other):
         if isinstance(other, Tropa):
@@ -104,32 +97,15 @@ class Tropa:
             return self.nombre.lower() == other
     
     def __str__(self):
-        return f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}, Cantidad: {self.cantidad}"
+        texto = f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}"
+        if self.cantidad > 0:
+            texto += f', Cantidad: {self.cantidad}'
+        return texto 
 
     def __repr__(self):
-        return \
-            (f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}')
+        return f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}'
 
-    def __sub__(self, other):
-        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
-        nueva_cantidad = self.cantidad
-        if isinstance(other, Tropa): # Es una Tropa
-            nueva_cantidad -= other.cantidad
-        else: # Es un entero
-            nueva_cantidad -= other
-
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
-
-
-    def __add__(self, other):
-        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
-        nueva_cantidad = self.cantidad
-        if isinstance(other, Tropa): # Es una Tropa
-            nueva_cantidad += other.cantidad
-        else: # Es un entero
-            nueva_cantidad += other
-
-        return self.__class__(self.recursos, self.nombre, nueva_cantidad)
+    
 
 
 class TropaAtaque(Tropa):
