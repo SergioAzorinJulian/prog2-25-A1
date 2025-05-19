@@ -87,7 +87,7 @@ class Partida:
                     texto_lista.append(tropas_alcance_atk[i].atacar(ejercito_atk, ejercito_def))
                 
                 if i < len(tropas_alcance_def):
-                    texto_lista.append(tropas_alcance_def[i].atacar(ejercito_atk, ejercito_def))
+                    texto_lista.append(tropas_alcance_def[i].atacar(ejercito_def, ejercito_atk))
 
         if ejercito_atk==[]:    #Si el ejercito de ataque se ha quedado sin tropas...
             texto_lista.append('El ataque fracasó.')
