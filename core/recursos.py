@@ -54,24 +54,57 @@ class Recurso:
     creados = {}
 
     def __init__(self, nombre: str, cantidad: int, regeneracion: int, valor_max: int = 300):
-        """constructor del objeto recurso"""
+        """
+        Inicializa un nuevo recurso con nombre y cantidad.
+
+        Parámetros
+        ----------
+        nombre : str
+            Nombre del recurso.
+        cantidad : int
+            Cantidad inicial del recurso.
+        """
+
         self.nombre = nombre
         self.cantidad = cantidad
         self.regeneracion = regeneracion
         self.valor_max = valor_max
         self.creados[self.nombre] = self.to_dict()
 
+
     def to_dict(self) -> dict:
-        """introduce la instancia en un diccionario"""
+        """
+        Convierte la instancia del recurso en un diccionario.
+
+        Returns
+        -------
+        dict
+            Diccionario con los atributos del recurso: nombre, cantidad y regeneración.
+        """
+
         return {
             "nombre": self.nombre,
             "cantidad": self.cantidad,
             "regeneracion": self.regeneracion,
         }
 
+
     @classmethod
     def desde_dict(cls, datos: dict):
-        """metodo para construir el objeto desde un diccionario"""
+        """
+        Construye una instancia de Recurso a partir de un diccionario.
+
+        Parameters
+        ----------
+        datos : dict
+            Diccionario con las claves 'nombre', 'cantidad', 'regeneracion' y 'valor_max' que representan
+            los atributos del recurso.
+
+        Returns
+        -------
+        Recurso
+            Instancia de la clase Recurso creada a partir del diccionario proporcionado.
+        """
         nombre = datos["nombre"]
         cantidad = datos["cantidad"]
         regeneracion = datos["regeneracion"]
@@ -79,61 +112,203 @@ class Recurso:
 
         return cls(nombre, cantidad, regeneracion, valor_maximo)
 
+
     def __str__(self) -> str:
-        """Metodo para mostrar información del recurso"""
+        """
+        Devuelve una representación en cadena del recurso.
+
+        Returns
+        -------
+        str
+            Representación en cadena del recurso.
+        """
+
         if self.regeneracion > 0:
             return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
         else:
             return f"{self.nombre.capitalize():<11}: {self.cantidad:<4} unidades"
 
+
     def __repr__(self) -> str:
-        """Metodo para mostrar información del recurso y su valor maximo"""
+        """
+        Devuelve una representación detallada del recurso, incluyendo su cantidad actual,
+        valor máximo y tasa de regeneración.
+
+        Returns
+        -------
+        str
+            Cadena con el nombre, cantidad actual, valor máximo y tasa de regeneración del recurso.
+        """
+
         return f"{self.nombre.capitalize():<11}: {self.cantidad:<4}/{self.valor_max:<4} unidades | Tasa de regeneración: {self.regeneracion:<3}"
 
-    def __sub__(self,other : int):
+
+    def __sub__(self, other: int):
+        """
+        Resta una cantidad o la cantidad de otro recurso a este recurso y devuelve una nueva instancia.
+
+        Parameters
+        ----------
+        other : int or Recurso
+            Cantidad a restar o instancia de Recurso cuya cantidad será restada.
+
+        Returns
+        -------
+        Recurso
+            Nueva instancia de Recurso con la cantidad resultante.
+
+        Raises
+        ------
+        TypeError
+            Si `other` no es un entero ni una instancia de Recurso.
+        """
+
         nueva_cantidad = self.cantidad
-        if isinstance(other, Recurso): # Es una Tropa
+        if isinstance(other, Recurso):
             nueva_cantidad -= other.cantidad
-        else: # Es un entero
+        else:
             nueva_cantidad -= other
 
         return self.__class__(self.nombre,nueva_cantidad,self.regeneracion,self.valor_max)
 
+
     def __isub__(self, other: int):
-        """restar los recursos que van a ser utilizados"""
+        """
+        Resta una cantidad o la cantidad de otro recurso a este recurso, modificando la instancia actual.
+
+        Parámetros
+        ----------
+        other : int o Recurso
+            Cantidad a restar o instancia de Recurso cuya cantidad será restada.
+
+        Retorna
+        -------
+        Recurso
+            La instancia actual de Recurso con la cantidad actualizada.
+        """
+
         if isinstance(other, Recurso):
             self.cantidad -= other.cantidad
         else:
             self.cantidad -= other
         return self
 
+
     def __iadd__(self, other: int):
-        """agregar mas cantidad del recurso"""
+        """
+        Incrementa la cantidad del recurso sumando una cantidad o la cantidad de otro recurso.
+
+        Parámetros
+        ----------
+        other : int o Recurso
+            Cantidad a sumar o instancia de Recurso cuya cantidad será sumada.
+
+        Retorna
+        -------
+        Recurso
+            La instancia actual de Recurso con la cantidad actualizada.
+        """
         if isinstance(other, Recurso):
             self.cantidad += other.cantidad
         else:
             self.cantidad += other
         return self
-    
+
+
     def __mul__(self,other : int):
+        """
+        Multiplica la cantidad del recurso por un valor entero y retorna una nueva instancia.
+
+        Parameters
+        ----------
+        other : int
+            Valor por el cual se multiplicará la cantidad del recurso.
+
+        Returns
+        -------
+        Recurso
+            Nueva instancia de Recurso con la cantidad multiplicada.
+        """
+
         return self.__class__(self.nombre,math.ceil(self.cantidad * other),self.regeneracion,self.valor_max)
+
     
     def __imul__(self, other : int):
+        """
+        Multiplica la cantidad del recurso por un valor entero, modificando la instancia actual.
+
+        Parameters
+        ----------
+        other : int
+            Valor por el cual se multiplicará la cantidad del recurso.
+
+        Returns
+        -------
+        Recurso
+            La instancia actual de Recurso con la cantidad actualizada.
+        """
+
         self.cantidad *= other
         return self
 
+
     def __eq__(self, other):
+        """
+        Compara si dos recursos son iguales por su nombre.
+
+        Parámetros
+        ----------
+        other : object
+            Objeto a comparar, puede ser una instancia de Recurso.
+
+        Returns
+        -------
+        bool
+            True si ambos recursos tienen el mismo nombre, False en caso contrario.
+        """
+
         if isinstance(other, Recurso):
             return self.nombre == other.nombre
         return False
 
     def __ge__(self, other):
+        """
+        Compara si la cantidad de este recurso es mayor o igual que la de otro recurso.
+
+        Parameters
+        ----------
+        other : Recurso
+            Instancia de Recurso con la que se compara la cantidad.
+
+        Returns
+        -------
+        bool
+            True si la cantidad de este recurso es mayor o igual que la de `other`, False en caso contrario.
+        """
+
         if isinstance(other, Recurso):
             return self.cantidad >= other.cantidad
         return False
 
+
     def regenerar(self, porcentaje):
-        """cantidad de regeneracion del recurso -> Se regenera cada turno"""
+        """
+        Regenera la cantidad del recurso en función de un porcentaje de su tasa de regeneración.
+
+        Parameters
+        ----------
+        porcentaje : float o int
+            Porcentaje de la tasa de regeneración que se aplicará para incrementar la cantidad del recurso.
+
+        Returns
+        -------
+        None
+
+        Notas
+        -----
+        Si la cantidad resultante supera el valor máximo (`valor_max`), se ajusta al valor máximo permitido.
+        """
+
         percent = porcentaje / 100
         cant_regenerada = self.regeneracion * percent
         self.cantidad += cant_regenerada
