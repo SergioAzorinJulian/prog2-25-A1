@@ -19,6 +19,15 @@ partidas={}
 
 ### FUNCIONES ###
 def id_partida() -> str:
+    """
+    Genera un identificador único para una nueva partida.
+
+    Returns
+    -------
+    str
+        Identificador único de la partida.
+    """
+
     while True:
         n = random.randint(0,999)
         if n not in partidas.keys():
@@ -30,10 +39,31 @@ def id_partida() -> str:
 #API
 @app.route('/')
 def kingdom_craft():
+    """
+    Endpoint raíz de la API.
+
+    Returns
+    -------
+    str
+        Mensaje de bienvenida.
+    """
+
     return 'KINGDOM CRAFT'
+
+
 #AUTENTICACIÓN
 @app.route('/auth/signup', methods=['POST'])
 def signup():
+    """
+    Registra un nuevo usuario en el sistema.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
 
     user = request.args.get('user', '')
     if user in users:
@@ -54,8 +84,20 @@ def signup():
         text_sql=add_user_ranking(user)
         return f'Usuario {user} registrado\n{text_sql}', 200
 
+
 @app.route('/auth/login', methods=['GET'])
 def login():
+    """
+    Autentifica a un usuario y retorna un token JWT si las credenciales son correctas.
+
+    Returns
+    -------
+    str
+        Token JWT o mensaje de error.
+    int
+        Código de estado HTTP.
+    """
+
     print(partidas)
     user = request.args.get('user', '')
 
@@ -70,23 +112,60 @@ def login():
         print(partidas)
         return f'Usuario o contraseña incorrectos', 401
 
+
 #USUARIOS
-#   RANKING
+### RANKING
 @app.route('/users/ranking', methods=['GET'])
 @jwt_required()
 def ranking_global():
+    """
+    Devuelve el ranking global de usuarios.
+
+    Returns
+    -------
+    list
+        Lista de usuarios ordenados por ranking.
+    int
+        Código de estado HTTP.
+    """
+
     ranking : list = ver_ranking()
     return jsonify(ranking), 200
-#   AMIGOS
+
+
+### AMIGOS
 @app.route('/users/friends', methods=['GET'])
 @jwt_required()
 def amigos():
+    """
+    Devuelve la lista de amigos del usuario autentificado.
+
+    Returns
+    -------
+    list
+        Lista de amigos.
+    int
+        Código de estado HTTP.
+    """
+
     amigos = users[get_jwt_identity()]['amigos']
     return jsonify(amigos),200    
+
 
 @app.route('/users/friend-requests', methods=['POST'])
 @jwt_required()
 def enviar_solicitud():
+    """
+    Envía una solicitud de amistad a otro usuario.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     id_solicitud = request.args.get('id_solicitud','')
     if id_solicitud in users:
         user = get_jwt_identity()
@@ -100,15 +179,43 @@ def enviar_solicitud():
     else:
         return 'Usuario no encontrado',404
 
+
 @app.route('/users/friend-requests', methods=['GET'])
 @jwt_required()
 def solicitudes():
+    """
+    Devuelve la lista de solicitudes de amistad recibidas.
+
+    Returns
+    -------
+    list
+        Lista de usuarios que han enviado solicitud.
+    int
+        Código de estado HTTP.
+    """
     solicitudes = users[get_jwt_identity()]['solicitudes_recibidas']
     return jsonify(solicitudes),200
-   
+
+
 @app.route('/users/friend-requests/<id>/accept', methods=['POST'])
 @jwt_required()
 def aceptar_solicitud(id):
+    """
+    Acepta una solicitud de amistad.
+
+    Parameters
+    ----------
+    id : str
+        Identificador del usuario que envió la solicitud.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     users[user]['solicitudes_recibidas'].remove(id)
     users[user]['amigos'].append(id)
@@ -117,19 +224,47 @@ def aceptar_solicitud(id):
     buzon[id].append({'mensaje':f'{user} ahora es tu amigo','leido': False})
     return f'Ahora eres amigo de {id}',200
 
+
 @app.route('/users/friend-requests/<id>/reject', methods=['POST'])
 @jwt_required()
 def rechazar_solicitud(id):
+    """
+    Rechaza una solicitud de amistad.
+
+    Parameters
+    ----------
+    id : str
+        Identificador del usuario que envió la solicitud.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
+    """
     user = get_jwt_identity()
     users[user]['solicitudes_recibidas'].remove(id)
     users[id]['solicitudes_enviadas'].remove(user)
     buzon[id].append({'mensaje':f'{user} rechazo tu solicitud de amistad','leido': False})
     return 'Solicitud de amistad rechazada',200
-#USUARIOS
-#   BUZON
+
+
+### BUZÓN
 @app.route('/users/mail/notificaciones', methods=['GET'])
 @jwt_required()
 def notificaciones():
+    """
+    Devuelve el número de notificaciones no leídas del usuario.
+
+    Returns
+    -------
+    str
+        Mensaje con el número de notificaciones.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
 
     notificaciones = 0
@@ -139,17 +274,42 @@ def notificaciones():
             notificaciones += 1
     return f'\nTienes {notificaciones} notificaciones nuevas',200
 
+
 @app.route('/users/mail', methods=['PUT'])
 @jwt_required()
 def marcar_leido():
+    """
+    Marca todos los mensajes del buzón como leídos.
+
+    Returns
+    -------
+    str
+        Mensaje de confirmación.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     for mensaje in buzon[user]:
         mensaje['leido'] = True
     return 'Mensajes marcados como leído',200
 
+
+
 @app.route('/users/mail', methods=['GET'])
 @jwt_required()
 def ver_buzon():
+    """
+    Devuelve los mensajes no leídos del buzón del usuario.
+
+    Returns
+    -------
+    list
+        Lista de mensajes no leídos.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     mensajes = []
     for mensaje in buzon[user]:
@@ -161,21 +321,58 @@ def ver_buzon():
 @app.route('/users/game_requests', methods=['GET'])
 @jwt_required()
 def invitaciones_privadas():
+    """
+    Devuelve las invitaciones a partidas privadas del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario de partidas privadas.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     id_privadas = users[user]['invitaciones_partida']
     partidas_privadas = {key : str(value) for key,value in partidas.items() if key in id_privadas}
     return jsonify(partidas_privadas),200
+
+
 @app.route('/users/my_games', methods=['GET'])
 @jwt_required()
 def mis_partidas():
+    """
+    Devuelve las partidas en las que participa el usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario de partidas del usuario.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     id_partidas_user = users[user]['partidas']
     partidas_user = {key : str(value) for key,value in partidas.items() if key in id_partidas_user}
     return jsonify(partidas_user),200
+
+
 #PARTIDA
 @app.route('/games',methods=['POST'])
 @jwt_required()
 def crear_partida():
+    """
+    Crea una nueva partida, pública o privada.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     id = id_partida()
     parametros_partida = request.get_json()
@@ -193,16 +390,46 @@ def crear_partida():
     partidas[id].add_jugador(user,parametros_partida['reino'])
     users[user]['partidas'].append(id)
     return f'Partida de id: {id} creada correctamente'
+
+
 @app.route('/games',methods=['GET'])
 @jwt_required()
 def partidas_publicas():
+    """
+    Devuelve las partidas públicas disponibles a las que el usuario puede unirse.
+
+    Returns
+    -------
+    dict
+        Diccionario de partidas públicas.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     publicas = {key: str(value) for key, value in partidas.items() if not value.privada and value.estado == 'Esperando' and value.host != user}
     return jsonify(publicas),200
 
+
 @app.route('/games/<id>/join',methods=['PUT'])
 @jwt_required()
 def unirse_partida(id):
+    """
+    Permite a un usuario unirse a una partida existente.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     reino = request.args.get('reino','')
     try:
@@ -215,18 +442,54 @@ def unirse_partida(id):
         return f'Te has unido ha partida: {id}',200
     except KeyError:
         return f'Partida {id} no encontrada',404
+
+
 @app.route('/games/<id>/start',methods=['PUT'])
 @jwt_required()
-def iniciar_partida(id): #Poner un mensaje al jugador que comienza el turno
+def iniciar_partida(id):
+    """
+    Inicializa una partida y notifica al jugador que comienza.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str or None
+        Mensaje de éxito o None si la partida no existe.
+    int
+        Código de estado HTTP.
+    """
+
     try:
         jugador = partidas[id].inicializar_partida()
         buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
         return f'Partida {id} inicializada, comienza {jugador}',200
     except KeyError:
         return None,404
+
+
 @app.route('/games/<id>/cancel',methods=['POST'])
 @jwt_required()
 def cancelar_partida(id):
+    """
+    Cancela una partida y notifica al host.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     try:
         user = get_jwt_identity()
         partidas[id].cancelar_partida()
@@ -238,17 +501,53 @@ def cancelar_partida(id):
         return f'Partida {id} cancelada con éxito',200
     except KeyError:
         return f'Partida {id} no encontrada',404
+
+
 @app.route('/games/<id>/game_state',methods=['GET'])
 @jwt_required()
 def estado_partida(id):
+    """
+    Devuelve el estado actual de una partida.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Estado de la partida.
+    int
+        Código de estado HTTP.
+    """
+
     try:
         estado = partidas[id].estado_partida()
         return estado, 200
     except KeyError:
         return 'Partida no encontrada', 404
+
+
 @app.route('/games/<id>/player_state',methods=['GET'])
 @jwt_required()
 def estado_jugador(id):
+    """
+    Devuelve el estado del jugador autenticado en la partida.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Estado del jugador.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     return jsonify(partidas[id].estado_jugador(user)),200
 
@@ -257,6 +556,22 @@ def estado_jugador(id):
 @app.route('/games/<id>/player/ver_zona',methods=['POST'])
 @jwt_required()
 def ver_zona(id):
+    """
+    Devuelve la información de una zona específica del mapa.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Información de la zona o error.
+    int
+        Código de estado HTTP.
+    """
+
     zona = request.get_json()
     zona = tuple(zona['zona'])
     if zona in partidas[id].mapa.regiones.keys():
@@ -266,34 +581,42 @@ def ver_zona(id):
     else:
         return jsonify({'error': f'Zona {zona} no encontrada'}),404
 
+
 @app.route('/games/<id>/player/ver_recursos',methods=['GET'])
 @jwt_required()
 def ver_recursos(id):
     """
-    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
-    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
-    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
-    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
+    Devuelve los recursos del jugador autenticado en la partida.
 
     Parameters
     ----------
     id : str
-        El identificador único del juego cuyo turno necesita ser cambiado.
+        Identificador de la partida.
 
     Returns
     -------
-    tuple
-        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
+    list
+        Lista de recursos del jugador.
+    int
+        Código de estado HTTP.
     """
     user = get_jwt_identity()
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
 
     return jsonify(jugador.ver_recursos()),200
 
+
 @app.route('/games/partidas.pkl',methods=['POST'])
 def guardar_partidas():
     """
-    Metemos en archivo pkl las partidas
+    Guarda el estado de las partidas en un archivo pickle.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
     """
     with open('pickle_files/partidas.pkl', 'wb') as f:
         pickle.dump(partidas, f)
@@ -303,16 +626,31 @@ def guardar_partidas():
 @app.route('/users/jugadores.pkl',methods=['POST'])
 def guardar_jugadores():
     """
-    Metemos en archivo pkl los jugadores
+    Guarda el estado de los usuarios en un archivo pickle.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
     """
     with open('pickle_files/jugadores.pkl', 'wb') as f:
         pickle.dump(users, f)
     return f'Jugadores guardados', 200
 
+
 @app.route('/users/mail/buzones.pkl',methods=['POST'])
 def guardar_buzones():
     """
-    Metemos en archivo pkl los buzones (notificaciones)
+    Guarda el estado de los buzones en un archivo pickle.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
     """
 
     with open('pickle_files/buzones.pkl', 'wb') as f:
@@ -323,8 +661,16 @@ def guardar_buzones():
 @app.route('/games/partidas.pkl',methods=['GET'])
 def obtener_partidas():
     """
-        Cargamos las partidas
+    Carga el estado de las partidas desde un archivo pickle.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
     """
+
     try:
         with open('pickle_files/partidas.pkl', 'rb') as f:
             partidas_nuevo=pickle.load(f)
@@ -338,12 +684,20 @@ def obtener_partidas():
 
     return 'Partidas obtenidas', 200
 
+
 @app.route('/users/jugadores.pkl',methods=['GET'])
 def obtener_jugadores():
     """
-        Cargamos los jugadores
+    Carga el estado de los usuarios desde un archivo pickle.
 
-        """
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
+    """
+
     try:
         with open('pickle_files/jugadores.pkl', 'rb') as f:
             users_nuevo=pickle.load(f)
@@ -360,8 +714,16 @@ def obtener_jugadores():
 @app.route('/users/mail/buzones.pkl',methods=['GET'])
 def obtener_buzones():
     """
-        Cargamos los buzones (notificaciones)
-        """
+    Carga el estado de los buzones desde un archivo pickle.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
+    """
+
     try:
         with open('pickle_files/buzones.pkl', 'rb') as f:
             buzon_nuevo=pickle.load(f)
@@ -378,22 +740,19 @@ def obtener_buzones():
 @jwt_required()
 def ver_mapa(id):
     """
-    Recupera la representación gráfica del mapa para un jugador
-    en una partida específica. Este endpoint está protegido y requiere
-    un token JWT válido para acceder. Identifica al usuario autenticado,
-    recupera su instancia de jugador correspondiente dentro de la partida
-    y obtiene la representación gráfica del mapa del jugador.
+    Devuelve la representación gráfica del mapa para el jugador autentificado.
 
     Parameters
     ----------
     id : str
-        ID de la partida en la que está jugando el jugador.
+        Identificador de la partida.
 
     Returns
     -------
-    tuple
-        Una tupla que contiene la representación gráfica del mapa del jugador
-        y el código de estado HTTP.
+    str
+        Representación gráfica del mapa.
+    int
+        Código de estado HTTP.
     """
     user = get_jwt_identity()
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
@@ -404,29 +763,46 @@ def ver_mapa(id):
 @jwt_required()
 def cambiar_turno(id):
     """
-    Gestiona la funcionalidad de cambio de turno para un juego específico identificado por su ID.
-    Utiliza el metodo HTTP PUT y requiere autenticación JWT para garantizar que la solicitud esté autorizada.
-    La función localiza la instancia del juego en el diccionario `partidas` usando el ID, cambia el turno
-    utilizando el metodo `cambiar_turno` de la instancia del juego y proporciona una respuesta de éxito.
+    Cambia el turno al siguiente jugador en la partida.
 
     Parameters
     ----------
     id : str
-        El identificador único del juego cuyo turno necesita ser cambiado.
+        Identificador de la partida.
 
     Returns
     -------
-    tuple
-        Un mensaje de éxito y un código de estado HTTP 200 que indica que el turno se ha cambiado con éxito.
+    str
+        Mensaje de éxito.
+    int
+        Código de estado HTTP.
     """
     partida = partidas[id]
     partida.cambiar_turno()
     le_toca_a = partida.turno
     buzon[le_toca_a].append({'mensaje': f'Es tu turno! Partida: {id}','leido':False})
     return "Turno cambiado con éxito", 200
+
+
 @app.route('/games/<id>/player/catalogos',methods=['GET'])
 @jwt_required()
 def catalogos(id):
+    """
+    Devuelve los catálogos de tropas y edificios disponibles para el jugador.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con catálogos y valores válidos.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     catalogos_dict = {}
@@ -441,41 +817,131 @@ def catalogos(id):
         'catalogo' : catalogo_edificios
     }
     return jsonify(catalogos_dict),200
+
+
 @app.route('/games/<id>/player/add_tropa',methods=['POST'])
 @jwt_required()
 def add_tropa(id):
+    """
+    Añade una tropa al jugador en la partida.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     tropa_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.add_tropa(tropa_dict['tropa'],tropa_dict['cantidad'])
     return salida, 200
+
+
 @app.route('/games/<id>/player/mover_tropa',methods=['PUT'])
 @jwt_required()
 def mover_tropa(id):
+    """
+    Mueve una tropa a otra región del mapa.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     tropa_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
     return jsonify(salida), 200
+
+
 @app.route('/games/<id>/player/mover_batallon',methods=['PUT'])
 @jwt_required()
 def mover_batallon(id):
+    """
+    Mueve un batallón completo a otra región del mapa.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     destino_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.mover_batallon(tuple(destino_dict['destino']))
     return jsonify(salida), 200
+
+
 @app.route('/games/<id>/player/edificio',methods=['POST'])
 @jwt_required()
 def construir_edificio(id):
+    """
+    Construye un edificio en la región actual del jugador.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     edificio = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
     salida = jugador.construir_edificio(edificio)
     return salida,200
+
+
 @app.route('/games/<id>/player/edificio',methods=['PUT'])
 @jwt_required()
 def subir_nivel_edificio(id):
+    """
+    Sube el nivel de un edificio en la región actual del jugador.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje de éxito o error.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     edificio = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
@@ -484,6 +950,22 @@ def subir_nivel_edificio(id):
 @app.route('/games/<id>/player/combatir',methods=['PUT'])
 @jwt_required()
 def combatir(id):
+    """
+    Realiza un combate entre dos regiones.
+
+    Parameters
+    ----------
+    id : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Resultado del combate y estado de la partida.
+    int
+        Código de estado HTTP.
+    """
+
     user = get_jwt_identity()
     parametros = request.get_json()
     salida = partidas[id].combatir(user,tuple(parametros['atacantes']),tuple(parametros['defensores']))
