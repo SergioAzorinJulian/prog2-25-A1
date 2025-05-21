@@ -34,6 +34,18 @@ class Tropa:
         self.vida = self.__class__.vida_base * self.cantidad
 
     def actualizar_cantidad(self, aliado):
+        '''
+        Actualiza la cantidad de la tropa
+
+        Parametros:
+        -------
+        aliado: Lista con las tropas de su mismo ejercito
+
+        Returns:
+        ------
+        str
+            tropas que han muerto
+        '''
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         self.dmg=self.__class__.dmg_base*self.cantidad
@@ -46,7 +58,19 @@ class Tropa:
         return f'{self.nombre}: {self.cantidad}'
 
     def atacar(self, aliado: list, enemigo: list) -> str:
-        """ Ataque basico para las tropas """
+        '''
+        Hace daño al enemigo
+
+        Parametros:
+        -------
+        aliado: Lista con las tropas de su mismo ejercito
+        enemigo: Lista con las tropas del otro ejercito
+
+        Returns:
+        ------
+        str
+            mensaje de daño realizado
+        '''
         if enemigo != []:
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
             nombre = enemigo[n].nombre
