@@ -549,7 +549,7 @@ def iniciar_partida(id):
         buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
         return f'Partida {id} inicializada, comienza {jugador}',200
     except KeyError:
-        return None,404
+        return 'No se ha podido iniciar la partida',404
 
 
 @app.route('/games/<id>/cancel',methods=['POST'])
