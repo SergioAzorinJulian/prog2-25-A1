@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from partida import Partida
 from jugador import Jugador
+from errores import TropaError
 from mysql_base import add_user_ranking, ver_ranking
 from apscheduler.schedulers.background import BackgroundScheduler
 import hashlib
@@ -818,8 +819,11 @@ def mover_tropa(id):
     user = get_jwt_identity()
     tropa_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
-    return jsonify(salida), 200
+    try:
+        salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
+        return jsonify(salida), 200
+    except TropaError as e:
+        return jsonify(e.mensaje), e.codigo
 
 
 @app.route('/games/<id>/player/mover_batallon',methods=['PUT'])
@@ -844,8 +848,12 @@ def mover_batallon(id):
     user = get_jwt_identity()
     destino_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    salida = jugador.mover_batallon(tuple(destino_dict['destino']))
-    return jsonify(salida), 200
+    try:
+        salida = jugador.mover_batallon(tuple(destino_dict['destino']))
+        return jsonify(salida), 200
+    except TropaError as e:
+        return jsonify(e.mensaje), e.codigo #400
+        
 
 
 @app.route('/games/<id>/player/edificio',methods=['POST'])
