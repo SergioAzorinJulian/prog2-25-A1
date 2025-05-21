@@ -272,7 +272,6 @@ def obtener_buzon(token):
 
 def marcar_leido(token):
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
     return r.text
 
 # USERS - AMIGOS
@@ -406,46 +405,6 @@ def subir_nivel_edificio(token, id_partida, edificio):
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
     return r.text
 
-def obtener_jugadores():
-    r = requests.get(f'{URL}/users/jugadores.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
-        return None
-
-def obtener_buzones():
-    r = requests.get(f'{URL}/users/mail/buzones.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
-        return None
-
-def subir_jugadores():
-    r = requests.post(f'{URL}/users/jugadores.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
-        return None
-
-def subir_buzones():
-    r = requests.post(f'{URL}/users/mail/buzones.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
-        return None
-
-def obtener_partidas():
-    r = requests.get(f'{URL}/games/partidas.pkl')
-    if r.status_code==200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
-        return None
-
 def subir_partidas():
     r = requests.post(f'{URL}/games/partidas.pkl')
     if r.status_code==200:
@@ -459,10 +418,10 @@ def subir_partidas():
 def jugar(token):
     limpiar_pantalla()
     while True:
-        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida"]]}
+        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]}
         crear_tabla(menu, dim=True)
 
-        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3])
         console.print()
 
         if choice == 1:
@@ -559,7 +518,6 @@ def jugar(token):
                                         catalogos_dict = catalogos(token, id_user_partida)
                                     limpiar_pantalla()
 
-                                    obtener_partidas()
                                     op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
                                     crear_tabla(op, dim = True)
     
@@ -569,7 +527,6 @@ def jugar(token):
                                     console.print()
     
                                     if choice == 1:
-                                        obtener_partidas()
                                         coordenada = to_tuple()
                                         while True:
                                             zona, estado = ver_zona(token, id_user_partida, coordenada)
@@ -667,13 +624,13 @@ def jugar(token):
                                             continue
                                     elif choice == 4:
                                         mostrar_texto(cambiar_turno(token, id_user_partida))
+                                        subir_partidas()
                                         param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
                                         limpiar_pantalla()
                                         continue
                                     else:
                                         limpiar_pantalla()
                                         break
-                                    subir_partidas()
                                 else:
                                     mostrar_texto('Todavía no es tu turno', estilo='info')
                                     tabla_espera()
@@ -697,6 +654,13 @@ def jugar(token):
                 else:
                     limpiar_pantalla()
                     break
+
+        elif choice == 3:
+            mostrar_texto(ver_ranking(token))
+            param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
+            limpiar_pantalla()
+            continue
+
         elif choice == 0:
             limpiar_pantalla()
             break
