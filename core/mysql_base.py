@@ -19,6 +19,10 @@ config = {
 def connect_to_db() -> None:
     '''
     Función que conecta con la base de datos MYSQL
+
+    Returns
+    ---------
+    None
     '''
     try:
         connection = mysql.connector.connect(**config)
@@ -26,7 +30,26 @@ def connect_to_db() -> None:
             return connection
     except Error as e:
         print(f'Error al conectar con la base de datos: {e}')
+
 def add_user_ranking(id):
+    '''
+    Función para añadir al usuario al ranking
+
+    Parámetros
+    ------------
+    id
+        id del usuario a añadir
+
+    Returns
+    ---------
+    None
+
+    Raises
+    --------
+    Exception
+        Si el usuario a añadir ya está en el ranking
+
+    '''
     conexion = connect_to_db()
     try:
         if conexion:
@@ -41,7 +64,17 @@ def add_user_ranking(id):
         if conexion: 
             cursor.close()
             conexion.close()
+
 def ver_ranking():
+    '''
+    Función para obtener el ranking actual
+
+    Returns
+    --------
+     list[tuple(str,int)]
+        Lista de tuplas con el nombre del usuario y la puntuación
+
+    '''
     conexion = connect_to_db()
     if conexion:
         cursor = conexion.cursor()
@@ -50,7 +83,25 @@ def ver_ranking():
         cursor.close()
         conexion.close()
         return ranking
+
+
 def add_elo(id, puntos):
+    '''
+    Función para actualizar el ranking de un usuario
+
+    Parámetros
+    ------------
+    id
+        id del usuario a actualizar
+    puntos
+        puntos a añadir en el ranking
+
+    Returns
+    --------
+    str
+        Mensaje que muestra el id la puntuación actualizada y el rango
+
+    '''
     conexion = connect_to_db()
     if conexion:
         cursor = conexion.cursor()
