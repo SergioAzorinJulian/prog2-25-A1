@@ -78,12 +78,38 @@ class Tropa:
             return f'{self.nombre} ataca a {nombre} : {self.dmg} \n' + txt_cantidad
 
     def recibir_dmg(self, dmg, aliado):
+        """
+        Recibe el daño del enemigo
+
+        Parámetros
+        ------------
+        dmg: daño a recibir
+        aliado: lista con las tropas de su mismo ejército
+
+        Returns
+        ----------
+        str
+            mensaje con la cantidad actualizada de tropas que han muerto
+        """
         self.vida = self.vida - dmg
         if self.vida <= 0:
             self.vida = 0
         return self.actualizar_cantidad(aliado)
 
     def __iadd__(self, other):
+        """
+        Metodo para sumar
+
+        Parámetros
+        -----------
+        other: objeto a sumar
+
+        Returns
+        ---------
+        self
+            instancia actualizada con la nueva cantidad
+
+        """
         if isinstance(other, Tropa):
             self.cantidad += other.cantidad
         else:
@@ -91,11 +117,36 @@ class Tropa:
         return self
 
     def __isub__(self, other):
+        """
+        Función para restar
+
+        Parámetros
+        -----------
+        other: objeto a restar
+
+        Returns
+        ---------
+        self
+            instancia actualizada con la nueva cantidad
+
+        """
         self.cantidad -= other
         return self
 
     def __add__(self, other):
-        """Devuelve una nueva instancia de Tropa con la cantidad sumada."""
+        """
+        Función que devuelve una nueva instancia de Tropa con la cantidad sumada
+
+        Parámetros
+        -----------
+        other: objeto con el que operar
+
+        Returns
+        ---------
+        self
+            intancia con la nueva cantidad sumada
+
+        """
         nueva_cantidad = self.cantidad
         if isinstance(other, Tropa): # Es una Tropa
             nueva_cantidad += other.cantidad
@@ -105,7 +156,19 @@ class Tropa:
         return self.__class__(nueva_cantidad, self.recursos, self.nombre)
     
     def __sub__(self, other):
-        """Devuelve una nueva instancia de Tropa con la cantidad restada."""
+        """
+        Función que devuelve una nueva instancia de Tropa con la cantidad restada
+
+        Parámetros
+        -----------
+        other: objeto con el que operar
+
+        Returns
+        ---------
+        self
+            intancia con la nueva cantidad restada
+
+        """
         nueva_cantidad = self.cantidad
         if isinstance(other, Tropa): # Es una Tropa
             nueva_cantidad -= other.cantidad
@@ -115,30 +178,83 @@ class Tropa:
         return self.__class__(nueva_cantidad, self.recursos, self.nombre)
     
     def __eq__(self, other):
+        """
+        Función para comparar dos tropas según su nombre
+
+        Parámetros
+        ------------
+        other: objeto a comparar
+
+        Returns
+        ---------
+        bool
+            True si los nombres coinciden, False si no se cumple la igualdad
+
+        """
         if isinstance(other, Tropa):
             return self.nombre == other.nombre
         else:
             return self.nombre.lower() == other
     
     def __str__(self):
+        """
+        Función str para mostrar la información del objeto
+
+        Returns
+        ----------
+        str
+            cadena de texto con la información de la instancia
+        """
         texto = f"{self.nombre}: Daño: {self.__class__.dmg_base}, Vida: {self.__class__.vida_base}"
         if self.cantidad > 0:
             texto += f', Cantidad: {self.cantidad}'
         return texto 
 
     def __repr__(self):
+        """
+        Función str para mostrar la información del objeto
+
+        Returns
+        ----------
+        str
+            cadena de texto con la información de la instancia
+        """
         return f'Tropa \nNombre: {self.nombre} Cantidad: {self.cantidad}'
 
     
 
 
 class TropaAtaque(Tropa):
-    '''
-    Clase de la que heredarán las tropas de tipo "Ataque"
-    '''
+    """
+    Subclase para crear las tropas de ataque del reino
+    Hereda de la clase base Tropa, modifica el metodo recibir_dmg() para recibir menos daño
 
+    ATRIBUTOS:
+    -------------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+
+    METODOS:
+    -----------
+    recibir_dmg: metodo para recibir el daño enemigo
+    critico: calcula la probabilidad de dar un golpe crítico
+    atacar: metodo para atacar al enemigo
+    """
     def critico(self) -> tuple:
-        """ Probabilidad de golpe critico """
+        """
+        Función para calcular la probabilidad de dar un golpe crítico
+
+        Returns
+        ---------
+        tuple
+            bool: True si se da el golpe crítico, False si no se da
+            int: 2 si golpe crítico, 1 si no
+            str: solo si se da el golpe crítico
+        """
         if self.vida < self.__class__.vida_base:
             if random.random() < 0.8:  # < 80% de probabilidad
                 return True, 2, f'{self.nombre} : Golpe crítico \n'
