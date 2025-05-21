@@ -568,9 +568,9 @@ def jugar(token):
                                                                               'valores_validos'])
                                                             cantidad = param('Introduzca la cantidad: ', int)
                                                             destino = to_tuple()
-                                                            salida = mover_tropa(token, id_user_partida, tropa,
+                                                            salida, estado = mover_tropa(token, id_user_partida, tropa,
                                                                                  cantidad, destino)
-                                                            if isinstance(salida[0], list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                            if isinstance(salida, list):  # No se a podido mover la tropa, saltar opcion de combate
                                                                 mostrar_texto(salida[0])
                                                                 dict = {"Opciones": ["prompt",
                                                                                    ["0. Abortar",
@@ -593,8 +593,8 @@ def jugar(token):
                                                                     limpiar_pantalla()
                                                                     continue
 
-                                                            elif salida[1] == 200:
-                                                                mostrar_texto(salida[0])
+                                                            elif estado == 200:
+                                                                mostrar_texto(salida)
                                                                 mostrar_texto(cambiar_turno(token, id_user_partida))
                                                                 subir_partidas()
                                                                 param('Presione "Enter" para continuar ...', str,
@@ -603,14 +603,14 @@ def jugar(token):
                                                                 break
 
                                                             else: # Error al mover la tropa
-                                                                mostrar_texto(salida[0])
+                                                                mostrar_texto(salida)
                                                                 limpiar_pantalla()
                                                                 continue
 
                                                         case 3:
                                                             destino = to_tuple()
-                                                            salida = mover_batallon(token, id_user_partida, destino)
-                                                            if isinstance(salida[0], list):
+                                                            salida, estado = mover_batallon(token, id_user_partida, destino)
+                                                            if isinstance(salida, list):
                                                                 mostrar_texto(salida[0])
                                                                 dict = {"Opciones": ["prompt",
                                                                                      ["0. Abortar",
@@ -633,8 +633,8 @@ def jugar(token):
                                                                 else:
                                                                     limpiar_pantalla()
                                                                     continue
-                                                            elif salida[1] == 200:
-                                                                mostrar_texto(salida[0])
+                                                            elif estado == 200:
+                                                                mostrar_texto(salida)
                                                                 mostrar_texto(cambiar_turno(token, id_user_partida))
                                                                 subir_partidas()
                                                                 param('Presione "Enter" para continuar ...', str,
@@ -643,7 +643,7 @@ def jugar(token):
                                                                 break
 
                                                             else: # Error al mover la tropa
-                                                                mostrar_texto(salida[0])
+                                                                mostrar_texto(salida)
                                                                 limpiar_pantalla()
                                                                 continue
 
