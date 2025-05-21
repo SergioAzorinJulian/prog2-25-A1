@@ -424,15 +424,8 @@ def get_estado_jugador(token, id_partida):
     obtener_jugadores()
     obtener_buzones()
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
-    try:
-        respuesta_json = r.json()
-        return respuesta_json.get("es_turno")
-    except requests.exceptions.JSONDecodeError as e:
-        console.print(f"ERROR: Fallo al decodificar JSON en get_estado_jugador. Respuesta recibida: {r.text}", style='error')
-        return None
-    except AttributeError:
-        console.print(f"ERROR: La respuesta JSON no era un diccionario o no tenía la clave 'es_turno'. Respuesta: {r.text}", style='error')
-        return None
+    estado = r.json()
+    return estado
 
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
