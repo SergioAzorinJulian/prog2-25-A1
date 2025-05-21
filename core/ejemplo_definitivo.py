@@ -13,7 +13,6 @@ from rich.text import Text
 from rich.progress import track
 from rich import box
 
-from core.EJEMPLO_rich import despedida_md, temas_predefinidos
 from mapa import Mapa
 
 #Configuracion de rich
