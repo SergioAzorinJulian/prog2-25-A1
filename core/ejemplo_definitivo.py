@@ -538,7 +538,7 @@ def subir_partidas():
 def jugar(token):
     limpiar_pantalla()
     while True:
-        menu = {"Menu": ["prompt",["0.Volver","1.Crear partida","2.Unirse a partida"]]}
+        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida"]]}
         crear_tabla(menu, dim=True)
 
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
@@ -561,7 +561,7 @@ def jugar(token):
                         # Todo: mostrar mejor la lista de amigos
                         mostrar_texto(amigos, enumerado=True)
                         valores_validos = [n for n in range(0, len(amigos) + 1)]
-                        amigo = param('Que amigo desea invitar: ', int, valores_validos=valores_validos)
+                        amigo = param('¿A qué amigo desea invitar?: ', int, valores_validos=valores_validos)
                         invitado = amigos[amigo - 1]
                         limpiar_pantalla()
                     else:
