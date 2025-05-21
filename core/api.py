@@ -613,136 +613,7 @@ def ver_recursos(id):
     return jsonify(jugador.ver_recursos()),200
 
 
-@app.route('/games/partidas.pkl',methods=['POST'])
-def guardar_partidas():
-    """
-    Guarda el estado de las partidas en un archivo pickle.
 
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-    with open('pickle_files/partidas.pkl', 'wb') as f:
-        pickle.dump(partidas, f)
-    return f'Partidas guardadas', 200
-
-
-@app.route('/users/jugadores.pkl',methods=['POST'])
-def guardar_jugadores():
-    """
-    Guarda el estado de los usuarios en un archivo pickle.
-
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-    with open('pickle_files/jugadores.pkl', 'wb') as f:
-        pickle.dump(users, f)
-    return f'Jugadores guardados', 200
-
-
-@app.route('/users/mail/buzones.pkl',methods=['POST'])
-def guardar_buzones():
-    """
-    Guarda el estado de los buzones en un archivo pickle.
-
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-
-    with open('pickle_files/buzones.pkl', 'wb') as f:
-        pickle.dump(buzon, f)
-    return f'Buzones guardados', 200
-
-
-@app.route('/games/partidas.pkl',methods=['GET'])
-def obtener_partidas():
-    """
-    Carga el estado de las partidas desde un archivo pickle.
-
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-
-    try:
-        with open('pickle_files/partidas.pkl', 'rb') as f:
-            partidas_nuevo=pickle.load(f)
-
-        for keys in partidas_nuevo:
-            partidas[keys]=partidas_nuevo[keys]
-    except EOFError:
-        with open('pickle_files/partidas.pkl', 'wb') as f:
-            print('hola')
-            pickle.dump(partidas, f)
-
-    return 'Partidas obtenidas', 200
-
-
-@app.route('/users/jugadores.pkl',methods=['GET'])
-def obtener_jugadores():
-    """
-    Carga el estado de los usuarios desde un archivo pickle.
-
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-
-    try:
-        with open('pickle_files/jugadores.pkl', 'rb') as f:
-            users_nuevo=pickle.load(f)
-        for keys in users_nuevo:
-            users[keys] = users_nuevo[keys]
-    except EOFError:
-        with open('pickle_files/jugadores.pkl', 'wb') as f:
-            pickle.dump(users, f)
-
-
-    return 'Jugadores obtenidos', 200
-
-
-@app.route('/users/mail/buzones.pkl',methods=['GET'])
-def obtener_buzones():
-    """
-    Carga el estado de los buzones desde un archivo pickle.
-
-    Returns
-    -------
-    str
-        Mensaje de éxito.
-    int
-        Código de estado HTTP.
-    """
-
-    try:
-        with open('pickle_files/buzones.pkl', 'rb') as f:
-            buzon_nuevo=pickle.load(f)
-        for keys in buzon_nuevo:
-            buzon[keys] = buzon_nuevo[keys]
-    except EOFError:
-        with open('pickle_files/buzones.pkl', 'wb') as f:
-            pickle.dump(buzon, f)
-
-
-    return 'Buzones obtenidos', 200
-'''
 @app.route('/games/partidas.pkl',methods=['POST'])
 def guardar_partidas():
     """
@@ -821,7 +692,7 @@ def obtener_buzones():
         with open(pickle_path('buzones.pkl'), 'wb') as f:
             pickle.dump(buzon, f)
     return 'Buzones obtenidos', 200
-'''
+
 @app.route('/games/<id>/player/ver_mapa',methods=['GET'])
 @jwt_required()
 def ver_mapa(id):
