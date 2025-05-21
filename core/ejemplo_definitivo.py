@@ -352,6 +352,7 @@ def partidas_publicas(token):
     obtener_partidas()
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
+    subir_partidas()
     return publicas
 
 # /game/<id>/
@@ -377,6 +378,7 @@ def get_estado_partida(token, id_partida):
     obtener_partidas()
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
+    subir_partidas()
     return estado, r.status_code
 
 def get_estado_jugador(token, id_partida):
@@ -401,10 +403,12 @@ def ver_zona(token, id_partida, coordenada):
     return zona, r.status_code
 
 def ver_recursos(token, id_partida):
+    obtener_jugadores()
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
 
 def ver_mapa(token, id_partida):
+
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
