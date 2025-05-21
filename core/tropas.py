@@ -264,6 +264,19 @@ class TropaAtaque(Tropa):
         return False, 1
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]) -> str:
+        """
+        Función para realizar un ataque
+
+        Parámetros
+        -----------------
+        aliado: lista con las tropas aliadas
+        enemigo: lista con las tropas enemigas
+
+        Returns
+        -----------
+        str
+            mensaje de texto describiendo el ataque
+        """
         if enemigo != []:
             critico = self.critico()
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
@@ -278,11 +291,38 @@ class TropaAtaque(Tropa):
 
 
 class TropaDefensa(Tropa):
-    '''
-    Clase de la que heredarán las tropas de tipo "Defensa"
-    '''
+    """
+    Subclase para crear las tropas de defensa del reino
+    Hereda de la clase base Tropa, modifica el metodo recibir_dmg() para recibir menos daño
+
+    ATRIBUTOS:
+    -------------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+
+    METODOS:
+    -----------
+    recibir_dmg: metodo para recibir el daño enemigo
+    """
 
     def recibir_dmg(self, dmg, aliado, reducion=0.8):
+        """
+        Recibe el daño del enemigo
+
+        Parámetros
+        ------------
+        dmg: daño a recibir
+        aliado: lista con las tropas de su mismo ejército
+        reducion: porcentaje de reduccion de danyo recibido
+        Returns
+        ----------
+        str
+            mensaje con la cantidad actualizada de tropas que han muerto
+        """
         dmg_reducido = dmg * reducion
         self.vida = self.vida - dmg_reducido
         if self.vida <= 0:
@@ -291,22 +331,41 @@ class TropaDefensa(Tropa):
 
 
 class TropaAlcance(Tropa):
-    '''
-    Clase de la que heredarán las tropas de tipo "Alcance"
-    '''
+    """
+    Subclase para crear las tropas de tipo alcance
+    Hereda de la clase base Tropa todos sus métodos
+    """
 
 
 class TropaEstructura(Tropa):
-    '''
-    Clase de la que heredarán las tropas de tipo "Inmóviles"
-    '''
+    """
+    Subclase para crear las tropas de tipo estructura
+    Hereda de la clase base Tropa todos sus métodos
+    """
 
 
 # TROPAS DE ATAQUE
 class Soldado(TropaAtaque):
-    '''
-    Soldado: Clase Default de Tropa de Atk
-    '''
+    """
+        Subclase para crear las tropas soldado
+        Hereda de la subclase TropaAtaque, redefine el constructor
+
+        Atributos
+        -----------
+        recursos: int
+            Coste de recursos para entrenar la tropa.
+        nombre: str
+            Nombre de la tropa.
+        cantidad: int
+            Número de instancias de esta tropa.
+        dmg_base: int
+            daño generado base del soldado
+        vida_base: int
+            vida base del soldado
+        recursos: Recurso
+            recursos necesarios para entranar la tropa
+
+        """
     dmg_base = 100  #Daño de la tropa
     vida_base = 150  #Vida de la tropa
     recursos = Recurso('caza',10,0)
@@ -314,6 +373,32 @@ class Soldado(TropaAtaque):
         super().__init__(recursos, nombre, cantidad)
 
 class Oso(TropaAtaque):
+    """
+    Subclase para crear las tropas oso
+    Hereda de la subclase TropaAtaque, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    ------------
+
+    recibir_dmg: metodo para recibir el daño enemigo
+    critico: calcula la probabilidad de dar un golpe crítico
+    atacar: metodo para atacar al enemigo
+    """
     dmg_base=20
     vida_base=100
     recursos=Recurso('caza',30,0)
@@ -322,6 +407,30 @@ class Oso(TropaAtaque):
  
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
+    """
+    Subclase para crear las tropas oso
+    Hereda de la subclase TropaDefensa, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    ------------
+    atacar: metodo de ataque del gigante
+    recibir_dmg: metodo para recibir el daño enemigo
+    """
     dmg_base = 100
     vida_base = 250
     recursos = Recurso('caza', 20, 0)
@@ -329,6 +438,19 @@ class Gigante(TropaDefensa):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):  # Solo ataca estructuras
+        """
+        Metodo para atacar con el gigante
+
+        Parámetros
+        -------------
+        aliado: lista con las tropas aliadas
+        enemigo: lista con las tropas enemigas
+
+        Returns
+        ----------
+        str
+            mensaje para mostrar que se ha realizado el ataque
+        """
         if enemigo != []:
             txt = None
             for i in enemigo:
@@ -338,6 +460,29 @@ class Gigante(TropaDefensa):
                     txt += f'{self.nombre} ataca a {i.nombre} \n' + i.recibir_dmg(self.dmg, enemigo)
             return txt
 class Ogro(TropaDefensa):
+    """
+    Subclase para crear las tropas ogro
+    Hereda de la subclase TropaDefensa, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    -------------
+    recibir_dmg: metodo para recibir el daño enemigo
+    """
     dmg_base=30
     vida_base=400
     recursos=Recurso('caza',50,0)
@@ -346,9 +491,29 @@ class Ogro(TropaDefensa):
 
 # TROPAS DE ALCANCE
 class Arquero(TropaAlcance):
-    '''
-    Arquero: ''Dispara varias flechas''
-    '''
+    """
+    Subclase para crear las tropas arquero
+    Hereda de la subclase TropaAlcance, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    ---------
+    atacar: metodo para atacar con la tropa arquero
+    """
     dmg_base = 80
     vida_base = 150
     recursos = Recurso('caza', 5, 0)
@@ -356,6 +521,19 @@ class Arquero(TropaAlcance):
         super().__init__(recursos, nombre, cantidad)
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        """
+        Metodo para atacar con el arquero
+
+        Parámetros
+        -------------
+        aliado: lista con las tropas aliadas
+        enemigo: lista con las tropas enemigas
+
+        Returns
+        ----------
+        str
+            mensaje para mostrar que se ha realizado el ataque
+        """
         if enemigo != []:
             n = 0
             for i in enemigo[:]:
@@ -365,6 +543,32 @@ class Arquero(TropaAlcance):
             return f'{self.nombre} acertó {n} veces : {self.dmg * n}'
 
 class Magician(TropaAlcance):
+    """
+    Subclase para crear las tropas magician
+    Hereda de la subclase TropaAlcance, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    ------------
+    curar: metodo para cuarar aliados
+    atacar: metodo para atacar con la tropa magician
+
+
+    """
     dmg_base=50
     vida_base=100
     recursos=Recurso('caza',50,0)
@@ -374,12 +578,37 @@ class Magician(TropaAlcance):
         self.heal = self.__class__.healing_base * self.cantidad
        
     def curar(self,aliado:list[Tropa]):
+        """
+        Metodo para curar aliados
+
+        Parámetros
+        -------------
+        aliado: lista con las tropas aliadas
+
+        Returns
+        ----------
+        str
+            mensaje para mostrar que se ha realizado la operación de curar
+        """
         if aliado!=[]:
             n = random.randint(0,len(aliado)-1)
             aliado[n].vida+=self.heal*aliado[n].cantidad
             return f'{self.nombre} cura a {aliado[n].nombre} : {self.heal*aliado[n].cantidad} \n'
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        """
+        Metodo para atacar con el magician
+
+        Parámetros
+        -------------
+        aliado: lista con las tropas aliadas
+        enemigo: lista con las tropas enemigas
+
+        Returns
+        ----------
+        str
+            mensaje para mostrar que se ha realizado el ataque
+        """
         if enemigo != []:
             self.heal = self.__class__.healing_base * self.cantidad
             n = random.randint(0, len(enemigo) - 1)
@@ -392,9 +621,32 @@ class Magician(TropaAlcance):
         
 # TROPAS DE ESTRUCTURA
 class Cannon(TropaEstructura):
-    '''
-    Cañon: ''Daño en area'' -> Ataca cada 2 Turnos (De combate)
-    '''
+    """
+    Subclase para crear las tropas cannon. ataca cada 2 turnos de combate y tiene daño en area
+    Hereda de la subclase TropaEsctructura, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+
+    Metodos
+    ------------
+    toggle: metodo para activar y desactivar el cannon
+    atacar: metodo para atacar con la tropa magician
+
+
+    """
     dmg_base = 300
     vida_base = 500
     recursos = Recurso('madera', 100, 0)
@@ -403,11 +655,32 @@ class Cannon(TropaEstructura):
         self.activo = True
 
     def toggle(self) -> bool:  # Activa y desactiva el cañon
+        """
+        Metodo para activar o desactivar el cannon
+
+        Returns
+        ----------
+        bool
+            True si está activado, False si no lo está
+        """
         estado = self.activo
         self.activo = not self.activo
         return estado
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
+        """
+        Metodo para atacar con el cañon
+
+        Parámetros
+        -------------
+        aliado: lista con las tropas aliadas
+        enemigo: lista con las tropas enemigas
+
+        Returns
+        ----------
+        str
+            mensaje para mostrar que se ha realizado el ataque o no
+        """
         if enemigo != []:
             dmg_total = 0
             reduccion = 1
@@ -422,6 +695,25 @@ class Cannon(TropaEstructura):
                 return f'{self.nombre} sobrecalentado'
             
 class Catapulta(TropaEstructura):
+    """
+    Subclase para crear las tropas catapulta
+    Hereda de la subclase TropaEsctructura, redefine el constructor
+
+    Atributos
+    -----------
+    recursos: int
+        Coste de recursos para entrenar la tropa.
+    nombre: str
+        Nombre de la tropa.
+    cantidad: int
+        Número de instancias de esta tropa.
+    dmg_base: int
+        daño generado base del soldado
+    vida_base: int
+        vida base del soldado
+    recursos: Recurso
+        recursos necesarios para entranar la tropa
+"""
     dmg_base=275
     vida_base=200
     recursos=Recurso('madera',200,0)
