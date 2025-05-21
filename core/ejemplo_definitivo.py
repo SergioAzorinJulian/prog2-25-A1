@@ -390,12 +390,12 @@ def add_tropa(token, id_partida, tropa, cantidad):
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
-    return r.json()
+    return r.json(), r.status_code
 
 def mover_batallon(token, id_partida, destino):
     diccionario = {'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
-    return r.json()
+    return r.json(), r.status_code
 
 def construir_edificio(token, id_partida, edificio):
     r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
@@ -570,39 +570,7 @@ def jugar(token):
                                                             destino = to_tuple()
                                                             salida = mover_tropa(token, id_user_partida, tropa,
                                                                                  cantidad, destino)
-                                                            if isinstance(salida,
-                                                                          list):  # No se a podido mover la tropa, saltar opcion de combate
-                                                                if isinstance(salida, list):
-                                                                    mostrar_texto(salida[0])
-                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
-                                                                    print('2. ABORTAR')
-                                                                    choice = param('Eliga una opción: ', int,
-                                                                                   valores_validos=[1, 2])
-                                                                    if choice == 1:
-                                                                        salida = combatir(token, id_user_partida,
-                                                                                          coordenada, destino)
-                                                                        mostrar_texto(salida['texto'])
-                                                                        limpiar_pantalla()
-                                                                        if salida['estado'] == 'Finalizada':
-                                                                            break
-                                                                    else:
-                                                                        limpiar_pantalla()
-                                                                        continue
-                                                            else:
-                                                                mostrar_texto(salida)
-                                                                limpiar_pantalla()
-
-                                                            mostrar_texto(cambiar_turno(token, id_user_partida))
-                                                            subir_partidas()
-                                                            param('Presione "Enter" para continuar ...', str,
-                                                                  valores_validos=[''], estilo='info')
-                                                            limpiar_pantalla()
-                                                            continue
-                                                            
-                                                        case 3:
-                                                            destino = to_tuple()
-                                                            salida = mover_batallon(token, id_user_partida, destino)
-                                                            if isinstance(salida, list):
+                                                            if isinstance(salida[0], list):  # No se a podido mover la tropa, saltar opcion de combate
                                                                 mostrar_texto(salida[0])
                                                                 print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
                                                                 print('2. ABORTAR')
@@ -618,16 +586,53 @@ def jugar(token):
                                                                 else:
                                                                     limpiar_pantalla()
                                                                     continue
-                                                            else:
-                                                                mostrar_texto(salida)
-                                                                limpiar_pantalla()
 
-                                                            mostrar_texto(cambiar_turno(token, id_user_partida))
-                                                            subir_partidas()
-                                                            param('Presione "Enter" para continuar ...', str,
-                                                                  valores_validos=[''], estilo='info')
-                                                            limpiar_pantalla()
-                                                            continue
+                                                            elif salida[1] == 200:
+                                                                mostrar_texto(salida[0])
+                                                                mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                                subir_partidas()
+                                                                param('Presione "Enter" para continuar ...', str,
+                                                                      valores_validos=[''], estilo='info')
+                                                                limpiar_pantalla()
+                                                                break
+
+                                                            else:
+                                                                mostrar_texto(salida[0])
+                                                                limpiar_pantalla()
+                                                                break
+
+                                                        case 3:
+                                                            destino = to_tuple()
+                                                            salida = mover_batallon(token, id_user_partida, destino)
+                                                            if isinstance(salida[0], list):
+                                                                mostrar_texto(salida[0])
+                                                                print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                print('2. ABORTAR')
+                                                                choice = param('Eliga una opción: ', int,
+                                                                               valores_validos=[1, 2])
+                                                                if choice == 1:
+                                                                    salida = combatir(token, id_user_partida,
+                                                                                      coordenada, destino)
+                                                                    mostrar_texto(salida['texto'])
+                                                                    limpiar_pantalla()
+                                                                    if salida['estado'] == 'Finalizada':
+                                                                        break
+                                                                else:
+                                                                    limpiar_pantalla()
+                                                                    continue
+                                                            elif salida[1] == 200:
+                                                                mostrar_texto(salida[0])
+                                                                mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                                subir_partidas()
+                                                                param('Presione "Enter" para continuar ...', str,
+                                                                      valores_validos=[''], estilo='info')
+                                                                limpiar_pantalla()
+                                                                break
+
+                                                            else:
+                                                                mostrar_texto(salida[0])
+                                                                limpiar_pantalla()
+                                                                break
 
                                                         case 4:
                                                             mostrar_texto(catalogos_dict['edificios']['catalogo'])
