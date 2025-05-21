@@ -40,6 +40,9 @@ TERRENOS_JUEGO = Mapa.terrenos_disponibles
 def partida_custom():
     size = param('Introduce el tamaño del mapa (min.3, max.50): ', int, valores_validos=[i for i in range(3, 51)],
                  estilo='input')
+
+    mostrar_terrenos_en_tabla()
+
     while True:
         terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str, estilo='input')
         if len(terrenos.split(',')) < 2:
@@ -56,18 +59,23 @@ def partida_custom():
                         f'[error]Error: El tipo de terreno "{terreno}" se ha introducido más de una vez.[/error] \n[info]Ayuda: La multiplicidad máxima de cada terreno es 1.[/info]')
                 else:
                     console.print(f'Error: El tipo de terreno "{terreno}" no existe en el juego.', style='error')
-                console.print()
-                table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
-                table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
-                for terreno in TERRENOS_JUEGO:
-                    table_terrenos.add_row(terreno.capitalize())
-                console.print(table_terrenos)
-                console.print()
-                #limpiar_pantalla()
+
+                mostrar_terrenos_en_tabla()
+
                 break
         else:
             break
+
     return size, terrenos
+
+def mostrar_terrenos_en_tabla():
+    console.print()
+    table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
+    table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
+    for terreno in TERRENOS_JUEGO:
+        table_terrenos.add_row(terreno.capitalize())
+    console.print(table_terrenos)
+    console.print()
 
 def to_tuple():
     while True:
