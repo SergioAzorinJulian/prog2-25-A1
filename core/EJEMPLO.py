@@ -386,20 +386,19 @@ def menu():
                                                                                 destino = to_tuple()
                                                                                 salida = mover_tropa(token,id_user_partida,tropa,cantidad,destino)
                                                                                 if isinstance(salida,list): #No se a podido mover la tropa, saltar opcion de combate
-                                                                                    if isinstance(salida, list):
-                                                                                        mostrar_texto(salida[0])
-                                                                                        print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
-                                                                                        print('2. ABORTAR')
-                                                                                        choice = param('Eliga una opción: ',int, valores_validos=[1,2])
-                                                                                        if choice == 1:
-                                                                                            salida = combatir(token,id_user_partida, coordenada, destino)
-                                                                                            mostrar_texto(salida['texto'])
-                                                                                            limpiar_pantalla()
-                                                                                            if salida['estado'] == 'Finalizada':
-                                                                                                break
-                                                                                        else:
-                                                                                            limpiar_pantalla()
-                                                                                            continue
+                                                                                    mostrar_texto(salida[0])
+                                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                                    print('2. ABORTAR')
+                                                                                    choice = param('Eliga una opción: ',int, valores_validos=[1,2])
+                                                                                    if choice == 1:
+                                                                                        salida = combatir(token,id_user_partida, coordenada, destino)
+                                                                                        mostrar_texto(salida['texto'])
+                                                                                        limpiar_pantalla()
+                                                                                        if salida['estado'] == 'Finalizada':
+                                                                                            break
+                                                                                    else:
+                                                                                        limpiar_pantalla()
+                                                                                        continue
                                                                                 else:
                                                                                     mostrar_texto(salida)
                                                                                     limpiar_pantalla()                                                                                                                       

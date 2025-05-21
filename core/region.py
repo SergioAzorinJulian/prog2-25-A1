@@ -155,10 +155,14 @@ class Region:
         for resource in self.recursos:
             recursos_str += f' {resource.__str__()} |\n'
 
+        edificios_str = ''
+        for edificio in self.edificios:
+            edificios_str += f' {edificio.__str__()} |\n'
+
         mensaje = (f"Posición: {self._posicion} | Terreno: {self._tipo_terreno} | Reino: {self._es_reino} | \n"
                 f"Propietario: {self._propietario} |\n"
                 f"Recursos: \n{recursos_str}"
-                f"Edificios: {self.edificios} | \n"
+                f"Edificios: \n{edificios_str}"
                 f"Tropas: \n{tropas_str}")
 
         return mensaje if not self.get_es_reino() else mensaje + f"Nombre: {self.get_nombre_reino()} |"

@@ -4,31 +4,7 @@ from region_manager import RegionManager
 from recursos import Recurso
 from tropas import *
 from edificios import *
-
-'''
-PLANTEAMIENTO DEL MENÚ DEL JUGADOR:
-    VER MAPA GRÁFICO -> La idea seria mostrar tus zonas con una X, las de nadie con ? y las del enemigo con O (No es prioridad para el viernes)
-        Se podría quizá dibujar un grafo, pero ya se verá ... 
-
-    ACCEDER A ZONA:
-        (SE MUESTRA LA INFORMACIÓN DE LA ZONA), Se actualiza self.region_actual a la zona que esta viendo
-        AÑADIR TROPAS -> Se crean tropas en la zona actual, consume recursos:[] (escribir que recurso consume cada tropa el que lo sepa)
-            Tropas normales -> Comida y Agua
-            Tropas de asedio (elefantes y arietes) -> Comida, Agua y Madera
-
-        MOVER_TROPA -> Se mueve la tropa indicada a destino, es necesario implementar un método que permita restar cant a la instancia del obj tropa, y otro para sumarlo en caso de que en destino ya esté esa tropa
-            Para movimientos dentro de tu dominio -> Puedes avanzar 2 (o 3, ya se ve en el desarrollo) "casillas" en un turno
-            Para movimientos en zonas neutras o enemigas -> Puedes avanzar una zona por turno
-
-        MOVER_BATALLÓN -> Lo mismo pero mueve todas las tropas de una
-
-        CONSTRUIR EDIFICIO -> Construye edificios, escribir aquí edificios y recursos que consumen crearlos -> []
-
-        VOLVER
-
-Mover tropa, y mover batallón consumen el turno, si mueves la tropa a territorio enemigo -> COMBATIR o ABORTAR
-'''
-
+from errores import TropaError
 
 class Jugador:
     """
@@ -279,7 +255,7 @@ class Jugador:
 
         # Verifica si el destino está dentro de las regiones conquistadas o conectadas; si no, retorna error
         if destino not in self.conquista + self.mapa.regiones[self.region_actual].get_conexiones():
-            return f'No puedes moverte a {destino}, fuera de rango'
+            raise TropaError(f'No puedes moverte a {destino}, fuera de rango',400)
 
         # Si el destino es del jugador o neutral, permite el movimiento
         if self.mapa.regiones[destino].get_propietario() == self.usuario or self.mapa.regiones[destino].get_propietario() == 'Neutral':
@@ -325,10 +301,10 @@ class Jugador:
 
                 else:
                     # Si no hay suficientes tropas para mover
-                    return f'No dispones de {cantidad} {tropa}'
+                    raise TropaError(f'No dispones de {cantidad} {tropa}',400)
 
             # Si la tropa no está en la región actual
-            return f'No dispones de {tropa} en la region'
+            raise TropaError(f'No dispones de {tropa} en la region',400)
 
         else:
             # Si la región destino es enemiga, pregunta si desea combatir
@@ -352,7 +328,7 @@ class Jugador:
         """
 
         if destino not in self.conquista + self.mapa.regiones[self.region_actual].get_conexiones():
-            return f'No puedes moverte a {destino}, fuera de rango'
+            raise TropaError(f'No puedes moverte a {destino}, fuera de rango',400) 
         if self.mapa.regiones[destino].get_propietario() == self.usuario or self.mapa.regiones[destino].get_propietario() == 'Neutral':
             for i in self.mapa.regiones[self.region_actual].tropas[:]:
                 cantidad = i.cantidad

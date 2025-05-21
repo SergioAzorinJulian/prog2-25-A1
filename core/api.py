@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from partida import Partida
 from jugador import Jugador
+from errores import TropaError
 from mysql_base import add_user_ranking, ver_ranking
+from apscheduler.schedulers.background import BackgroundScheduler
 import hashlib
 import random
 import pickle
@@ -36,13 +38,76 @@ def id_partida() -> str:
     """
 
     while True:
-        n = random.randint(0,999)
+        n = random.randint(1,999)
         if n not in partidas.keys():
             n = str(n)
             return n
         else:
             continue
-      
+
+#GUARDADOS
+
+def cargar_partidas():
+    """
+        Cargamos las partidas
+    """
+    try:
+        with open(pickle_path('partidas.pkl'), 'rb') as f:
+            partidas_nuevo = pickle.load(f)
+        partidas.update(partidas_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('partidas.pkl'), 'wb') as f:
+            pickle.dump(partidas, f)
+    return 'Partidas obtenidas', 200
+
+
+def cargar_jugadores():
+    """
+        Cargamos los jugadores
+
+        """
+    try:
+        with open(pickle_path('jugadores.pkl'), 'rb') as f:
+            users_nuevo = pickle.load(f)
+        users.update(users_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('jugadores.pkl'), 'wb') as f:
+            pickle.dump(users, f)
+    return 'Jugadores obtenidos', 200
+
+
+def cargar_buzones():
+    """
+        Cargamos los buzones (notificaciones)
+        """
+    try:
+        with open(pickle_path('buzones.pkl'), 'rb') as f:
+            buzones_nuevo = pickle.load(f)
+        buzon.update(buzones_nuevo)
+    except (EOFError, FileNotFoundError):
+        with open(pickle_path('buzones.pkl'), 'wb') as f:
+            pickle.dump(buzon, f)
+    return 'Buzones obtenidos', 200
+
+def guardar_jugadores():
+    """
+    Metemos en archivo pkl los jugadores
+    """
+    with open(pickle_path('jugadores.pkl'), 'wb') as f:
+        pickle.dump(users, f)
+    return 'Jugadores guardados', 200
+
+
+def guardar_buzones():
+    """
+    Metemos en archivo pkl los buzones (notificaciones)
+    """
+
+    with open(pickle_path('buzones.pkl'), 'wb') as f:
+        pickle.dump(buzon, f)
+    return 'Buzones guardados', 200
+
+
 #API
 @app.route('/')
 def kingdom_craft():
@@ -398,6 +463,16 @@ def crear_partida():
     users[user]['partidas'].append(id)
     return f'Partida de id: {id} creada correctamente'
 
+#GUARDADO PARTIDA
+@app.route('/games/partidas.pkl',methods=['POST'])
+def guardar_partidas():
+    """
+    Metemos en archivo pkl las partidas
+    """
+
+    with open(pickle_path('partidas.pkl'), 'wb') as f:
+        pickle.dump(partidas, f)
+    return 'Partidas guardadas', 200
 
 @app.route('/games',methods=['GET'])
 @jwt_required()
@@ -475,7 +550,7 @@ def iniciar_partida(id):
         buzon[jugador].append({'mensaje':f'Es tu turno! Partida: {id}','leido':False})
         return f'Partida {id} inicializada, comienza {jugador}',200
     except KeyError:
-        return None,404
+        return 'No se ha podido iniciar la partida',404
 
 
 @app.route('/games/<id>/cancel',methods=['POST'])
@@ -558,6 +633,11 @@ def estado_jugador(id):
     user = get_jwt_identity()
     return jsonify(partidas[id].estado_jugador(user)),200
 
+@app.route('/games/<id>/winner',methods=['GET'])
+@jwt_required()
+def ganador(id):
+    return partidas[id].ganador
+
 
 #/games/<id>/player/
 @app.route('/games/<id>/player/ver_zona',methods=['POST'])
@@ -612,86 +692,6 @@ def ver_recursos(id):
 
     return jsonify(jugador.ver_recursos()),200
 
-
-
-@app.route('/games/partidas.pkl',methods=['POST'])
-def guardar_partidas():
-    """
-    Metemos en archivo pkl las partidas
-    """
-
-    with open(pickle_path('partidas.pkl'), 'wb') as f:
-        pickle.dump(partidas, f)
-    return 'Partidas guardadas', 200
-
-@app.route('/users/jugadores.pkl',methods=['POST'])
-def guardar_jugadores():
-    """
-    Metemos en archivo pkl los jugadores
-    """
-    with open(pickle_path('jugadores.pkl'), 'wb') as f:
-        pickle.dump(users, f)
-    return 'Jugadores guardados', 200
-
-@app.route('/users/mail/buzones.pkl',methods=['POST'])
-def guardar_buzones():
-    """
-    Metemos en archivo pkl los buzones (notificaciones)
-    """
-
-    with open(pickle_path('buzones.pkl'), 'wb') as f:
-        pickle.dump(buzon, f)
-    return 'Buzones guardados', 200
-
-
-@app.route('/games/partidas.pkl',methods=['GET'])
-def obtener_partidas():
-    """
-        Cargamos las partidas
-    """
-    try:
-        with open(pickle_path('partidas.pkl'), 'rb') as f:
-            partidas_nuevo = pickle.load(f)
-        partidas.update(partidas_nuevo)
-    except (EOFError, FileNotFoundError):
-        with open(pickle_path('partidas.pkl'), 'wb') as f:
-            pickle.dump(partidas, f)
-    return 'Partidas obtenidas', 200
-
-@app.route('/users/jugadores.pkl',methods=['GET'])
-def obtener_jugadores():
-    """
-        Cargamos los jugadores
-
-        """
-    try:
-        with open(pickle_path('jugadores.pkl'), 'rb') as f:
-            users_nuevo = pickle.load(f)
-        users.update(users_nuevo)
-    except (EOFError, FileNotFoundError):
-        with open(pickle_path('jugadores.pkl'), 'wb') as f:
-            pickle.dump(users, f)
-    return 'Jugadores obtenidos', 200
-
-
-
-
-
-
-
-@app.route('/users/mail/buzones.pkl',methods=['GET'])
-def obtener_buzones():
-    """
-        Cargamos los buzones (notificaciones)
-        """
-    try:
-        with open(pickle_path('buzones.pkl'), 'rb') as f:
-            buzones_nuevo = pickle.load(f)
-        buzon.update(buzones_nuevo)
-    except (EOFError, FileNotFoundError):
-        with open(pickle_path('buzones.pkl'), 'wb') as f:
-            pickle.dump(buzon, f)
-    return 'Buzones obtenidos', 200
 
 @app.route('/games/<id>/player/ver_mapa',methods=['GET'])
 @jwt_required()
@@ -824,8 +824,11 @@ def mover_tropa(id):
     user = get_jwt_identity()
     tropa_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
-    return jsonify(salida), 200
+    try:
+        salida = jugador.mover_tropa(tuple(tropa_dict['destino']),tropa_dict['tropa'],tropa_dict['cantidad'])
+        return jsonify(salida), 200
+    except TropaError as e:
+        return jsonify(e.mensaje), e.codigo
 
 
 @app.route('/games/<id>/player/mover_batallon',methods=['PUT'])
@@ -850,8 +853,12 @@ def mover_batallon(id):
     user = get_jwt_identity()
     destino_dict = request.get_json()
     jugador : Jugador = partidas[id].jugadores[partidas[id].jugadores.index(user)]
-    salida = jugador.mover_batallon(tuple(destino_dict['destino']))
-    return jsonify(salida), 200
+    try:
+        salida = jugador.mover_batallon(tuple(destino_dict['destino']))
+        return jsonify(salida), 200
+    except TropaError as e:
+        return jsonify(e.mensaje), e.codigo #400
+        
 
 
 @app.route('/games/<id>/player/edificio',methods=['POST'])
@@ -931,5 +938,17 @@ def combatir(id):
         'estado': salida[1]
     }
     return jsonify(salida_dict),200
+
+
+
+scheduler = BackgroundScheduler() #Cada 10 min se guardarán los archivos.
+scheduler.add_job(guardar_jugadores, 'interval', seconds=600)
+scheduler.add_job(guardar_buzones, 'interval', seconds=600)
+scheduler.start()
+
+cargar_jugadores()
+cargar_buzones()
+cargar_partidas()
+
 if __name__ == '__main__':
     app.run(debug=True)

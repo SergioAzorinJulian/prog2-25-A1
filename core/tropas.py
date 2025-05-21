@@ -34,6 +34,18 @@ class Tropa:
         self.vida = self.__class__.vida_base * self.cantidad
 
     def actualizar_cantidad(self, aliado):
+        '''
+        Actualiza la cantidad de la tropa
+
+        Parametros:
+        -------
+        aliado: Lista con las tropas de su mismo ejercito
+
+        Returns:
+        ------
+        str
+            tropas que han muerto
+        '''
         ratio = math.ceil(self.vida / self.__class__.vida_base)  # Redondeo hacia arriba la cantidad
         self.cantidad = ratio
         self.dmg=self.__class__.dmg_base*self.cantidad
@@ -46,7 +58,19 @@ class Tropa:
         return f'{self.nombre}: {self.cantidad}'
 
     def atacar(self, aliado: list, enemigo: list) -> str:
-        """ Ataque basico para las tropas """
+        '''
+        Hace daño al enemigo
+
+        Parametros:
+        -------
+        aliado: Lista con las tropas de su mismo ejercito
+        enemigo: Lista con las tropas del otro ejercito
+
+        Returns:
+        ------
+        str
+            mensaje de daño realizado
+        '''
         if enemigo != []:
             n = random.randint(0, len(enemigo) - 1)  # Elegimos una tropa al azar de la lista
             nombre = enemigo[n].nombre
@@ -179,14 +203,7 @@ class Oso(TropaAtaque):
     recursos=Recurso('caza',30,0)
     def __init__(self,cantidad=0, recursos=30, nombre='Oso'):
         super().__init__(recursos, nombre, cantidad)
-
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]): #No le habeis puesto el crítico, ponerselo
-        if enemigo != []:
-            n = 0
-            for i in enemigo[:]:
-                i.recibir_dmg(self.dmg, enemigo)
-                n += 1
-            return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
+ 
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
@@ -248,13 +265,14 @@ class Magician(TropaAlcance):
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
         if enemigo != []:
+            self.heal = self.__class__.healing_base * self.cantidad
             n = random.randint(0, len(enemigo) - 1)
             dmg=self.dmg
             nombre=enemigo[n].nombre
             text_cantidad = enemigo[n].recibir_dmg(dmg,aliado) #Este texto devuelve si murieron tropas del enemigo
-            txt_healing=self.curar(self,aliado)
+            txt_healing=self.curar(aliado)
             return (f'{self.nombre} ataca a {nombre} : {dmg}\n{text_cantidad}\n{txt_healing}')
-    #AQUÍ FALTA AÑADIR EL METODO DE ACTUALIZAR CANTIDAD, YA QUE EL DEL PADRE TROPA, NO ACTUALIZA LA CANTIDAD DE CURACIÓN
+
         
 # TROPAS DE ESTRUCTURA
 class Cannon(TropaEstructura):

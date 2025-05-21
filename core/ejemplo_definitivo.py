@@ -10,10 +10,8 @@ from rich.table import Table
 from rich.markdown import Markdown
 from rich.align import Align
 from rich.text import Text
-from rich.progress import track
 from rich import box
 
-from core.EJEMPLO_rich import despedida_md, temas_predefinidos
 from mapa import Mapa
 
 #Configuracion de rich
@@ -41,6 +39,9 @@ TERRENOS_JUEGO = Mapa.terrenos_disponibles
 def partida_custom():
     size = param('Introduce el tamaño del mapa (min.3, max.50): ', int, valores_validos=[i for i in range(3, 51)],
                  estilo='input')
+
+    mostrar_terrenos_en_tabla()
+
     while True:
         terrenos = param('Introduce los terrenos del mapa separados por comas (min. 2): ', str, estilo='input')
         if len(terrenos.split(',')) < 2:
@@ -57,18 +58,23 @@ def partida_custom():
                         f'[error]Error: El tipo de terreno "{terreno}" se ha introducido más de una vez.[/error] \n[info]Ayuda: La multiplicidad máxima de cada terreno es 1.[/info]')
                 else:
                     console.print(f'Error: El tipo de terreno "{terreno}" no existe en el juego.', style='error')
-                console.print()
-                table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
-                table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
-                for terreno in TERRENOS_JUEGO:
-                    table_terrenos.add_row(terreno.capitalize())
-                console.print(table_terrenos)
-                console.print()
-                limpiar_pantalla()
+
+                mostrar_terrenos_en_tabla()
+
                 break
         else:
             break
+
     return size, terrenos
+
+def mostrar_terrenos_en_tabla():
+    console.print()
+    table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
+    table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
+    for terreno in TERRENOS_JUEGO:
+        table_terrenos.add_row(terreno.capitalize())
+    console.print(table_terrenos)
+    console.print()
 
 def to_tuple():
     while True:
@@ -231,21 +237,14 @@ def tabla_espera():
     console.print(table_espera)
     console.print()
 
-def barra_de_progreso(ritmo, tiempo):
-    for _ in track(range(ritmo), description="Procesando..."):
-        time.sleep(tiempo)
 
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
-    obtener_jugadores()
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def login(user, password):
-    obtener_jugadores()
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
         return r.text, True
@@ -263,81 +262,59 @@ def ver_ranking(token):
 # USERS - BUZON
 
 def notificaciones(token):
-    obtener_buzones()
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 def obtener_buzon(token):
-    obtener_buzones()
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
     return mensajes
 
 def marcar_leido(token):
-    obtener_buzones()
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
     return r.text
 
 # USERS - AMIGOS
 def obtener_amigos(token):
-    obtener_jugadores()
     r = requests.get(f'{URL}/users/friends', headers={'Authorization': f'Bearer {token}'})
     amigos = r.json()
     return amigos
 
 def obtener_solicitudes(token):
-    obtener_jugadores()
-    obtener_buzones()
     r = requests.get(f'{URL}/users/friend-requests', headers={'Authorization': f'Bearer {token}'})
     solicitudes = r.json()
     return solicitudes
 
 def enviar_solicitud(token, usuario):
-    obtener_jugadores()
-    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 def aceptar_solicitud(token, nuevo_amigo):
-    obtener_jugadores()
-    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 def rechazar_solicitud(token, usuario):
-    obtener_jugadores()
-    obtener_buzones()
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 # USERS - GAME REQUESTS
 def invitaciones_privadas(token):
-    obtener_jugadores()
-    obtener_buzones()
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
-    subir_jugadores()
-    subir_buzones()
     return invitaciones
 
 # MY GAMES
 def mis_partidas(token):
-    obtener_jugadores()
-    obtener_partidas()
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
     return partidas
 
 # PARTIDA
+def obtener_ganador(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/winner', headers={'Authorization': f'Bearer {token}'})
+    return f'La partida ya ha finalizado. \nEl ganador ha sido {r.text}'
+
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
-    obtener_partidas()
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -346,53 +323,35 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
         'terrenos': terrenos
     }
     r = requests.post(f'{URL}/games', headers={'Authorization': f'Bearer {token}'}, json=parametros_partida)
-    subir_partidas()
     return r.text
 
 def partidas_publicas(token):
-    obtener_partidas()
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
     return publicas
 
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
-    obtener_partidas()
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
     return r.text
 
 def iniciar_partida(token, id_partida):
-    obtener_partidas()
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
     return r.text
 
 def cancelar_partida(token, id_partida):
-    obtener_partidas()
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
     return r.text
 
 def get_estado_partida(token, id_partida):
-    obtener_partidas()
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
     return estado, r.status_code
 
 def get_estado_jugador(token, id_partida):
-    obtener_partidas()
-    obtener_jugadores()
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
-    try:
-        respuesta_json = r.json()
-        return respuesta_json.get("es_turno")
-    except requests.exceptions.JSONDecodeError as e:
-        console.print(f"ERROR: Fallo al decodificar JSON en get_estado_jugador. Respuesta recibida: {r.text}", style='error')
-        return None
-    except AttributeError:
-        console.print(f"ERROR: La respuesta JSON no era un diccionario o no tenía la clave 'es_turno'. Respuesta: {r.text}", style='error')
-        return None
+    estado = r.json()
+    return estado
 
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
@@ -435,12 +394,12 @@ def add_tropa(token, id_partida, tropa, cantidad):
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
-    return r.json()
+    return r.json(), r.status_code
 
 def mover_batallon(token, id_partida, destino):
     diccionario = {'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
-    return r.json()
+    return r.json(), r.status_code
 
 def construir_edificio(token, id_partida, edificio):
     r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
@@ -450,45 +409,14 @@ def subir_nivel_edificio(token, id_partida, edificio):
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
     return r.text
 
-def obtener_jugadores():
-    r = requests.get(f'{URL}/users/jugadores.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
-        return None
-
-def obtener_buzones():
-    r = requests.get(f'{URL}/users/mail/buzones.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
-        return None
-
-def subir_jugadores():
-    r = requests.post(f'{URL}/users/jugadores.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar jugadores: [/error]{r.status_code}")
-        return None
-
-def subir_buzones():
-    r = requests.post(f'{URL}/users/mail/buzones.pkl')
-    if r.status_code == 200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar buzones: [/error]{r.status_code}")
-        return None
-
-def obtener_partidas():
-    r = requests.get(f'{URL}/games/partidas.pkl')
-    if r.status_code==200:
-        return r.text
-    else:
-        console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
-        return None
+def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    diccionario = {
+        'atacantes': atacantes_pos,
+        'defensores': defensores_pos
+    }
+    r = requests.put(f'{URL}/games/{id_partida}/player/combatir', headers={'Authorization': f'Bearer {token}'},
+                     json=(diccionario))
+    return r.json()
 
 def subir_partidas():
     r = requests.post(f'{URL}/games/partidas.pkl')
@@ -503,10 +431,10 @@ def subir_partidas():
 def jugar(token):
     limpiar_pantalla()
     while True:
-        menu = {"Menu": ["prompt",["0.Volver","1.Crear partida","2.Unirse a partida"]]}
+        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]}
         crear_tabla(menu, dim=True)
 
-        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
+        choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3])
         console.print()
 
         if choice == 1:
@@ -523,10 +451,12 @@ def jugar(token):
                 if privada:
                     amigos = obtener_amigos(token)
                     if amigos != []:
+                        # Todo: mostrar mejor la lista de amigos
                         mostrar_texto(amigos, enumerado=True)
                         valores_validos = [n for n in range(0, len(amigos) + 1)]
-                        amigo = param('Que amigo desea invitar: ', int, valores_validos=valores_validos)
+                        amigo = param('¿A qué amigo desea invitar?: ', int, valores_validos=valores_validos)
                         invitado = amigos[amigo - 1]
+                        limpiar_pantalla()
                     else:
                         mostrar_texto('Todavía no tienes amigos')
                         limpiar_pantalla()
@@ -544,13 +474,13 @@ def jugar(token):
                 if choice == 1:
                     size, terrenos = partida_custom()
                     reino = param('Introduce el nombre de tu reino: ', str)
-                    # barra_de_progreso(10, 0.1)
+                    # (10, 0.1)
                     mostrar_texto(crear_partida(token, privada, reino, invitado, size, terrenos))
                     limpiar_pantalla()
                     break
                 elif choice == 2:
                     reino = param('Introduce el nombre de tu reino: ', str)
-                    # barra_de_progreso(10, 0.1)
+                    # (10, 0.1)
                     mostrar_texto(crear_partida(token, privada, reino, invitado))
                     limpiar_pantalla()
                     break
@@ -560,7 +490,7 @@ def jugar(token):
         elif choice == 2:
             limpiar_pantalla()
             while True:
-                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continiar una partida a la que ya se ha unido"]]}
+                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continuar una partida a la que ya se ha unido"]]}
                 crear_tabla(op2, dim = True)
 
                 console.print()
@@ -569,12 +499,16 @@ def jugar(token):
                 console.print()
 
                 if choice == 1:
+                    # Todo: mostrar las partidas
                     publicas = partidas_publicas(token)
                     partidas_str = [partida for partida in publicas.values()]
                     mostrar_texto(partidas_str, enumerado=True)
-                    id_partida = param('Introduzca el id de la partida a la que desea unirse: ', str)
+                    # Todo: si nos metemos a una partida que no existe nos sale un error
+                    id_partida = param('Introduzca el id de la partida a la que desea unirse (o 0 para volver): ', str)
+                    if id_partida == '0':
+                        limpiar_pantalla()
+                        continue
                     reino = param('Introduce el nombre de tu reino: ', str)
-                    barra_de_progreso(10, 0.2)
                     mostrar_texto(unirse_partida(token, id_partida, reino))
                     mostrar_texto(iniciar_partida(token, id_partida))
                     limpiar_pantalla()
@@ -588,146 +522,225 @@ def jugar(token):
                         limpiar_pantalla()
                         continue
                     id_user_partida = param('Introduzca el id de la partida: ', str)
-                    barra_de_progreso(10, 0.1)
-                    estado_partida, r_estado = get_estado_partida(token, id_user_partida)
-                    if r_estado == 200:
-                        if estado_partida == 'Empezada':
-                            if 'catalogos_dict' not in locals().keys():
-                                catalogos_dict = catalogos(token, id_user_partida)
-                            limpiar_pantalla()
-                            while get_estado_jugador(token, id_user_partida) == True:
-                                obtener_partidas()
-                                op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
-                                crear_tabla(op, dim = True)
 
-                                console.print()
+                    while True:
+                        estado_partida, r_estado = get_estado_partida(token, id_user_partida)
+                        if r_estado == 200:
 
-                                choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4])
-                                console.print()
+                            if estado_partida == 'Empezada':
+                                estado_jugador = get_estado_jugador(token, id_user_partida)
+                                if estado_jugador:
+                                    if 'catalogos_dict' not in locals().keys():  # Creamos el catalogo si no existe
+                                        catalogos_dict = catalogos(token, id_user_partida)
+                                    limpiar_pantalla()
 
-                                if choice == 1:
-                                    coordenada = to_tuple()
-                                    while True:
-                                        zona, estado = ver_zona(token, id_user_partida, coordenada)
-                                        if estado == 200:
-                                            if zona[1]:
-                                                dict = {"Opciones dentro de la zona": ["success", ["0. Volver", "1. Añadir tropa", "2. Mover tropa", "3. Mover batallón", "4. Contruir edificio", "5. Subir de nivel edificio"]]}
-                                                crear_tabla(dict, dim = True)
+                                    op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
+                                    crear_tabla(op, dim = True)
+    
+                                    console.print()
+    
+                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4])
+                                    console.print()
+    
+                                    if choice == 1:
+                                        coordenada = to_tuple()
+                                        while True:
+                                            zona, estado = ver_zona(token, id_user_partida, coordenada)
+                                            if estado == 200:
+                                                if zona[1]:
+                                                    dict = {"Opciones dentro de la zona": ["success", ["0. Volver", "1. Añadir tropa", "2. Mover tropa", "3. Mover batallón", "4. Contruir edificio", "5. Subir de nivel edificio"]]}
+                                                    crear_tabla(dict, dim = True)
+    
+                                                    console.print()
+    
+                                                    console.print(zona[0], style='prompt')
+    
+                                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4, 5])
+                                                    match choice:
+                                                        case 0:
+                                                            limpiar_pantalla()
+                                                            break
+                                                        case 1:
+                                                            mostrar_texto(catalogos_dict['tropas']['catalogo'])
+                                                            tropa = param('Introduzca el nombre de la tropa: ', str, valores_validos=catalogos_dict['tropas']['valores_validos'])
+                                                            cantidad = param('Introduzca la cantidad: ', int)
+                                                            mostrar_texto(add_tropa(token, id_user_partida, tropa, cantidad))
+                                                            limpiar_pantalla()
+                                                        case 2:
+                                                            tropa = param('Introduzca el nombre de la tropa: ', str,
+                                                                          valores_validos=catalogos_dict['tropas'][
+                                                                              'valores_validos'])
+                                                            cantidad = param('Introduzca la cantidad: ', int)
+                                                            destino = to_tuple()
+                                                            salida, estado = mover_tropa(token, id_user_partida, tropa,
+                                                                                 cantidad, destino)
+                                                            if isinstance(salida, list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                                mostrar_texto(salida[0])
+                                                                dict = {"Opciones": ["prompt",
+                                                                                   ["0. Abortar",
+                                                                                    "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
 
-                                                console.print()
+                                                                crear_tabla(dict, dim = False)
 
-                                                console.print(zona[0], style='prompt')
+                                                                console.print()
 
-                                                choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4, 5])
-                                                match choice:
-                                                    case 0:
+                                                                choice = param('Eliga una opción: ', int,
+                                                                               valores_validos=[0, 1])
+                                                                if choice == 1:
+                                                                    salida = combatir(token, id_user_partida,
+                                                                                      coordenada, destino)
+                                                                    mostrar_texto(salida['texto'])
+                                                                    limpiar_pantalla()
+                                                                    if salida['estado'] == 'Finalizada':
+                                                                        break
+                                                                else:
+                                                                    limpiar_pantalla()
+                                                                    continue
+
+                                                            elif estado == 200:
+                                                                mostrar_texto(salida)
+                                                                mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                                subir_partidas()
+                                                                param('Presione "Enter" para continuar ...', str,
+                                                                      valores_validos=[''], estilo='info')
+                                                                limpiar_pantalla()
+                                                                break
+
+                                                            else: # Error al mover la tropa
+                                                                mostrar_texto(salida)
+                                                                limpiar_pantalla()
+                                                                continue
+
+                                                        case 3:
+                                                            destino = to_tuple()
+                                                            salida, estado = mover_batallon(token, id_user_partida, destino)
+                                                            if isinstance(salida, list):
+                                                                mostrar_texto(salida[0])
+                                                                dict = {"Opciones": ["prompt",
+                                                                                     ["0. Abortar",
+                                                                                      "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
+
+                                                                crear_tabla(dict, dim=False)
+
+                                                                console.print()
+
+                                                                choice = param('Eliga una opción: ', int,
+                                                                               valores_validos=[0, 1])
+
+                                                                if choice == 1:
+                                                                    salida = combatir(token, id_user_partida,
+                                                                                      coordenada, destino)
+                                                                    mostrar_texto(salida['texto'])
+                                                                    limpiar_pantalla()
+                                                                    if salida['estado'] == 'Finalizada':
+                                                                        break
+                                                                else:
+                                                                    limpiar_pantalla()
+                                                                    continue
+                                                            elif estado == 200:
+                                                                mostrar_texto(salida)
+                                                                mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                                subir_partidas()
+                                                                param('Presione "Enter" para continuar ...', str,
+                                                                      valores_validos=[''], estilo='info')
+                                                                limpiar_pantalla()
+                                                                break
+
+                                                            else: # Error al mover la tropa
+                                                                mostrar_texto(salida)
+                                                                limpiar_pantalla()
+                                                                continue
+
+                                                        case 4:
+                                                            mostrar_texto(catalogos_dict['edificios']['catalogo'])
+                                                            edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
+                                                            mostrar_texto(construir_edificio(token, id_user_partida, edificio))
+                                                            limpiar_pantalla()
+                                                        case 5:
+                                                            edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
+                                                            mostrar_texto(subir_nivel_edificio(token, id_user_partida, edificio))
+                                                            limpiar_pantalla()
+                                                else:
+                                                    console.print(zona[0], style='prompt')
+                                                    table_volver = Table(show_edge=False, header_style="bold white reverse blue")
+                                                    table_volver.add_column('MENÚ', justify='center', style='prompt')
+                                                    table_volver.add_row('0. Volver', style='dim')
+                                                    console.print(table_volver)
+                                                    console.print()
+                                                    choice = param('Eliga una opción: ', int, valores_validos=[0])
+                                                    if choice == 0:
                                                         limpiar_pantalla()
                                                         break
-                                                    case 1:
-                                                        mostrar_texto(catalogos_dict['tropas']['catalogo'])
-                                                        tropa = param('Introduzca el nombre de la tropa: ', str, valores_validos=catalogos_dict['tropas']['valores_validos'])
-                                                        cantidad = param('Introduzca la cantidad: ', int)
-                                                        mostrar_texto(add_tropa(token, id_user_partida, tropa, cantidad))
-                                                        limpiar_pantalla()
-                                                    case 2:
-                                                        tropa = param('Introduzca el nombre de la tropa: ', str, valores_validos=catalogos_dict['tropas']['valores_validos'])
-                                                        cantidad = param('Introduzca la cantidad: ', int)
-                                                        destino = to_tuple()
-                                                        salida = mover_tropa(token, id_user_partida, tropa, cantidad, destino)
-                                                        if isinstance(salida, tuple):
-                                                            console.print('[warning]¿Combatir? (s/n)[/]')
-                                                            if console.input().lower() == 's':
-                                                                console.print("[info]Kingdom Craft se encargará pronto[/]")
-                                                            else:
-                                                                console.print("[warning]Movimiento abortado[/]")
-                                                        else:
-                                                            mostrar_texto(salida)
-                                                            limpiar_pantalla()
-                                                    case 3:
-                                                        destino = to_tuple()
-                                                        salida = mover_batallon(token, id_user_partida, destino)
-                                                        if isinstance(salida, tuple):
-                                                            console.print('[warning]¿Combatir? (s/n)[/]')
-                                                            if console.input().lower() == 's':
-                                                                console.print("[info]Kingdom Craft se encargará pronto[/]")
-                                                            else:
-                                                                console.print("[warning]Movimiento abortado[/]")
-                                                        else:
-                                                            mostrar_texto(salida)
-                                                            limpiar_pantalla()
-                                                    case 4:
-                                                        mostrar_texto(catalogos_dict['edificios']['catalogo'])
-                                                        edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
-                                                        mostrar_texto(construir_edificio(token, id_user_partida, edificio))
-                                                        limpiar_pantalla()
-                                                    case 5:
-                                                        edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
-                                                        mostrar_texto(subir_nivel_edificio(token, id_user_partida, edificio))
-                                                        limpiar_pantalla()
-                                            else:
-                                                console.print(zona[0], style='prompt')
-                                                table_volver = Table(show_edge=False, header_style="bold white reverse blue")
-                                                table_volver.add_column('MENÚ', justify='center', style='prompt')
-                                                table_volver.add_row('0. Volver', style='dim')
-                                                console.print(table_volver)
-                                                console.print()
-                                                choice = param('Eliga una opción: ', int, valores_validos=[0])
-                                                if choice == 0:
-                                                    limpiar_pantalla()
-                                                    break
-                                        elif estado == 404:
-                                            mostrar_texto(zona['error'])
-                                            break
-                                elif choice == 2:
-                                    mostrar_texto(ver_recursos(token, id_user_partida), enumerado=True)
-                                    table_volver = Table(show_edge=False, header_style="bold white reverse blue")
-                                    table_volver.add_column('MENÚ', justify='center', style='prompt')
-                                    table_volver.add_row('0. Volver', style='dim')
-                                    console.print(table_volver)
-                                    console.print()
-                                    choice = param('Eliga una opción: ', int, valores_validos=[0])
-                                    if choice == 0:
+                                            elif estado == 404:
+                                                mostrar_texto(zona['error'])
+                                                break
+                                    elif choice == 2:
+                                        mostrar_texto(ver_recursos(token, id_user_partida), enumerado=True)
+                                        table_volver = Table(show_edge=False, header_style="bold white reverse blue")
+                                        table_volver.add_column('MENÚ', justify='center', style='prompt')
+                                        table_volver.add_row('0. Volver', style='dim')
+                                        console.print(table_volver)
+                                        console.print()
+                                        choice = param('Eliga una opción: ', int, valores_validos=[0])
+                                        if choice == 0:
+                                            limpiar_pantalla()
+                                            continue
+                                    elif choice == 3:
+                                        mapa = ver_mapa(token, id_user_partida)
+                                        mostrar_texto(mapa)
+                                        table_volver = Table(show_edge=False, header_style="bold white reverse blue")
+                                        table_volver.add_column('MENÚ', justify='center', style='prompt')
+                                        table_volver.add_row('0. Volver', style='dim')
+                                        console.print(table_volver)
+                                        console.print()
+                                        choice = param('Eliga una opción: ', int, valores_validos=[0])
+                                        if choice == 0:
+                                            limpiar_pantalla()
+                                            continue
+                                    elif choice == 4:
+                                        mostrar_texto(cambiar_turno(token, id_user_partida))
+                                        subir_partidas()
+                                        param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
                                         limpiar_pantalla()
                                         continue
-                                elif choice == 3:
-                                    mapa = ver_mapa(token, id_user_partida)
-                                    mostrar_texto(mapa)
-                                    table_volver = Table(show_edge=False, header_style="bold white reverse blue")
-                                    table_volver.add_column('MENÚ', justify='center', style='prompt')
-                                    table_volver.add_row('0. Volver', style='dim')
-                                    console.print(table_volver)
-                                    console.print()
-                                    choice = param('Eliga una opción: ', int, valores_validos=[0])
-                                    if choice == 0:
+                                    else:
                                         limpiar_pantalla()
-                                        continue
-                                elif choice == 4:
-                                    mostrar_texto(cambiar_turno(token, id_user_partida))
-                                    param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
-                                    limpiar_pantalla()
-                                    break
+                                        break
                                 else:
-                                    limpiar_pantalla()
-                                    break
-                                subir_partidas()
-                        else:
-                            mostrar_texto('Todavía no es tu turno', estilo='info')
-                            tabla_espera()
-                            choice = param('Eliga una opción: ', int, valores_validos=[0, 1])
-                            if choice == 1:
-                                continue
-                            else:
+                                    mostrar_texto('Todavía no es tu turno', estilo='info')
+                                    tabla_espera()
+                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1])
+                                    if choice == 1:
+                                        continue
+                                    else:
+                                        limpiar_pantalla()
+                                        break
+                            elif estado_partida == 'Esperando':
+                                mostrar_texto('Esperando a que se una otro jugador')
                                 limpiar_pantalla()
                                 break
-                    elif r_estado == 404:
-                        mostrar_texto(estado_partida)
-                        break
+                            elif estado_partida == 'Finalizada':
+                                mostrar_texto(obtener_ganador(token, id_user_partida))
+                                param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
+                                limpiar_pantalla()
+                                break
+                        elif r_estado == 404:
+                            mostrar_texto(estado_partida)
+                            break
                 else:
                     limpiar_pantalla()
                     break
+
+        elif choice == 3:
+            mostrar_texto(ver_ranking(token))
+            param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
+            limpiar_pantalla()
+            continue
+
         elif choice == 0:
             limpiar_pantalla()
             break
+
 # choice2- mostrar perfil del jugador
 def mostrar_perfil(token):
     limpiar_pantalla()
@@ -780,7 +793,7 @@ def mostrar_perfil(token):
                     mostrar_texto(amigos)
                 else:
                     mostrar_texto('Todavía no tienes amigos agregados', estilo='info')
-                amigos = {"Menú": ["prompt",["0. Vover", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
+                amigos = {"Menú": ["prompt",["0. Volver", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
                 crear_tabla(amigos, dim = True)
 
 
@@ -790,6 +803,7 @@ def mostrar_perfil(token):
                 if choice == 1:
                     limpiar_pantalla()
                     while True:
+                        # Todo: tabla mostrando bien la información
                         solicitudes = obtener_solicitudes(token)
                         if solicitudes != []:
                             mostrar_texto(solicitudes, enumerado=True)
@@ -885,7 +899,7 @@ def menu():
     param('Presione "Enter" para continuar ...', str,
           valores_validos=[''], estilo='info')
 
-    barra_de_progreso(10, 0.1)
+
     limpiar_pantalla()
 
     while True:
@@ -899,14 +913,14 @@ def menu():
         if choice == 1:
             user = param('Usuario: ', str)
             password = param('Contraseña: ', str, is_password=True)
-            barra_de_progreso(10, 0.1)
+
             mostrar_texto(signup(user, password))
             limpiar_pantalla()
         elif choice == 2:
             user = param('Usuario: ', str)
             password = param('Contraseña: ', str, is_password=True)
             log_in = login(user, password)
-            barra_de_progreso(10, 0.2)
+
             if log_in[1]:
                 token = log_in[0]
                 limpiar_pantalla()
