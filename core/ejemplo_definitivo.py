@@ -605,6 +605,7 @@ def jugar(token):
                                 console.print()
 
                                 if choice == 1:
+                                    obtener_partidas()
                                     coordenada = to_tuple()
                                     while True:
                                         zona, estado = ver_zona(token, id_user_partida, coordenada)
