@@ -34,7 +34,7 @@ temas_predefinidos = Theme({
 })
 console = Console(theme = temas_predefinidos)
 
-URL = 'https://MaritoTSF.pythonanywhere.com'
+URL = 'https://sergioazorinjulian.pythonanywhere.com/'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 #-----------------FUNCIONES-----------------
