@@ -63,7 +63,7 @@ def partida_custom():
                     table_terrenos.add_row(terreno.capitalize())
                 console.print(table_terrenos)
                 console.print()
-                limpiar_pantalla()
+                #limpiar_pantalla()
                 break
         else:
             break
@@ -522,10 +522,12 @@ def jugar(token):
                 if privada:
                     amigos = obtener_amigos(token)
                     if amigos != []:
+                        # Todo: mostrar mejor la lista de amigos
                         mostrar_texto(amigos, enumerado=True)
                         valores_validos = [n for n in range(0, len(amigos) + 1)]
                         amigo = param('Que amigo desea invitar: ', int, valores_validos=valores_validos)
                         invitado = amigos[amigo - 1]
+                        limpiar_pantalla()
                     else:
                         mostrar_texto('Todavía no tienes amigos')
                         limpiar_pantalla()
@@ -559,7 +561,7 @@ def jugar(token):
         elif choice == 2:
             limpiar_pantalla()
             while True:
-                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continiar una partida a la que ya se ha unido"]]}
+                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continuar una partida a la que ya se ha unido"]]}
                 crear_tabla(op2, dim = True)
 
                 console.print()
@@ -568,9 +570,11 @@ def jugar(token):
                 console.print()
 
                 if choice == 1:
+                    # Todo: mostrar las partidas
                     publicas = partidas_publicas(token)
                     partidas_str = [partida for partida in publicas.values()]
                     mostrar_texto(partidas_str, enumerado=True)
+                    # Todo: si nos metemos a una partida que no existe nos sale un error
                     id_partida = param('Introduzca el id de la partida a la que desea unirse: ', str)
                     reino = param('Introduce el nombre de tu reino: ', str)
                     barra_de_progreso(10, 0.2)
@@ -790,6 +794,7 @@ def mostrar_perfil(token):
                 if choice == 1:
                     limpiar_pantalla()
                     while True:
+                        # Todo: tabla mostrando bien la información
                         solicitudes = obtener_solicitudes(token)
                         if solicitudes != []:
                             mostrar_texto(solicitudes, enumerado=True)
