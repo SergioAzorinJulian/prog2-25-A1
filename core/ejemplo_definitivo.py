@@ -547,20 +547,6 @@ def jugar(token):
                         limpiar_pantalla()
                         continue
                     id_user_partida = param('Introduzca el id de la partida: ', str)
-<<<<<<< Updated upstream
-                    barra_de_progreso(10, 0.1)
-                    estado_partida, r_estado = get_estado_partida(token, id_user_partida)
-                    if r_estado == 200:
-                        if estado_partida == 'Empezada':
-                            if 'catalogos_dict' not in locals().keys():
-                                catalogos_dict = catalogos(token, id_user_partida)
-                            limpiar_pantalla()
-                            while get_estado_jugador(token, id_user_partida) == True:
-                              
-                                op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
-                                crear_tabla(op, dim = True)
-=======
->>>>>>> Stashed changes
 
                     while True:
                         estado_partida, r_estado = get_estado_partida(token, id_user_partida)
@@ -573,25 +559,6 @@ def jugar(token):
                                         catalogos_dict = catalogos(token, id_user_partida)
                                     limpiar_pantalla()
 
-<<<<<<< Updated upstream
-                                if choice == 1:
-                                    
-                                    coordenada = to_tuple()
-                                    while True:
-                                        zona, estado = ver_zona(token, id_user_partida, coordenada)
-                                        if estado == 200:
-                                            if zona[1]:
-                                                dict = {"Opciones dentro de la zona": ["success", ["0. Volver", "1. Añadir tropa", "2. Mover tropa", "3. Mover batallón", "4. Contruir edificio", "5. Subir de nivel edificio"]]}
-                                                crear_tabla(dict, dim = True)
-
-                                                console.print()
-
-                                                console.print(zona[0], style='prompt')
-
-                                                choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4, 5])
-                                                match choice:
-                                                    case 0:
-=======
                                     obtener_partidas()
                                     op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
                                     crear_tabla(op, dim = True)
@@ -670,7 +637,6 @@ def jugar(token):
                                                     console.print()
                                                     choice = param('Eliga una opción: ', int, valores_validos=[0])
                                                     if choice == 0:
->>>>>>> Stashed changes
                                                         limpiar_pantalla()
                                                         break
                                             elif estado == 404:
