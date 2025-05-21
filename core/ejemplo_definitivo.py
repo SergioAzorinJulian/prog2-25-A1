@@ -780,7 +780,7 @@ def mostrar_perfil(token):
                     mostrar_texto(amigos)
                 else:
                     mostrar_texto('Todavía no tienes amigos agregados', estilo='info')
-                amigos = {"Menú": ["prompt",["0. Vover", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
+                amigos = {"Menú": ["prompt",["0. Volver", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
                 crear_tabla(amigos, dim = True)
 
 
