@@ -203,17 +203,7 @@ class Oso(TropaAtaque):
     recursos=Recurso('caza',30,0)
     def __init__(self,cantidad=0, recursos=30, nombre='Oso'):
         super().__init__(recursos, nombre, cantidad)
-
-    def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]): #No le habeis puesto el crítico, ponerselo
-        if enemigo != []:
-            n = 0
-            for i in enemigo[:]:
-                if critico[0]==True:
-                    i.recibir_dmg(self.dmg*critico[1],enemigo)
-                else:
-                    i.recibir_dmg(self.dmg, enemigo)
-                n += 1
-            return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
+ 
 # TROPAS DE DEFENSA
 class Gigante(TropaDefensa):
     dmg_base = 100
