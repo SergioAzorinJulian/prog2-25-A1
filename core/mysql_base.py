@@ -12,7 +12,7 @@ CREATE TABLE ranking (
 '''
 config = {
     'host': 'Sergioazorinjulian.mysql.pythonanywhere-services.com',
-    'user': 'Sergioazorinjulian',
+    'user': 'Sergioazorinjuli',
     'password': 'databaseprog2',
     'database': 'Sergioazorinjuli$default'
 }
