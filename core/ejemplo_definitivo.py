@@ -572,10 +572,16 @@ def jugar(token):
                                                                                  cantidad, destino)
                                                             if isinstance(salida[0], list):  # No se a podido mover la tropa, saltar opcion de combate
                                                                 mostrar_texto(salida[0])
-                                                                print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
-                                                                print('2. ABORTAR')
+                                                                dict = {"Opciones": ["prompt",
+                                                                                   ["0. Abortar",
+                                                                                    "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
+
+                                                                crear_tabla(dict, dim = False)
+
+                                                                console.print()
+
                                                                 choice = param('Eliga una opción: ', int,
-                                                                               valores_validos=[1, 2])
+                                                                               valores_validos=[0, 1])
                                                                 if choice == 1:
                                                                     salida = combatir(token, id_user_partida,
                                                                                       coordenada, destino)
@@ -596,20 +602,27 @@ def jugar(token):
                                                                 limpiar_pantalla()
                                                                 break
 
-                                                            else:
+                                                            else: # Error al mover la tropa
                                                                 mostrar_texto(salida[0])
                                                                 limpiar_pantalla()
-                                                                break
+                                                                continue
 
                                                         case 3:
                                                             destino = to_tuple()
                                                             salida = mover_batallon(token, id_user_partida, destino)
                                                             if isinstance(salida[0], list):
                                                                 mostrar_texto(salida[0])
-                                                                print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
-                                                                print('2. ABORTAR')
+                                                                dict = {"Opciones": ["prompt",
+                                                                                     ["0. Abortar",
+                                                                                      "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
+
+                                                                crear_tabla(dict, dim=False)
+
+                                                                console.print()
+
                                                                 choice = param('Eliga una opción: ', int,
-                                                                               valores_validos=[1, 2])
+                                                                               valores_validos=[0, 1])
+
                                                                 if choice == 1:
                                                                     salida = combatir(token, id_user_partida,
                                                                                       coordenada, destino)
@@ -629,10 +642,10 @@ def jugar(token):
                                                                 limpiar_pantalla()
                                                                 break
 
-                                                            else:
+                                                            else: # Error al mover la tropa
                                                                 mostrar_texto(salida[0])
                                                                 limpiar_pantalla()
-                                                                break
+                                                                continue
 
                                                         case 4:
                                                             mostrar_texto(catalogos_dict['edificios']['catalogo'])
