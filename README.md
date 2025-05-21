@@ -50,3 +50,6 @@ Para **generar un archivo requirements.txt**
 
 Para **instalar las dependencias** en un nuevo entorno virtual
 `pip install -r requirements.txt`
+
+## Ejecución
+- Ejecutar el archivo .exe o el archivo ejemplo_definitivo.py del repositorio
