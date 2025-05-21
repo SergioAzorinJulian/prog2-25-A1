@@ -246,8 +246,6 @@ def barra_de_progreso(ritmo, tiempo):
 # AUTENTICACIÓN
 def signup(user, password):
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def login(user, password):
@@ -294,38 +292,26 @@ def obtener_solicitudes(token):
 
 def enviar_solicitud(token, usuario):
     r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 def aceptar_solicitud(token, nuevo_amigo):
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 def rechazar_solicitud(token, usuario):
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
-    subir_buzones()
-    subir_jugadores()
     return r.text
 
 # USERS - GAME REQUESTS
 def invitaciones_privadas(token):
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
-    subir_jugadores()
-    subir_buzones()
-    subir_partidas()
     return invitaciones
 
 # MY GAMES
 def mis_partidas(token):
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
-    subir_jugadores()
-    subir_partidas()
-    subir_buzones()
     return partidas
 
 # PARTIDA
@@ -338,47 +324,29 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
         'terrenos': terrenos
     }
     r = requests.post(f'{URL}/games', headers={'Authorization': f'Bearer {token}'}, json=parametros_partida)
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def partidas_publicas(token):
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return publicas
 
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def iniciar_partida(token, id_partida):
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def cancelar_partida(token, id_partida):
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return r.text
 
 def get_estado_partida(token, id_partida):
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
-    subir_partidas()
-    subir_jugadores()
-    subir_buzones()
     return estado, r.status_code
 
 def get_estado_jugador(token, id_partida):
@@ -398,7 +366,6 @@ def ver_recursos(token, id_partida):
     return r.json()
 
 def ver_mapa(token, id_partida):
-
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
@@ -593,7 +560,7 @@ def jugar(token):
                                 catalogos_dict = catalogos(token, id_user_partida)
                             limpiar_pantalla()
                             while get_estado_jugador(token, id_user_partida) == True:
-                                obtener_partidas()
+                              
                                 op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
                                 crear_tabla(op, dim = True)
 
@@ -603,7 +570,7 @@ def jugar(token):
                                 console.print()
 
                                 if choice == 1:
-                                    obtener_partidas()
+                                    
                                     coordenada = to_tuple()
                                     while True:
                                         zona, estado = ver_zona(token, id_user_partida, coordenada)
