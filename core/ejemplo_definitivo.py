@@ -405,6 +405,15 @@ def subir_nivel_edificio(token, id_partida, edificio):
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
     return r.text
 
+def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    diccionario = {
+        'atacantes': atacantes_pos,
+        'defensores': defensores_pos
+    }
+    r = requests.put(f'{URL}/games/{id_partida}/player/combatir', headers={'Authorization': f'Bearer {token}'},
+                     json=(diccionario))
+    return r.json()
+
 def subir_partidas():
     r = requests.post(f'{URL}/games/partidas.pkl')
     if r.status_code==200:
@@ -491,7 +500,10 @@ def jugar(token):
                     partidas_str = [partida for partida in publicas.values()]
                     mostrar_texto(partidas_str, enumerado=True)
                     # Todo: si nos metemos a una partida que no existe nos sale un error
-                    id_partida = param('Introduzca el id de la partida a la que desea unirse: ', str)
+                    id_partida = param('Introduzca el id de la partida a la que desea unirse (o 0 para volver): ', str)
+                    if id_partida == '0':
+                        limpiar_pantalla()
+                        continue
                     reino = param('Introduce el nombre de tu reino: ', str)
                     mostrar_texto(unirse_partida(token, id_partida, reino))
                     mostrar_texto(iniciar_partida(token, id_partida))
@@ -551,31 +563,72 @@ def jugar(token):
                                                             mostrar_texto(add_tropa(token, id_user_partida, tropa, cantidad))
                                                             limpiar_pantalla()
                                                         case 2:
-                                                            tropa = param('Introduzca el nombre de la tropa: ', str, valores_validos=catalogos_dict['tropas']['valores_validos'])
+                                                            tropa = param('Introduzca el nombre de la tropa: ', str,
+                                                                          valores_validos=catalogos_dict['tropas'][
+                                                                              'valores_validos'])
                                                             cantidad = param('Introduzca la cantidad: ', int)
                                                             destino = to_tuple()
-                                                            salida = mover_tropa(token, id_user_partida, tropa, cantidad, destino)
-                                                            if isinstance(salida, tuple):
-                                                                console.print('[warning]¿Combatir? (s/n)[/]')
-                                                                if console.input().lower() == 's':
-                                                                    console.print("[info]Kingdom Craft se encargará pronto[/]")
-                                                                else:
-                                                                    console.print("[warning]Movimiento abortado[/]")
+                                                            salida = mover_tropa(token, id_user_partida, tropa,
+                                                                                 cantidad, destino)
+                                                            if isinstance(salida,
+                                                                          list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                                if isinstance(salida, list):
+                                                                    mostrar_texto(salida[0])
+                                                                    print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                    print('2. ABORTAR')
+                                                                    choice = param('Eliga una opción: ', int,
+                                                                                   valores_validos=[1, 2])
+                                                                    if choice == 1:
+                                                                        salida = combatir(token, id_user_partida,
+                                                                                          coordenada, destino)
+                                                                        mostrar_texto(salida['texto'])
+                                                                        limpiar_pantalla()
+                                                                        if salida['estado'] == 'Finalizada':
+                                                                            break
+                                                                    else:
+                                                                        limpiar_pantalla()
+                                                                        continue
                                                             else:
                                                                 mostrar_texto(salida)
                                                                 limpiar_pantalla()
+
+                                                            mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                            subir_partidas()
+                                                            param('Presione "Enter" para continuar ...', str,
+                                                                  valores_validos=[''], estilo='info')
+                                                            limpiar_pantalla()
+                                                            continue
+                                                            
                                                         case 3:
                                                             destino = to_tuple()
                                                             salida = mover_batallon(token, id_user_partida, destino)
-                                                            if isinstance(salida, tuple):
-                                                                console.print('[warning]¿Combatir? (s/n)[/]')
-                                                                if console.input().lower() == 's':
-                                                                    console.print("[info]Kingdom Craft se encargará pronto[/]")
+                                                            if isinstance(salida, list):
+                                                                mostrar_texto(salida[0])
+                                                                print('1. COMBATIR (Se enviarán a todas las tropas de la región)')
+                                                                print('2. ABORTAR')
+                                                                choice = param('Eliga una opción: ', int,
+                                                                               valores_validos=[1, 2])
+                                                                if choice == 1:
+                                                                    salida = combatir(token, id_user_partida,
+                                                                                      coordenada, destino)
+                                                                    mostrar_texto(salida['texto'])
+                                                                    limpiar_pantalla()
+                                                                    if salida['estado'] == 'Finalizada':
+                                                                        break
                                                                 else:
-                                                                    console.print("[warning]Movimiento abortado[/]")
+                                                                    limpiar_pantalla()
+                                                                    continue
                                                             else:
                                                                 mostrar_texto(salida)
                                                                 limpiar_pantalla()
+
+                                                            mostrar_texto(cambiar_turno(token, id_user_partida))
+                                                            subir_partidas()
+                                                            param('Presione "Enter" para continuar ...', str,
+                                                                  valores_validos=[''], estilo='info')
+                                                            limpiar_pantalla()
+                                                            continue
+
                                                         case 4:
                                                             mostrar_texto(catalogos_dict['edificios']['catalogo'])
                                                             edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])

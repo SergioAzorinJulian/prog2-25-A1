@@ -37,7 +37,7 @@ def id_partida() -> str:
     """
 
     while True:
-        n = random.randint(0,999)
+        n = random.randint(1,999)
         if n not in partidas.keys():
             n = str(n)
             return n
