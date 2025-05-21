@@ -184,7 +184,10 @@ class Oso(TropaAtaque):
         if enemigo != []:
             n = 0
             for i in enemigo[:]:
-                i.recibir_dmg(self.dmg, enemigo)
+                if critico[0]==True:
+                    i.recibir_dmg(self.dmg*critico[1],enemigo)
+                else:
+                    i.recibir_dmg(self.dmg, enemigo)
                 n += 1
             return f'{self.nombre} atacó a {n} enemigos : {self.dmg * n}'
 # TROPAS DE DEFENSA
@@ -248,13 +251,14 @@ class Magician(TropaAlcance):
 
     def atacar(self, aliado: list[Tropa], enemigo: list[Tropa]):
         if enemigo != []:
+            self.heal = self.__class__.healing_base * self.cantidad
             n = random.randint(0, len(enemigo) - 1)
             dmg=self.dmg
             nombre=enemigo[n].nombre
             text_cantidad = enemigo[n].recibir_dmg(dmg,aliado) #Este texto devuelve si murieron tropas del enemigo
-            txt_healing=self.curar(self,aliado)
+            txt_healing=self.curar(aliado)
             return (f'{self.nombre} ataca a {nombre} : {dmg}\n{text_cantidad}\n{txt_healing}')
-    #AQUÍ FALTA AÑADIR EL METODO DE ACTUALIZAR CANTIDAD, YA QUE EL DEL PADRE TROPA, NO ACTUALIZA LA CANTIDAD DE CURACIÓN
+
         
 # TROPAS DE ESTRUCTURA
 class Cannon(TropaEstructura):
