@@ -11,10 +11,10 @@ CREATE TABLE ranking (
 
 '''
 config = {
-    'host': 'MaritoTSF.mysql.pythonanywhere-services.com',
-    'user': 'MaritoTSF',
-    'password': 'UhDRsq@V.VR@9tL',
-    'database': 'MaritoTSF$default'
+    'host': 'Sergioazorinjulian.mysql.pythonanywhere-services.com',
+    'user': 'Sergioazorinjulian',
+    'password': 'databaseprog2',
+    'database': 'Sergioazorinjuli$default'
 }
 def connect_to_db() -> None:
     '''
