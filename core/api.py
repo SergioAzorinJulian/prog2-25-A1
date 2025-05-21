@@ -633,6 +633,11 @@ def estado_jugador(id):
     user = get_jwt_identity()
     return jsonify(partidas[id].estado_jugador(user)),200
 
+@app.route('/games/<id>/winner',methods=['GET'])
+@jwt_required()
+def ganador(id):
+    return partidas[id].ganador
+
 
 #/games/<id>/player/
 @app.route('/games/<id>/player/ver_zona',methods=['POST'])

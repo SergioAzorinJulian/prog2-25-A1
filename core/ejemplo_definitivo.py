@@ -310,6 +310,10 @@ def mis_partidas(token):
     return partidas
 
 # PARTIDA
+def obtener_ganador(token, id_partida):
+    r = requests.get(f'{URL}/games/{id_partida}/winner', headers={'Authorization': f'Bearer {token}'})
+    return f'La partida ya ha finalizado. \nEl ganador ha sido {r.text}'
+
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
     parametros_partida = {
         'privada': privada,
@@ -716,7 +720,8 @@ def jugar(token):
                                 limpiar_pantalla()
                                 break
                             elif estado_partida == 'Finalizada':
-                                mostrar_texto('Kingdom Craft esta trabajando en ello')
+                                mostrar_texto(obtener_ganador(token, id_user_partida))
+                                param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
                                 limpiar_pantalla()
                                 break
                         elif r_estado == 404:
