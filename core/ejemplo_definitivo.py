@@ -37,6 +37,22 @@ TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 #-----------------FUNCIONES-----------------
 def partida_custom():
+    """
+    Permite al usuario configurar una partida personalizada eligiendo el tamaño del mapa y los tipos de terrenos.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el tamaño del mapa (int) y los terrenos seleccionados (str).
+
+    Raises
+    ------
+    None
+    """
     size = param('Introduce el tamaño del mapa (min.3, max.50): ', int, valores_validos=[i for i in range(3, 51)],
                  estilo='input')
 
@@ -68,6 +84,23 @@ def partida_custom():
     return size, terrenos
 
 def mostrar_terrenos_en_tabla():
+    """
+    Muestra una tabla con los tipos de terrenos disponibles utilizando Rich.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     console.print()
     table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
     table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
@@ -77,6 +110,25 @@ def mostrar_terrenos_en_tabla():
     console.print()
 
 def to_tuple():
+    """
+    Solicita al usuario que introduzca dos coordenadas separadas por una coma y las devuelve como una tupla de enteros.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    tuple
+        Tupla de dos enteros que representan la fila y la columna introducidas por el usuario.
+
+    Raises
+    ------
+    ValueError
+        Si la entrada no puede convertirse a enteros.
+    TypeError
+        Si la entrada no es válida o no se puede procesar.
+    """
     while True:
         try:
             entrada = console.input("[input]Introduce las coordenadas (fila, columna): [/input]")
@@ -100,6 +152,36 @@ def param(
         valores_validos: Union[list, tuple, None] = None,
         estilo: str = 'input'
 ) -> Any:
+    """
+    Solicita un parámetro al usuario, validando tipo, longitud mínima y valores permitidos.
+
+    Parámetros
+    ----------
+    nombre : str
+        Mensaje que se muestra al usuario solicitando la entrada.
+    tipo : type
+        Tipo al que se debe convertir la entrada del usuario.
+    lon_min : int, opcional
+        Longitud mínima permitida para la entrada (por defecto es 0).
+    is_password : bool, opcional
+        Si es True, la entrada se oculta como contraseña (por defecto es False).
+    valores_validos : list, tuple o None, opcional
+        Lista o tupla de valores válidos permitidos para la entrada (por defecto es None).
+    estilo : str, opcional
+        Estilo de Rich para el prompt de entrada (por defecto es 'input').
+
+    Returns
+    -------
+    Any
+        Valor introducido por el usuario, convertido al tipo especificado.
+
+    Raises
+    ------
+    ValueError
+        Si la entrada no puede convertirse al tipo especificado.
+    TypeError
+        Si la entrada no es válida o no se puede procesar.
+    """
     valido = False
     out = None
     while not valido:
@@ -124,6 +206,23 @@ def param(
     return out
 
 def limpiar_pantalla() -> None:
+    """
+    Limpia la pantalla de la terminal según el sistema operativo.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     if os.name == 'nt':
         os.system('cls')
     else:
@@ -212,6 +311,28 @@ def crear_tabla(info: dict, dim = True, forma = None) -> None:
     console.print(table)
 
 def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str = 'prompt') -> None:
+    """
+    Muestra texto o una lista de textos en la consola, con opción de enumerar y aplicar un estilo.
+
+    Parámetros
+    ----------
+    lista : list[str] o str
+        Texto o lista de textos a mostrar.
+    enumerado : bool, opcional
+        Si es True, enumera cada elemento de la lista (por defecto es False).
+    estilo : str, opcional
+        Estilo de Rich para el texto mostrado (por defecto es 'prompt').
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     n = 1
     if isinstance(lista, str):
         lista = [lista]
@@ -230,6 +351,23 @@ def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str =
             console.print('\n', end='')
 
 def tabla_espera():
+    """
+    Muestra una tabla de espera con opciones de menú utilizando Rich.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     table_espera = Table(show_edge=False, header_style="bold white reverse blue")
     table_espera.add_column('MENÚ', justify='center', style='prompt')
     table_espera.add_row('0. Volver', style='dim')
@@ -241,10 +379,40 @@ def tabla_espera():
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
+    """
+    Registra un nuevo usuario en el sistema.
+
+    Parámetros
+    ----------
+    user : str
+        Nombre de usuario para el registro.
+    password : str
+        Contraseña para el registro.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar registrar el usuario.
+    """
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
     return r.text
 
 def login(user, password):
+    """
+    Inicia sesión de un usuario en el sistema.
+
+    Parámetros
+    ----------
+    user : str
+        Nombre de usuario.
+    password : str
+        Contraseña del usuario.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor y un booleano que indica si el inicio de sesión fue exitoso.
+    """
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
         return r.text, True
@@ -255,66 +423,299 @@ def login(user, password):
 #USERS -ranking
 #   SQL
 def ver_ranking(token):
+    """
+    Obtiene el ranking de usuarios desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información del ranking de usuarios.
+    """
     r = requests.get(f'{URL}/users/ranking',headers={'Authorization': f'Bearer {token}'})
     ranking = r.json()
     return ranking
 
 # USERS - BUZON
-
 def notificaciones(token):
+    """
+    Obtiene las notificaciones del buzón del usuario desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    str
+        Texto con las notificaciones recibidas.
+    """
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 def obtener_buzon(token):
+    """
+    Obtiene los mensajes del buzón del usuario desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de mensajes recibidos por el usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
     return mensajes
-
 def marcar_leido(token):
+    """
+    Marca como leídos todos los mensajes del buzón del usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras marcar los mensajes como leídos.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 # USERS - AMIGOS
 def obtener_amigos(token):
+    """
+    Obtiene la lista de amigos del usuario autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de amigos del usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/friends', headers={'Authorization': f'Bearer {token}'})
     amigos = r.json()
     return amigos
 
 def obtener_solicitudes(token):
+    """
+    Obtiene la lista de solicitudes de amistad recibidas por el usuario autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de solicitudes de amistad.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/friend-requests', headers={'Authorization': f'Bearer {token}'})
     solicitudes = r.json()
     return solicitudes
 
 def enviar_solicitud(token, usuario):
+    """
+    Envía una solicitud de amistad a un usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    usuario : str
+        Nombre de usuario al que se envía la solicitud.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras enviar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}', headers={'Authorization': f'Bearer {token}'})
     return r.text
-
 def aceptar_solicitud(token, nuevo_amigo):
+    """
+    Acepta una solicitud de amistad recibida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    nuevo_amigo : str
+        Nombre de usuario cuya solicitud se acepta.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras aceptar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 def rechazar_solicitud(token, usuario):
+    """
+    Rechaza una solicitud de amistad recibida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    usuario : str
+        Nombre de usuario cuya solicitud se rechaza.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras rechazar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
-# USERS - GAME REQUESTS
 def invitaciones_privadas(token):
+    """
+    Obtiene las invitaciones de partidas privadas recibidas por el usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con las invitaciones de partidas privadas.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
     return invitaciones
 
 # MY GAMES
 def mis_partidas(token):
+    """
+    Obtiene las partidas en las que el usuario autenticado está participando.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información de las partidas del usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
     return partidas
 
 # PARTIDA
 def obtener_ganador(token, id_partida):
+    """
+    Obtiene el ganador de una partida finalizada.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje indicando el ganador de la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/winner', headers={'Authorization': f'Bearer {token}'})
     return f'La partida ya ha finalizado. \nEl ganador ha sido {r.text}'
 
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
+    """
+    Crea una nueva partida enviando los parámetros al servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    privada : bool
+        Indica si la partida es privada.
+    reino : str
+        Nombre del reino del usuario.
+    invitado : str, opcional
+        Nombre del usuario invitado a la partida (solo para partidas privadas).
+    size : int, opcional
+        Tamaño del mapa de la partida (por defecto es 3).
+    terrenos : any, opcional
+        Tipos de terrenos seleccionados para la partida.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras crear la partida.
+    """
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -326,45 +727,220 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
     return r.text
 
 def partidas_publicas(token):
+    """
+    Obtiene la lista de partidas públicas disponibles desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información de las partidas públicas.
+    """
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
     return publicas
 
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
+    """
+    Permite a un usuario unirse a una partida existente.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a la que se desea unir.
+    reino : str
+        Nombre del reino del usuario.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar unirse a la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 def iniciar_partida(token, id_partida):
+    """
+    Inicia una partida existente.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a iniciar.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar iniciar la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
 def cancelar_partida(token, id_partida):
+    """
+    Cancela una partida existente en el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a cancelar.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar cancelar la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
     return r.text
-
 def get_estado_partida(token, id_partida):
+    """
+    Obtiene el estado actual de una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el estado de la partida (str) y el código de estado HTTP (int).
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
     return estado, r.status_code
 
 def get_estado_jugador(token, id_partida):
+    """
+    Obtiene el estado del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con el estado del jugador.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
     return estado
 
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
+    """
+    Obtiene la información de una zona específica del mapa de la partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    coordenada : any
+        Coordenada de la zona a consultar.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el diccionario con la información de la zona y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'zona': coordenada}
     r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
     zona = r.json()
     return zona, r.status_code
 
 def ver_recursos(token, id_partida):
+    """
+    Obtiene los recursos del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con los recursos del jugador.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
-
 def ver_mapa(token, id_partida):
+    """
+    Obtiene el mapa de la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str or None
+        Mapa de la partida en formato texto si la solicitud es exitosa, None en caso de error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
@@ -374,6 +950,26 @@ def ver_mapa(token, id_partida):
         return None
 
 def cambiar_turno(token, id_partida):
+    """
+    Cambia el turno del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str or None
+        Respuesta del servidor si la operación es exitosa, None en caso de error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
@@ -383,33 +979,199 @@ def cambiar_turno(token, id_partida):
         return None
 
 def catalogos(token, id_partida):
+    """
+    Obtiene los catálogos de tropas y edificios disponibles para el jugador en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con los catálogos de tropas y edificios.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/catalogos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
-
 def add_tropa(token, id_partida, tropa, cantidad):
+    """
+    Añade una cantidad específica de una tropa al jugador en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    tropa : str
+        Nombre de la tropa a añadir.
+    cantidad : int
+        Cantidad de tropas a añadir.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar añadir la tropa.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'tropa': tropa, 'cantidad': cantidad}
     r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
     return r.text
 
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
+    """
+    Mueve una cantidad específica de una tropa a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    tropa : str
+        Nombre de la tropa a mover.
+    cantidad : int
+        Cantidad de tropas a mover.
+    destino : any
+        Coordenada de destino a la que se moverán las tropas.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
     return r.json(), r.status_code
 
 def mover_batallon(token, id_partida, destino):
+    """
+    Mueve un batallón completo a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    destino : any
+        Coordenada de destino a la que se moverá el batallón.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
+    diccionario = {'destino': destino}
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
+    return r.json(), r.status_code
+
+def mover_batallon(token, id_partida, destino):
+    """
+    Mueve un batallón completo a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    destino : any
+        Coordenada de destino a la que se moverá el batallón.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+    """
     diccionario = {'destino': destino}
     r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
     return r.json(), r.status_code
 
 def construir_edificio(token, id_partida, edificio):
+    """
+    Construye un edificio en la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    edificio : any
+        Información del edificio a construir.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar construir el edificio.
+    """
     r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
     return r.text
 
 def subir_nivel_edificio(token, id_partida, edificio):
+    """
+    Sube el nivel de un edificio en la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    edificio : any
+        Información del edificio a subir de nivel.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar subir el nivel del edificio.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
     return r.text
 
 def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    """
+    Realiza una acción de combate entre atacantes y defensores en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    atacantes_pos : any
+        Información sobre los atacantes.
+    defensores_pos : any
+        Información sobre los defensores.
+
+    Returns
+    -------
+    dict
+        Respuesta del servidor en formato JSON con el resultado del combate.
+    """
     diccionario = {
         'atacantes': atacantes_pos,
         'defensores': defensores_pos
@@ -419,6 +1181,19 @@ def combatir(token, id_partida, atacantes_pos, defensores_pos):
     return r.json()
 
 def subir_partidas():
+    """
+    Sube el archivo de partidas al servidor.
+
+    Returns
+    -------
+    str or None
+        Respuesta del servidor si la actualización fue exitosa, o None si ocurrió un error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/games/partidas.pkl')
     if r.status_code==200:
         return r.text
@@ -429,6 +1204,24 @@ def subir_partidas():
 
 
 def jugar(token):
+    """
+    Muestra y gestiona el menú principal de juego, permitiendo crear partidas, unirse a partidas existentes o ver el ranking.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    Exception
+        Puede lanzar excepciones si ocurre un error inesperado durante la ejecución de las operaciones del menú.
+    """
     limpiar_pantalla()
     while True:
         menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]}
