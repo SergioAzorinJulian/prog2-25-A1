@@ -14,7 +14,7 @@ from rich import box
 
 from mapa import Mapa
 
-#Configuracion de rich
+# Configuracion de rich
 titulo_md = Markdown("# Bienvenido a Kingdom Kraft")
 parrafo_texto = Text(
     "Un juego de estrategia por turnos donde podrás construir tu reino, gestionar tus recursos y enfrentarte a otros jugadores.",
@@ -30,20 +30,30 @@ temas_predefinidos = Theme({
     "prompt": "magenta",
     "input": "cyan",
 })
-console = Console(theme = temas_predefinidos)
+console = Console(theme=temas_predefinidos)
 
 URL = 'https://sergioazorinjulian.pythonanywhere.com/'
 TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
-#-----------------FUNCIONES-----------------
-def partida_custom():
-    '''
-    metodo para crear una partida con ajustes personalizados
 
-    return:
-        tamaño y tipos de terrenos del mapa
-    '''
-    
+# -----------------FUNCIONES-----------------
+def partida_custom():
+    """
+    Permite al usuario configurar una partida personalizada eligiendo el tamaño del mapa y los tipos de terrenos.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el tamaño del mapa (int) y los terrenos seleccionados (str).
+
+    Raises
+    ------
+    None
+    """
     size = param('Introduce el tamaño del mapa (min.3, max.50): ', int, valores_validos=[i for i in range(3, 51)],
                  estilo='input')
 
@@ -74,10 +84,25 @@ def partida_custom():
 
     return size, terrenos
 
+
 def mostrar_terrenos_en_tabla():
-    '''
-    metodo para mostrar los tipos de terreno durante la seleccion de partida personalizada
-    '''
+    """
+    Muestra una tabla con los tipos de terrenos disponibles utilizando Rich.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     console.print()
     table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
     table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
@@ -86,13 +111,27 @@ def mostrar_terrenos_en_tabla():
     console.print(table_terrenos)
     console.print()
 
-def to_tuple():
-    '''
-    transforma los valores del usuario en una tupla
 
-    return:
-        tupla con los valores
-    '''
+def to_tuple():
+    """
+    Solicita al usuario que introduzca dos coordenadas separadas por una coma y las devuelve como una tupla de enteros.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    tuple
+        Tupla de dos enteros que representan la fila y la columna introducidas por el usuario.
+
+    Raises
+    ------
+    ValueError
+        Si la entrada no puede convertirse a enteros.
+    TypeError
+        Si la entrada no es válida o no se puede procesar.
+    """
     while True:
         try:
             entrada = console.input("[input]Introduce las coordenadas (fila, columna): [/input]")
@@ -108,6 +147,7 @@ def to_tuple():
             console.print('El tipo de dato no es válido.', style='error')
             continue
 
+
 def param(
         nombre: str,
         tipo: type,
@@ -116,12 +156,36 @@ def param(
         valores_validos: Union[list, tuple, None] = None,
         estilo: str = 'input'
 ) -> Any:
-    '''
-    metodo para el funcionamiento de las tablas con diferentes opciones y reconocimiento de la opcion elegida por el usuario
+    """
+    Solicita un parámetro al usuario, validando tipo, longitud mínima y valores permitidos.
 
-    '''
+    Parámetros
+    ----------
+    nombre : str
+        Mensaje que se muestra al usuario solicitando la entrada.
+    tipo : type
+        Tipo al que se debe convertir la entrada del usuario.
+    lon_min : int, opcional
+        Longitud mínima permitida para la entrada (por defecto es 0).
+    is_password : bool, opcional
+        Si es True, la entrada se oculta como contraseña (por defecto es False).
+    valores_validos : list, tuple o None, opcional
+        Lista o tupla de valores válidos permitidos para la entrada (por defecto es None).
+    estilo : str, opcional
+        Estilo de Rich para el prompt de entrada (por defecto es 'input').
 
-    
+    Returns
+    -------
+    Any
+        Valor introducido por el usuario, convertido al tipo especificado.
+
+    Raises
+    ------
+    ValueError
+        Si la entrada no puede convertirse al tipo especificado.
+    TypeError
+        Si la entrada no es válida o no se puede procesar.
+    """
     valido = False
     out = None
     while not valido:
@@ -145,16 +209,32 @@ def param(
         valido = True
     return out
 
+
 def limpiar_pantalla() -> None:
-    '''
-    metodo para limpiar la pantalla
-    '''
+    """
+    Limpia la pantalla de la terminal según el sistema operativo.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
 
-def crear_tabla(info: dict, dim = True, forma = None) -> None:
+
+def crear_tabla(info: dict, dim=True, forma=None) -> None:
     """
     Crea y muestra una tabla usando Rich.
 
@@ -201,7 +281,8 @@ def crear_tabla(info: dict, dim = True, forma = None) -> None:
     console.print(tabla)
     """
 
-    table = Table(show_edge=False, header_style="bold white reverse blue", box = forma) if forma else Table(show_edge=False, header_style="bold white reverse blue")
+    table = Table(show_edge=False, header_style="bold white reverse blue", box=forma) if forma else Table(
+        show_edge=False, header_style="bold white reverse blue")
 
     # Obtener los nombres de las columnas del diccionario
     columnas = list(info.keys())
@@ -209,13 +290,13 @@ def crear_tabla(info: dict, dim = True, forma = None) -> None:
     # Agregar cada columna a la tabla con su estilo correspondiente
     for columna in columnas:
         # El primer elemento de cada valor es el estilo de la columna
-        table.add_column(columna, justify="center", style= info[columna][0])
+        table.add_column(columna, justify="center", style=info[columna][0])
 
     # Determinamos el número de filas que habrán basándonos en la longitud de
     # la lista de datos de la primera columna (asumimos que todas las columnas tienen el mismo número de filas)
     num_filas = len(info[columnas[0]][1])
 
-    if num_filas > 0: # Solo procesamos las filas si hay al menos una ...
+    if num_filas > 0:  # Solo procesamos las filas si hay al menos una ...
         # Agregamos filas a la tabla
         for i in range(num_filas):
 
@@ -236,10 +317,30 @@ def crear_tabla(info: dict, dim = True, forma = None) -> None:
 
     console.print(table)
 
+
 def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str = 'prompt') -> None:
-    '''
-    muestra los textos con una animación
-    '''
+    """
+    Muestra texto o una lista de textos en la consola, con opción de enumerar y aplicar un estilo.
+
+    Parámetros
+    ----------
+    lista : list[str] o str
+        Texto o lista de textos a mostrar.
+    enumerado : bool, opcional
+        Si es True, enumera cada elemento de la lista (por defecto es False).
+    estilo : str, opcional
+        Estilo de Rich para el texto mostrado (por defecto es 'prompt').
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     n = 1
     if isinstance(lista, str):
         lista = [lista]
@@ -257,10 +358,25 @@ def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str =
                 time.sleep(0.03)
             console.print('\n', end='')
 
+
 def tabla_espera():
-    '''
-    tabla mientras esperas para recargar la pagina
-    '''
+    """
+    Muestra una tabla de espera con opciones de menú utilizando Rich.
+
+    Parámetros
+    ----------
+    Ninguno
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    None
+        No lanza ninguna excepción.
+    """
     table_espera = Table(show_edge=False, header_style="bold white reverse blue")
     table_espera.add_column('MENÚ', justify='center', style='prompt')
     table_espera.add_row('0. Volver', style='dim')
@@ -272,80 +388,358 @@ def tabla_espera():
 # ------------REQUESTS------------
 # AUTENTICACIÓN
 def signup(user, password):
+    """
+    Registra un nuevo usuario en el sistema.
+
+    Parámetros
+    ----------
+    user : str
+        Nombre de usuario para el registro.
+    password : str
+        Contraseña para el registro.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar registrar el usuario.
+    """
     r = requests.post(f'{URL}/auth/signup?user={user}&password={password}')
     return r.text
 
+
 def login(user, password):
+    """
+    Inicia sesión de un usuario en el sistema.
+
+    Parámetros
+    ----------
+    user : str
+        Nombre de usuario.
+    password : str
+        Contraseña del usuario.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor y un booleano que indica si el inicio de sesión fue exitoso.
+    """
     r = requests.get(f'{URL}/auth/login?user={user}&password={password}')
     if r.status_code == 200:
         return r.text, True
     return r.text, False
 
 
-
-#USERS -ranking
+# USERS -ranking
 #   SQL
 def ver_ranking(token):
-    r = requests.get(f'{URL}/users/ranking',headers={'Authorization': f'Bearer {token}'})
+    """
+    Obtiene el ranking de usuarios desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información del ranking de usuarios.
+    """
+    r = requests.get(f'{URL}/users/ranking', headers={'Authorization': f'Bearer {token}'})
     ranking = r.json()
     return ranking
 
-# USERS - BUZON
 
+# USERS - BUZON
 def notificaciones(token):
+    """
+    Obtiene las notificaciones del buzón del usuario desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    str
+        Texto con las notificaciones recibidas.
+    """
     r = requests.get(f'{URL}/users/mail/notificaciones', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def obtener_buzon(token):
+    """
+    Obtiene los mensajes del buzón del usuario desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de mensajes recibidos por el usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     mensajes = r.json()
     return mensajes
 
+
 def marcar_leido(token):
+    """
+    Marca como leídos todos los mensajes del buzón del usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras marcar los mensajes como leídos.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/users/mail', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 # USERS - AMIGOS
 def obtener_amigos(token):
+    """
+    Obtiene la lista de amigos del usuario autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de amigos del usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/friends', headers={'Authorization': f'Bearer {token}'})
     amigos = r.json()
     return amigos
 
+
 def obtener_solicitudes(token):
+    """
+    Obtiene la lista de solicitudes de amistad recibidas por el usuario autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    list
+        Lista de solicitudes de amistad.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/friend-requests', headers={'Authorization': f'Bearer {token}'})
     solicitudes = r.json()
     return solicitudes
 
+
 def enviar_solicitud(token, usuario):
-    r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}', headers={'Authorization': f'Bearer {token}'})
+    """
+    Envía una solicitud de amistad a un usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    usuario : str
+        Nombre de usuario al que se envía la solicitud.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras enviar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
+    r = requests.post(f'{URL}/users/friend-requests?id_solicitud={usuario}',
+                      headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def aceptar_solicitud(token, nuevo_amigo):
+    """
+    Acepta una solicitud de amistad recibida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    nuevo_amigo : str
+        Nombre de usuario cuya solicitud se acepta.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras aceptar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/users/friend-requests/{nuevo_amigo}/accept', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def rechazar_solicitud(token, usuario):
+    """
+    Rechaza una solicitud de amistad recibida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    usuario : str
+        Nombre de usuario cuya solicitud se rechaza.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras rechazar la solicitud.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/users/friend-requests/{usuario}/reject', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
-# USERS - GAME REQUESTS
+
 def invitaciones_privadas(token):
+    """
+    Obtiene las invitaciones de partidas privadas recibidas por el usuario.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con las invitaciones de partidas privadas.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/game_requests', headers={'Authorization': f'Bearer {token}'})
     invitaciones = r.json()
     return invitaciones
 
+
 # MY GAMES
 def mis_partidas(token):
+    """
+    Obtiene las partidas en las que el usuario autenticado está participando.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información de las partidas del usuario.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/users/my_games', headers={'Authorization': f'Bearer {token}'})
     partidas = r.json()
     return partidas
 
+
 # PARTIDA
 def obtener_ganador(token, id_partida):
+    """
+    Obtiene el ganador de una partida finalizada.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str
+        Mensaje indicando el ganador de la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/winner', headers={'Authorization': f'Bearer {token}'})
     return f'La partida ya ha finalizado. \nEl ganador ha sido {r.text}'
 
+
 def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
+    """
+    Crea una nueva partida enviando los parámetros al servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    privada : bool
+        Indica si la partida es privada.
+    reino : str
+        Nombre del reino del usuario.
+    invitado : str, opcional
+        Nombre del usuario invitado a la partida (solo para partidas privadas).
+    size : int, opcional
+        Tamaño del mapa de la partida (por defecto es 3).
+    terrenos : any, opcional
+        Tipos de terrenos seleccionados para la partida.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras crear la partida.
+    """
     parametros_partida = {
         'privada': privada,
         'invitado': invitado,
@@ -356,46 +750,233 @@ def crear_partida(token, privada, reino, invitado=None, size=3, terrenos=None):
     r = requests.post(f'{URL}/games', headers={'Authorization': f'Bearer {token}'}, json=parametros_partida)
     return r.text
 
+
 def partidas_publicas(token):
+    """
+    Obtiene la lista de partidas públicas disponibles desde el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    dict
+        Diccionario con la información de las partidas públicas.
+    """
     r = requests.get(f'{URL}/games', headers={'Authorization': f'Bearer {token}'})
     publicas = r.json()
     return publicas
 
+
 # /game/<id>/
 def unirse_partida(token, id_partida, reino):
+    """
+    Permite a un usuario unirse a una partida existente.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a la que se desea unir.
+    reino : str
+        Nombre del reino del usuario.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar unirse a la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/join?reino={reino}', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def iniciar_partida(token, id_partida):
+    """
+    Inicia una partida existente.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a iniciar.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar iniciar la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/start', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def cancelar_partida(token, id_partida):
+    """
+    Cancela una partida existente en el servidor.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida a cancelar.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar cancelar la partida.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/games/{id_partida}/cancel', headers={'Authorization': f'Bearer {token}'})
     return r.text
 
+
 def get_estado_partida(token, id_partida):
+    """
+    Obtiene el estado actual de una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el estado de la partida (str) y el código de estado HTTP (int).
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/game_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.text
     return estado, r.status_code
 
+
 def get_estado_jugador(token, id_partida):
+    """
+    Obtiene el estado del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con el estado del jugador.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player_state', headers={'Authorization': f'Bearer {token}'})
     estado = r.json()
     return estado
 
+
 # /game/<id>/player
 def ver_zona(token, id_partida, coordenada):
+    """
+    Obtiene la información de una zona específica del mapa de la partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    coordenada : any
+        Coordenada de la zona a consultar.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene el diccionario con la información de la zona y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'zona': coordenada}
-    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
+    r = requests.post(f'{URL}/games/{id_partida}/player/ver_zona', headers={'Authorization': f'Bearer {token}'},
+                      json=diccionario)
     zona = r.json()
     return zona, r.status_code
 
+
 def ver_recursos(token, id_partida):
+    """
+    Obtiene los recursos del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con los recursos del jugador.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_recursos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
 
+
 def ver_mapa(token, id_partida):
+    """
+    Obtiene el mapa de la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str or None
+        Mapa de la partida en formato texto si la solicitud es exitosa, None en caso de error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/ver_mapa', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
@@ -404,7 +985,28 @@ def ver_mapa(token, id_partida):
         console.print("Respuesta recibida: ", r.text, style='error')
         return None
 
+
 def cambiar_turno(token, id_partida):
+    """
+    Cambia el turno del jugador en una partida específica.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    str or None
+        Respuesta del servidor si la operación es exitosa, None en caso de error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.put(f'{URL}/games/{id_partida}/player/cambiar_turno', headers={'Authorization': f'Bearer {token}'})
     if r.status_code == 200:
         return r.text
@@ -413,34 +1015,215 @@ def cambiar_turno(token, id_partida):
         console.print("Respuesta recibida: ", r.text, style='error')
         return None
 
+
 def catalogos(token, id_partida):
+    """
+    Obtiene los catálogos de tropas y edificios disponibles para el jugador en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+
+    Returns
+    -------
+    dict
+        Diccionario con los catálogos de tropas y edificios.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.get(f'{URL}/games/{id_partida}/player/catalogos', headers={'Authorization': f'Bearer {token}'})
     return r.json()
 
+
 def add_tropa(token, id_partida, tropa, cantidad):
+    """
+    Añade una cantidad específica de una tropa al jugador en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    tropa : str
+        Nombre de la tropa a añadir.
+    cantidad : int
+        Cantidad de tropas a añadir.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar añadir la tropa.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'tropa': tropa, 'cantidad': cantidad}
-    r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
+    r = requests.post(f'{URL}/games/{id_partida}/player/add_tropa', headers={'Authorization': f'Bearer {token}'},
+                      json=diccionario)
     return r.text
+
 
 def mover_tropa(token, id_partida, tropa, cantidad, destino):
+    """
+    Mueve una cantidad específica de una tropa a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    tropa : str
+        Nombre de la tropa a mover.
+    cantidad : int
+        Cantidad de tropas a mover.
+    destino : any
+        Coordenada de destino a la que se moverán las tropas.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'tropa': tropa, 'cantidad': cantidad, 'destino': destino}
-    r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_tropa', headers={'Authorization': f'Bearer {token}'},
+                     json=diccionario)
     return r.json(), r.status_code
+
 
 def mover_batallon(token, id_partida, destino):
+    """
+    Mueve un batallón completo a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    destino : any
+        Coordenada de destino a la que se moverá el batallón.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     diccionario = {'destino': destino}
-    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'}, json=diccionario)
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'},
+                     json=diccionario)
     return r.json(), r.status_code
 
+
+def mover_batallon(token, id_partida, destino):
+    """
+    Mueve un batallón completo a una coordenada destino en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    destino : any
+        Coordenada de destino a la que se moverá el batallón.
+
+    Returns
+    -------
+    tuple
+        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
+    """
+    diccionario = {'destino': destino}
+    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'},
+                     json=diccionario)
+    return r.json(), r.status_code
+
+
 def construir_edificio(token, id_partida, edificio):
-    r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
+    """
+    Construye un edificio en la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    edificio : any
+        Información del edificio a construir.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar construir el edificio.
+    """
+    r = requests.post(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
+                      json=edificio)
     return r.text
+
 
 def subir_nivel_edificio(token, id_partida, edificio):
-    r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'}, json=edificio)
+    """
+    Sube el nivel de un edificio en la partida para el jugador autenticado.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    edificio : any
+        Información del edificio a subir de nivel.
+
+    Returns
+    -------
+    str
+        Respuesta del servidor tras intentar subir el nivel del edificio.
+    """
+    r = requests.put(f'{URL}/games/{id_partida}/player/edificio', headers={'Authorization': f'Bearer {token}'},
+                     json=edificio)
     return r.text
 
+
 def combatir(token, id_partida, atacantes_pos, defensores_pos):
+    """
+    Realiza una acción de combate entre atacantes y defensores en una partida.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+    id_partida : str
+        Identificador de la partida.
+    atacantes_pos : any
+        Información sobre los atacantes.
+    defensores_pos : any
+        Información sobre los defensores.
+
+    Returns
+    -------
+    dict
+        Respuesta del servidor en formato JSON con el resultado del combate.
+    """
     diccionario = {
         'atacantes': atacantes_pos,
         'defensores': defensores_pos
@@ -449,23 +1232,51 @@ def combatir(token, id_partida, atacantes_pos, defensores_pos):
                      json=(diccionario))
     return r.json()
 
+
 def subir_partidas():
+    """
+    Sube el archivo de partidas al servidor.
+
+    Returns
+    -------
+    str or None
+        Respuesta del servidor si la actualización fue exitosa, o None si ocurrió un error.
+
+    Raises
+    ------
+    requests.RequestException
+        Si ocurre un error en la solicitud HTTP.
+    """
     r = requests.post(f'{URL}/games/partidas.pkl')
-    if r.status_code==200:
+    if r.status_code == 200:
         return r.text
     else:
         console.print(f"[error]Error al actualizar partidas: [/error]{r.status_code}")
         return None
 
 
-
 def jugar(token):
-    '''
-    bucle principal del juego, ejecutado una vez se inicia sesión
-    '''
+    """
+    Muestra y gestiona el menú principal de juego, permitiendo crear partidas, unirse a partidas existentes o ver el ranking.
+
+    Parámetros
+    ----------
+    token : str
+        Token de autenticación del usuario.
+
+    Returns
+    -------
+    None
+        No retorna ningún valor.
+
+    Raises
+    ------
+    Exception
+        Puede lanzar excepciones si ocurre un error inesperado durante la ejecución de las operaciones del menú.
+    """
     limpiar_pantalla()
     while True:
-        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]} 
+        menu = {"Menu": ["prompt", ["0. Volver", "1. Crear partida", "2. Unirse a partida", "3. Ver ranking"]]}
         crear_tabla(menu, dim=True)
 
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3])
@@ -474,8 +1285,8 @@ def jugar(token):
         if choice == 1:
             limpiar_pantalla()
             while True:
-                op1 = {"Crear partida": ["success",["1. Pública","2. Privada"]]}
-                crear_tabla(op1, dim = True)
+                op1 = {"Crear partida": ["success", ["1. Pública", "2. Privada"]]}
+                crear_tabla(op1, dim=True)
 
                 console.print()
 
@@ -497,8 +1308,9 @@ def jugar(token):
                         break
                 else:
                     invitado = None
-                tipo = {"Tipo de partida":["prompt",["0. Volver", "1. Partida personalizada", "2. Partida predefinida"]]}
-                crear_tabla(tipo, dim = True)
+                tipo = {
+                    "Tipo de partida": ["prompt", ["0. Volver", "1. Partida personalizada", "2. Partida predefinida"]]}
+                crear_tabla(tipo, dim=True)
 
                 console.print()
 
@@ -524,8 +1336,9 @@ def jugar(token):
         elif choice == 2:
             limpiar_pantalla()
             while True:
-                op2 = {"Dónde quiere jugar": ["prompt",["0. volver", "1. Unirse a una nueva partida", "2. Empezar/Continuar una partida a la que ya se ha unido"]]}
-                crear_tabla(op2, dim = True)
+                op2 = {"Dónde quiere jugar": ["prompt", ["0. volver", "1. Unirse a una nueva partida",
+                                                         "2. Empezar/Continuar una partida a la que ya se ha unido"]]}
+                crear_tabla(op2, dim=True)
 
                 console.print()
 
@@ -568,37 +1381,49 @@ def jugar(token):
                                         catalogos_dict = catalogos(token, id_user_partida)
                                     limpiar_pantalla()
 
-                                    op = {"Opciones durante la partida": ["prompt",["0. Exit","1. Ver zona","2. ver mis recursos", "3. Ver mapa", "4. Finalizar mi turno"]]}
-                                    crear_tabla(op, dim = True)
-    
+                                    op = {"Opciones durante la partida": ["prompt", ["0. Exit", "1. Ver zona",
+                                                                                     "2. ver mis recursos",
+                                                                                     "3. Ver mapa",
+                                                                                     "4. Finalizar mi turno"]]}
+                                    crear_tabla(op, dim=True)
+
                                     console.print()
-    
+
                                     choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4])
                                     console.print()
-    
+
                                     if choice == 1:
                                         coordenada = to_tuple()
                                         while True:
                                             zona, estado = ver_zona(token, id_user_partida, coordenada)
                                             if estado == 200:
                                                 if zona[1]:
-                                                    dict = {"Opciones dentro de la zona": ["success", ["0. Volver", "1. Añadir tropa", "2. Mover tropa", "3. Mover batallón", "4. Contruir edificio", "5. Subir de nivel edificio"]]}
-                                                    crear_tabla(dict, dim = True)
-    
+                                                    dict = {"Opciones dentro de la zona": ["success", ["0. Volver",
+                                                                                                       "1. Añadir tropa",
+                                                                                                       "2. Mover tropa",
+                                                                                                       "3. Mover batallón",
+                                                                                                       "4. Contruir edificio",
+                                                                                                       "5. Subir de nivel edificio"]]}
+                                                    crear_tabla(dict, dim=True)
+
                                                     console.print()
-    
+
                                                     console.print(zona[0], style='prompt')
-    
-                                                    choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3, 4, 5])
+
+                                                    choice = param('Eliga una opción: ', int,
+                                                                   valores_validos=[0, 1, 2, 3, 4, 5])
                                                     match choice:
                                                         case 0:
                                                             limpiar_pantalla()
                                                             break
                                                         case 1:
                                                             mostrar_texto(catalogos_dict['tropas']['catalogo'])
-                                                            tropa = param('Introduzca el nombre de la tropa: ', str, valores_validos=catalogos_dict['tropas']['valores_validos'])
+                                                            tropa = param('Introduzca el nombre de la tropa: ', str,
+                                                                          valores_validos=catalogos_dict['tropas'][
+                                                                              'valores_validos'])
                                                             cantidad = param('Introduzca la cantidad: ', int)
-                                                            mostrar_texto(add_tropa(token, id_user_partida, tropa, cantidad))
+                                                            mostrar_texto(
+                                                                add_tropa(token, id_user_partida, tropa, cantidad))
                                                             limpiar_pantalla()
                                                         case 2:
                                                             tropa = param('Introduzca el nombre de la tropa: ', str,
@@ -607,14 +1432,15 @@ def jugar(token):
                                                             cantidad = param('Introduzca la cantidad: ', int)
                                                             destino = to_tuple()
                                                             salida, estado = mover_tropa(token, id_user_partida, tropa,
-                                                                                 cantidad, destino)
-                                                            if isinstance(salida, list):  # No se a podido mover la tropa, saltar opcion de combate
+                                                                                         cantidad, destino)
+                                                            if isinstance(salida,
+                                                                          list):  # No se a podido mover la tropa, saltar opcion de combate
                                                                 mostrar_texto(salida[0])
                                                                 dict = {"Opciones": ["prompt",
-                                                                                   ["0. Abortar",
-                                                                                    "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
+                                                                                     ["0. Abortar",
+                                                                                      "1. Combatir (Se enviarán a todas las tropas de la región)"]]}
 
-                                                                crear_tabla(dict, dim = False)
+                                                                crear_tabla(dict, dim=False)
 
                                                                 console.print()
 
@@ -640,14 +1466,15 @@ def jugar(token):
                                                                 limpiar_pantalla()
                                                                 break
 
-                                                            else: # Error al mover la tropa
+                                                            else:  # Error al mover la tropa
                                                                 mostrar_texto(salida)
                                                                 limpiar_pantalla()
                                                                 continue
 
                                                         case 3:
                                                             destino = to_tuple()
-                                                            salida, estado = mover_batallon(token, id_user_partida, destino)
+                                                            salida, estado = mover_batallon(token, id_user_partida,
+                                                                                            destino)
                                                             if isinstance(salida, list):
                                                                 mostrar_texto(salida[0])
                                                                 dict = {"Opciones": ["prompt",
@@ -680,23 +1507,32 @@ def jugar(token):
                                                                 limpiar_pantalla()
                                                                 break
 
-                                                            else: # Error al mover la tropa
+                                                            else:  # Error al mover la tropa
                                                                 mostrar_texto(salida)
                                                                 limpiar_pantalla()
                                                                 continue
 
                                                         case 4:
                                                             mostrar_texto(catalogos_dict['edificios']['catalogo'])
-                                                            edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
-                                                            mostrar_texto(construir_edificio(token, id_user_partida, edificio))
+                                                            edificio = param('Introduzca el nombre del edificio: ', str,
+                                                                             valores_validos=
+                                                                             catalogos_dict['edificios'][
+                                                                                 'valores_validos'])
+                                                            mostrar_texto(
+                                                                construir_edificio(token, id_user_partida, edificio))
                                                             limpiar_pantalla()
                                                         case 5:
-                                                            edificio = param('Introduzca el nombre del edificio: ', str, valores_validos=catalogos_dict['edificios']['valores_validos'])
-                                                            mostrar_texto(subir_nivel_edificio(token, id_user_partida, edificio))
+                                                            edificio = param('Introduzca el nombre del edificio: ', str,
+                                                                             valores_validos=
+                                                                             catalogos_dict['edificios'][
+                                                                                 'valores_validos'])
+                                                            mostrar_texto(
+                                                                subir_nivel_edificio(token, id_user_partida, edificio))
                                                             limpiar_pantalla()
                                                 else:
                                                     console.print(zona[0], style='prompt')
-                                                    table_volver = Table(show_edge=False, header_style="bold white reverse blue")
+                                                    table_volver = Table(show_edge=False,
+                                                                         header_style="bold white reverse blue")
                                                     table_volver.add_column('MENÚ', justify='center', style='prompt')
                                                     table_volver.add_row('0. Volver', style='dim')
                                                     console.print(table_volver)
@@ -734,7 +1570,8 @@ def jugar(token):
                                     elif choice == 4:
                                         mostrar_texto(cambiar_turno(token, id_user_partida))
                                         subir_partidas()
-                                        param('Presione "Enter" para continuar ...', str, valores_validos=[''], estilo='info')
+                                        param('Presione "Enter" para continuar ...', str, valores_validos=[''],
+                                              estilo='info')
                                         limpiar_pantalla()
                                         continue
                                     else:
@@ -775,14 +1612,13 @@ def jugar(token):
             limpiar_pantalla()
             break
 
+
 # choice2- mostrar perfil del jugador
 def mostrar_perfil(token):
     limpiar_pantalla()
     while True:
-        perfil = {"Menú": ["prompt",["0. Volver", "1. Buzón", "2. Amigos"]]}
-        crear_tabla(perfil, dim = True)
-
-
+        perfil = {"Menú": ["prompt", ["0. Volver", "1. Buzón", "2. Amigos"]]}
+        crear_tabla(perfil, dim=True)
 
         console.print()
 
@@ -795,9 +1631,6 @@ def mostrar_perfil(token):
                     mostrar_texto(buzon)
                     buzon = {"Menú": ["prompt", ["0. Volver", "1. Marcar como leído todos los mensajes"]]}
                     crear_tabla(buzon, dim=True)
-
-
-
 
                     console.print()
 
@@ -827,9 +1660,10 @@ def mostrar_perfil(token):
                     mostrar_texto(amigos)
                 else:
                     mostrar_texto('Todavía no tienes amigos agregados', estilo='info')
-                amigos = {"Menú": ["prompt",["0. Volver", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad", "3. Invitaciones de partida"]]}
-                crear_tabla(amigos, dim = True)
-
+                amigos = {"Menú": ["prompt",
+                                   ["0. Volver", "1. Solicitudes de amistad", "2. Enviar solicitud de amistad",
+                                    "3. Invitaciones de partida"]]}
+                crear_tabla(amigos, dim=True)
 
                 console.print()
 
@@ -886,9 +1720,6 @@ def mostrar_perfil(token):
                             invitacion = {"Menú": ["prompt", ["1. Aceptar invitación", "2. Rechazar invitación"]]}
                             crear_tabla(invitacion, dim=True)
 
-
-
-
                             console.print()
 
                             choice = param('Eliga una opción: ', int, valores_validos=[1, 2])
@@ -919,11 +1750,10 @@ def mostrar_perfil(token):
             limpiar_pantalla()
             break
 
+
 # MENU PRINCIPAL
 
 def menu():
-
-
     console.print(Align.center(titulo_md), style='bold bright_yellow', )
     console.print()
     console.print(Align.center(parrafo_texto), style='green italic', )
@@ -933,14 +1763,12 @@ def menu():
     param('Presione "Enter" para continuar ...', str,
           valores_validos=[''], estilo='info')
 
-
     limpiar_pantalla()
 
     while True:
         principal = {"Menú": ["prompt", ["0. Exit", "1. Registrarse", "2. Iniciar sesión"]]}
-        crear_tabla(principal, dim = True)
+        crear_tabla(principal, dim=True)
         console.print()
-
 
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2])
 
@@ -977,8 +1805,9 @@ def menu():
                 mostrar_texto(log_in[0])
                 limpiar_pantalla()
         elif choice == 0:
-            console.print('Saliendo...', style = 'info')
+            console.print('Saliendo...', style='info')
             break
+
 
 if __name__ == '__main__':
     menu()
