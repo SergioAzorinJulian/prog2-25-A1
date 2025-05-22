@@ -1135,30 +1135,6 @@ def mover_batallon(token, id_partida, destino):
     return r.json(), r.status_code
 
 
-def mover_batallon(token, id_partida, destino):
-    """
-    Mueve un batallón completo a una coordenada destino en una partida.
-
-    Parámetros
-    ----------
-    token : str
-        Token de autenticación del usuario.
-    id_partida : str
-        Identificador de la partida.
-    destino : any
-        Coordenada de destino a la que se moverá el batallón.
-
-    Returns
-    -------
-    tuple
-        Una tupla que contiene la respuesta del servidor en formato JSON y el código de estado HTTP.
-    """
-    diccionario = {'destino': destino}
-    r = requests.put(f'{URL}/games/{id_partida}/player/mover_batallon', headers={'Authorization': f'Bearer {token}'},
-                     json=diccionario)
-    return r.json(), r.status_code
-
-
 def construir_edificio(token, id_partida, edificio):
     """
     Construye un edificio en la partida para el jugador autenticado.
