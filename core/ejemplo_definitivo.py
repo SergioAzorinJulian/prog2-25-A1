@@ -37,6 +37,13 @@ TERRENOS_JUEGO = Mapa.terrenos_disponibles
 
 #-----------------FUNCIONES-----------------
 def partida_custom():
+    '''
+    metodo para crear una partida con ajustes personalizados
+
+    return:
+        tamaño y tipos de terrenos del mapa
+    '''
+    
     size = param('Introduce el tamaño del mapa (min.3, max.50): ', int, valores_validos=[i for i in range(3, 51)],
                  estilo='input')
 
@@ -68,6 +75,9 @@ def partida_custom():
     return size, terrenos
 
 def mostrar_terrenos_en_tabla():
+    '''
+    metodo para mostrar los tipos de terreno durante la seleccion de partida personalizada
+    '''
     console.print()
     table_terrenos = Table(box=box.ROUNDED, border_style='bold', header_style="bold white reverse blue")
     table_terrenos.add_column('TIPOS DE TERRENOS DISPONIBLES', justify='center', style='info')
@@ -77,6 +87,12 @@ def mostrar_terrenos_en_tabla():
     console.print()
 
 def to_tuple():
+    '''
+    transforma los valores del usuario en una tupla
+
+    return:
+        tupla con los valores
+    '''
     while True:
         try:
             entrada = console.input("[input]Introduce las coordenadas (fila, columna): [/input]")
@@ -100,6 +116,12 @@ def param(
         valores_validos: Union[list, tuple, None] = None,
         estilo: str = 'input'
 ) -> Any:
+    '''
+    metodo para el funcionamiento de las tablas con diferentes opciones y reconocimiento de la opcion elegida por el usuario
+
+    '''
+
+    
     valido = False
     out = None
     while not valido:
@@ -124,6 +146,9 @@ def param(
     return out
 
 def limpiar_pantalla() -> None:
+    '''
+    metodo para limpiar la pantalla
+    '''
     if os.name == 'nt':
         os.system('cls')
     else:
@@ -212,6 +237,9 @@ def crear_tabla(info: dict, dim = True, forma = None) -> None:
     console.print(table)
 
 def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str = 'prompt') -> None:
+    '''
+    muestra los textos con una animación
+    '''
     n = 1
     if isinstance(lista, str):
         lista = [lista]
@@ -230,6 +258,9 @@ def mostrar_texto(lista: list[str] | str, enumerado: bool = False, estilo: str =
             console.print('\n', end='')
 
 def tabla_espera():
+    '''
+    tabla mientras esperas para recargar la pagina
+    '''
     table_espera = Table(show_edge=False, header_style="bold white reverse blue")
     table_espera.add_column('MENÚ', justify='center', style='prompt')
     table_espera.add_row('0. Volver', style='dim')
@@ -429,9 +460,12 @@ def subir_partidas():
 
 
 def jugar(token):
+    '''
+    bucle principal del juego, ejecutado una vez se inicia sesión
+    '''
     limpiar_pantalla()
     while True:
-        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]}
+        menu = {"Menu": ["prompt",["0. Volver","1. Crear partida","2. Unirse a partida", "3. Ver ranking"]]} 
         crear_tabla(menu, dim=True)
 
         choice = param('Eliga una opción: ', int, valores_validos=[0, 1, 2, 3])
